@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SCRobotCityCore.iml" filepath="$PROJECT_DIR$/SCRobotCityCore.iml" />
       <module fileurl="file://$PROJECT_DIR$/SmartRobotCityCore.iml" filepath="$PROJECT_DIR$/SmartRobotCityCore.iml" />
     </modules>
   </component>
