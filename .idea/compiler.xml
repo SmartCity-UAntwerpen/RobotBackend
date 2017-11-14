@@ -6,11 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="RobotBackend" />
         <module name="SCRobotCityCore" />
         <module name="SmartRobotCityCore" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="RobotBackend" target="1.8" />
       <module name="SCCore" target="1.8" />
       <module name="SCRobotCityCore" target="1.8" />
       <module name="SmartRobotCityCore" target="1.8" />
