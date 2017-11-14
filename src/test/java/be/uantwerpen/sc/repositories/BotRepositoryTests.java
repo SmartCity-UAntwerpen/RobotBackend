@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.repositories;
 
-import be.uantwerpen.sc.SmartCityCoreApplication;
+import be.uantwerpen.sc.RobotBackendApplication;
 import be.uantwerpen.sc.configurations.SystemPropertyActiveProfileResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * Created by Niels on 17/03/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SmartCityCoreApplication.class)
+@SpringApplicationConfiguration(classes = RobotBackendApplication.class)
 @ActiveProfiles(profiles = {"dev"}, resolver = SystemPropertyActiveProfileResolver.class)
 public class BotRepositoryTests
 {

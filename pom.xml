@@ -135,7 +135,7 @@
 							<transformers>
 								<transformer
 										implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>be.uantwerpen.sc.SmartCityCoreApplication</mainClass>
+									<mainClass>be.uantwerpen.sc.RobotBackendApplication</mainClass>
 								</transformer>
 							</transformers>
 							<filters>

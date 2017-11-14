@@ -9,16 +9,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @SpringBootApplication(exclude = {EmbeddedServletContainerAutoConfiguration.class})
-public class SmartCityCoreApplication extends SpringBootServletInitializer
+public class RobotBackendApplication extends SpringBootServletInitializer
 {
 	public static void main(String[] args)
 	{
-		SpringApplication.run(SmartCityCoreApplication.class, args);
+		SpringApplication.run(RobotBackendApplication.class, args);
 	}
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder applicationBuilder)
 	{
-		return applicationBuilder.sources(SmartCityCoreApplication.class);
+		return applicationBuilder.sources(RobotBackendApplication.class);
 	}
 }

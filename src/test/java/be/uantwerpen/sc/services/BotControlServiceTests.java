@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.services;
 
-import be.uantwerpen.sc.SmartCityCoreApplication;
+import be.uantwerpen.sc.RobotBackendApplication;
 import be.uantwerpen.sc.configurations.SystemPropertyActiveProfileResolver;
 import be.uantwerpen.sc.models.Bot;
 import be.uantwerpen.sc.models.Link;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-@SpringApplicationConfiguration(classes = SmartCityCoreApplication.class)
+@SpringApplicationConfiguration(classes = RobotBackendApplication.class)
 @ActiveProfiles(profiles = {"dev"}, resolver = SystemPropertyActiveProfileResolver.class)
 public class BotControlServiceTests {
 

@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.SmartCityCoreApplication;
+import be.uantwerpen.sc.RobotBackendApplication;
 import be.uantwerpen.sc.configurations.SystemPropertyActiveProfileResolver;
 import be.uantwerpen.sc.models.Bot;
 import be.uantwerpen.sc.models.Link;
@@ -28,7 +28,7 @@ import com.google.gson.Gson;
  * Created by Niels on 17/03/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SmartCityCoreApplication.class)
+@SpringApplicationConfiguration(classes = RobotBackendApplication.class)
 @ActiveProfiles(profiles = {"dev"}, resolver = SystemPropertyActiveProfileResolver.class)
 public class BotControllerTests {
 
