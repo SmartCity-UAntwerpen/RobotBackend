@@ -31,6 +31,11 @@ public class Job
     private long idVehicle;
 
     /**
+     * Default Constructor
+     * TODO Better
+     */
+    public Job(){}
+    /**
      * Job Description?
      * TODO Description
      * @param jobDescription
