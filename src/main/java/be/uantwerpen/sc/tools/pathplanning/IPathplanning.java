@@ -7,9 +7,8 @@ import be.uantwerpen.sc.tools.Vertex;
 import java.util.List;
 
 /**
- * Created by Niels on 27/04/2016.
+ * Path Planning interface TODO
  */
-
 public interface IPathplanning
 {
     List<Vertex> Calculatepath(int start, int stop, List<Link> links);

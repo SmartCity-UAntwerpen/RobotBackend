@@ -21,8 +21,18 @@ import java.util.TreeMap;
 @Service
 public class DevelopersList
 {
+    /**
+     * DevelopersList
+     * TODO: Where does it come from? Backend?
+     */
     private static String DEVELOPERSLIST = "DevelopersList.xml";
 
+    /**
+     * Return list of supervisors
+     * TODO: What is this?
+     * @return
+     * @throws Exception
+     */
     public List<String> getSupervisorDevelopers() throws Exception
     {
         List<String> supervisors = new ArrayList<String>();
@@ -58,6 +68,12 @@ public class DevelopersList
         return supervisors;
     }
 
+    /**
+     * Get Map of Year with list of Students
+     * TODO: What is this?
+     * @return
+     * @throws Exception
+     */
     public Map<String, List<String>> getStudentDevelopers() throws Exception
     {
         Map<String, List<String>> students = new TreeMap<String, List<String>>();

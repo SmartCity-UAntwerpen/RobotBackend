@@ -9,10 +9,15 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 /**
- * Created by Thomas on 27/02/2016.
+ * Calculates Dijkstra Path for Robot TODO
  */
 public class Dijkstra
 {
+    /**
+     * Computes Dijkstra path based on Source Vertex and list of possible Vertices to visit
+     * @param source Source (start) Vertex
+     * @param vertexes Map Vertices
+     */
     public void computePaths(Vertex source, List<Vertex> vertexes)
     {
         source.setMinDistance(0);
@@ -45,6 +50,12 @@ public class Dijkstra
         }
     }
 
+    /**
+     * Calculates shortest path between given Vertex and list of available Vertices
+     * @param target Start or End point TODO
+     * @param vertexes List of available Vertices
+     * @return
+     */
     public List<Vertex> getShortestPathTo(Vertex target, List<Vertex> vertexes)
     {
         List<Vertex> path = new ArrayList<Vertex>();
