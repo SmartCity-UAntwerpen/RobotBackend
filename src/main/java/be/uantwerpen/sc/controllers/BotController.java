@@ -21,28 +21,38 @@ import java.util.List;
 import org.json.JSONObject;
 
 /**
- * Created by Thomas on 25/02/2016.
+ * Bot Controller
  */
 @RestController
 @RequestMapping("/bot/")
 public class BotController
 {
+    /**
+     * Autowired Botcontrol Service
+     */
     @Autowired
     private BotControlService botControlService;
 
+    /**
+     * Autowired Link Control Service
+     */
     @Autowired
     private LinkControlService linkControlService;
 
+    /**
+     * Autowired Map Control Service
+     */
     @Autowired
     private MapController mapController;
 
-
+    /**
+     * Get All Bots
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET)
     public List<Bot> allBots()
     {
-        List<Bot> robotEntityList = botControlService.getAllBots();
-
-        return robotEntityList;
+        return botControlService.getAllBots();
     }
 
     //NOG AANPASSEN

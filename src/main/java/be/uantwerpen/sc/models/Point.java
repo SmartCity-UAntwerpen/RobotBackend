@@ -3,17 +3,39 @@ package be.uantwerpen.sc.models;
 import javax.persistence.*;
 
 /**
- * Created by Niels on 24/03/2016.
+ * Point
  */
 @Entity
 @Table(name = "points", schema = "", catalog = "\"robotDB\"")
 public class Point
 {
+    /**
+     * Point ID
+     */
     private Long id;
+
+    /**
+     * RF ID?
+     * TODO
+     */
     private String rfid;
+
+    /**
+     * Point Type
+     * TODO: Enum
+     */
     private String type;
+
+    /**
+     * Point lock state
+     * TODO Enum?
+     */
     private int pointLock;
 
+    /**
+     * Get Point ID
+     * @return Point ID
+     */
     @Id
     @Column(name = "idpoint")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,11 +44,19 @@ public class Point
         return id;
     }
 
+    /**
+     * Set Point ID
+     * @param id Point ID
+     */
     public void setId(Long id)
     {
         this.id = id;
     }
 
+    /**
+     * Get Point RFID
+     * @return Point RFID
+     */
     @Basic
     @Column(name = "rfid")
     public String getRfid()
@@ -34,11 +64,19 @@ public class Point
         return rfid;
     }
 
+    /**
+     * Set Point RFID
+     * @param rfid Point RFID
+     */
     public void setRfid(String rfid)
     {
         this.rfid = rfid;
     }
 
+    /**
+     * Get Point Type
+     * @return Point Type
+     */
     @Basic
     @Column(name = "type")
     public String getType()
@@ -46,6 +84,10 @@ public class Point
         return type;
     }
 
+    /**
+     * Set Point Type
+     * @param type Point Type
+     */
     public void setType(String type)
     {
         this.type = type;
@@ -77,6 +119,10 @@ public class Point
         return result;
     }
 
+    /**
+     * Gets Point Lock State
+     * @return Point Lock State
+     */
     @Basic
     @Column(name = "\"lockedby\"")
     public int getPointLock()
@@ -84,6 +130,10 @@ public class Point
         return pointLock;
     }
 
+    /**
+     * Set Point Lock State
+     * @param pointLock Point Lock State
+     */
     public void setPointLock(int pointLock)
     {
         this.pointLock = pointLock;

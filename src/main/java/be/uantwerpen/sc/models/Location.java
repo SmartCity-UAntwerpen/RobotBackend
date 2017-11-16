@@ -1,10 +1,14 @@
 package be.uantwerpen.sc.models;
 
 /**
- * Created by Dries on 17-5-2017.
+ * Location
+ * TODO What dis?
  */
 public class Location {
 
+    /**
+     *
+     */
     private long startID;
     private long stopID;
     private long percentage;

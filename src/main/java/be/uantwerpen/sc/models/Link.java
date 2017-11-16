@@ -3,7 +3,8 @@ package be.uantwerpen.sc.models;
 import javax.persistence.*;
 
 /**
- * Created by Niels on 24/03/2016.
+ * Link Data Class
+ * Similar to point, TODO
  */
 @Entity
 @Table(name = "links", schema = "", catalog = "\"robotDB\"")

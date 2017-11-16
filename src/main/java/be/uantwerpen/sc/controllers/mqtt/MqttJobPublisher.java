@@ -12,28 +12,46 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 
 /**
- * Created by Thomas on 01/06/2016.
+ * MQTT Job publisher
  */
 @Service
 public class MqttJobPublisher
 {
+    /**
+     * MQTT IP, Default value got from config file
+     */
     @Value("${mqtt.ip:localhost}")
     private String mqttIP;
 
+    /**
+     * MQTT Port, Default value got from config file
+     */
     @Value("#{new Integer(${mqtt.port}) ?: 1883}")
     private int mqttPort;
 
+    /**
+     * MQTT Username, Default value got from config file
+     */
     @Value("${mqtt.username:default}")
     private String mqttUsername;
 
+    /**
+     * MQTT PWD, Default value got from config file
+     */
     @Value("${mqtt.password:default}")
     private String mqttPassword;
 
-    public boolean publishJob(Job job, long robotID)
+    /**
+     * Publish Job over MQTT
+     * @param job Job to publish
+     * @param botID Target bot ID
+     * @return Success
+     */
+    public boolean publishJob(Job job, long botID)
     {
         String content  = "Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getIdVehicle().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString()+"}";
         int qos         = 2;
-        String topic    = "BOT/" + robotID + "/Job";
+        String topic    = "BOT/" + botID + "/Job";
         String broker   = "tcp://" + mqttIP + ":" + mqttPort;
 
         MemoryPersistence persistence = new MemoryPersistence();

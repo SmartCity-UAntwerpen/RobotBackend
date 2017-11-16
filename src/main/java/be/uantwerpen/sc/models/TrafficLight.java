@@ -3,12 +3,15 @@ package be.uantwerpen.sc.models;
 import javax.persistence.*;
 
 /**
- * Created by Niels on 24/03/2016.
+ * Traffic Light
  */
 @Entity
 @Table(name = "tlights", schema = "", catalog = "\"robotDB\"")
 public class TrafficLight
 {
+    /**
+     * Traffic Light ID
+     */
     private Long id;
     private String direction;
     private int placeLink;

@@ -7,11 +7,14 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Created by Thomas on 25/02/2016.
+ * SystemLoader
  */
 @Configuration
 public class SystemLoader implements ApplicationRunner
 {
+    /**
+     * Auto Wired terminalservice
+     */
     @Autowired
     private TerminalService terminalService;
 
@@ -21,6 +24,10 @@ public class SystemLoader implements ApplicationRunner
         new Thread(new StartupProcess()).start();
     }
 
+    /**
+     * Starts up Terminal after waiting for 200ms
+     * TODO Why wait?
+     */
     private class StartupProcess implements Runnable
     {
         @Override

@@ -7,7 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
- * Created by Thomas on 25/02/2016.
+ * Security Configuration
+ * TODO Check use
  */
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter

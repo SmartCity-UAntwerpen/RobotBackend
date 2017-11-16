@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Dries on 8-6-2017.
+ *
  */
 public class MapNew implements AbstractMap
 {

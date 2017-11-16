@@ -37,7 +37,7 @@ public class PathPlanningService implements IPathplanning
      * TODO Wat is dis
      */
     private List<Link> linkEntityList;
-    
+
     /**
      * Dijkstra Path Finder
      * Todo Why hard coded?

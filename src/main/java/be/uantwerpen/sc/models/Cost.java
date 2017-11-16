@@ -1,7 +1,8 @@
 package be.uantwerpen.sc.models;
 
 /**
- * Created by Dries on 11-5-2017.
+ * Cost Data Class
+ * TODO
  */
 public class Cost {
     private boolean status;

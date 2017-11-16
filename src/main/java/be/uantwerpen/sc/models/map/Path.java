@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Niels on 10/05/2016.
+ * Path Data Class
+ * TODO WHAT DIS
  */
 public class Path {
 

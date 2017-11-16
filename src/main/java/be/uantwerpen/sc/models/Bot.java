@@ -3,7 +3,7 @@ package be.uantwerpen.sc.models;
 import javax.persistence.*;
 
 /**
- * Created by Niels on 24/03/2016.
+ * Bot Data Class
  */
 @Entity
 @Table(name = "robots", schema = "", catalog = "\"robotDB\"")

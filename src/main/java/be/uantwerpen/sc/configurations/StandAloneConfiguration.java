@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 /**
- * Created by Thomas on 28/03/2016.
+ * Stand-Alone configuration
+ * TODO check use
  */
 @Profile("standalone")
 @Configuration

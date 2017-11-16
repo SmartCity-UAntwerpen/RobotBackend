@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 /**
- * Created by Thomas on 25/02/2016.
+ * Development Configuration
+ * TODO check use
  */
 @Profile("dev")
 @Configuration
