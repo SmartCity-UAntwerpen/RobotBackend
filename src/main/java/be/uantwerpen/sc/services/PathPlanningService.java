@@ -14,25 +14,54 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by Thomas on 27/02/2016.
+ * Service for path planning
+ * TODO: Shitty class, remake
  */
 @Service
 public class PathPlanningService implements IPathplanning
 {
+    /**
+     * Autowired link control service
+     */
     @Autowired
     private LinkControlService linkControlService;
 
+    /**
+     * Autowired map control service
+     */
     @Autowired
     private MapControlService mapControlService;
 
+    /**
+     * Link entity List
+     * TODO Wat is dis
+     */
+    private List<Link> linkEntityList;
+    
+    /**
+     * Dijkstra Path Finder
+     * Todo Why hard coded?
+     */
     private Dijkstra dijkstra;
 
+    /**
+     * Creates path planning service
+     * TODO: hard coded dijkstra
+     */
     public PathPlanningService()
     {
         this.dijkstra = new Dijkstra();
     }
 
-    public List<Vertex> CalculatepathNonInterface(int start,int stop){
+    /**
+     * Calculates Path
+     * TODO UWOTM8
+     * TODO Como yo mango el gato
+     * @param start
+     * @param stop
+     * @return
+     */
+    public List<Vertex> CalculatePathNonInterface(int start,int stop){
         Map map = mapControlService.buildMap();
         List<Link> linkEntityList = new ArrayList<>();
         List<Vertex> vertexes = new ArrayList<>();
@@ -80,22 +109,32 @@ public class PathPlanningService implements IPathplanning
         //return ("Distance to " + vertexes.get(stop-1) + ": " + vertexes.get(stop-1).minDistance) + ( "Path: " + path);
         return path;
     }
-    private List<Link> linkEntityList;
 
+    /**
+     * Calculates path following Dijkstra
+     * TODO Hardcoded Dijkstra
+     * @param start start int (?)
+     * @param stop stop int (?)
+     * @param links List of Links
+     * @return List of Vertexes following the shortest path
+     */
     @Override
     public List<Vertex> Calculatepath(int start, int stop, List<Link> links) {
 
         List<Vertex> vertexes = mapToVertexes(links);
-
         Vertex v = vertexes.get(start-1);
-
         dijkstra.computePaths(v,vertexes);
-
         List<Vertex> path = dijkstra.getShortestPathTo(vertexes.get(stop-1),vertexes);
-
         return path;
     }
 
+    /**
+     *
+     * @param map
+     * @param start
+     * @param links
+     * @return
+     */
     @Override
     public List<Vertex> nextRandomPath(Map map, int start, List<Link> links) {
         List<Vertex> vertexes = mapToVertexes(links);

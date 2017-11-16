@@ -83,7 +83,7 @@ public class MapController
     @RequestMapping(value = "testpath/{start}/path/{stop}", method = RequestMethod.GET)
     public Path PathPlanning2(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        List<Vertex> path = pathPlanningService.CalculatepathNonInterface(start,stop);
+        List<Vertex> path = pathPlanningService.CalculatePathNonInterface(start,stop);
         return new Path(path);
     }
 

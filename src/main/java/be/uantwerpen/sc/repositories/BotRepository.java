@@ -7,10 +7,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by Niels on 16/03/2016.
+ * Bot Repository
+ * Interface for connecting with database
  */
 @Repository
 public interface BotRepository extends CrudRepository<Bot, Long>
 {
+    /**
+     * Return list of all available Bots
+     * @return List of Bots
+     */
     List<Bot> findAll();
 }

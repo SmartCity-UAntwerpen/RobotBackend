@@ -7,10 +7,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by Thomas on 25/02/2016.
+ * Point Repository
+ * Interface for connecting with database
  */
 @Repository
 public interface PointRepository extends CrudRepository<Point, Long>
 {
+    /**
+     * Returns list of available points TODO Whatapoint?
+     * @return List of Points
+     */
     List<Point> findAll();
 }

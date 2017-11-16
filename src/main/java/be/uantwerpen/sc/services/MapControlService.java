@@ -21,26 +21,52 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Created by Niels on 14/04/2016.
+ * Map Control Service
+ * TODO
  */
 @Service
 public class MapControlService
 {
+    /**
+     * Autowired Point Control Service
+     */
     @Autowired
     private PointControlService pointControlService;
 
+    /**
+     * Autowired Link Control Service
+     */
     @Autowired
     private LinkControlService linkControlService;
 
+    /**
+     * Autowired Bot Control Service
+     */
     @Autowired
     private BotControlService botControlService;
 
+    /**
+     * Autowired TrafficLight Control Service
+     */
     @Autowired
     private TrafficLightControlService trafficLightControlService;
 
+    /**
+     * IP Address
+     * TODO Better position/dynamic/?
+     */
     String coreIp = "143.129.39.151";
+
+    /**
+     * Port
+     * TODO Better position/dynamic/?
+     */
     String corePort = "10000";
 
+    /**
+     * Creates map from DB links
+     * @return Created Map
+     */
     public Map buildMap()
     {
         Map map = new Map();
@@ -62,6 +88,10 @@ public class MapControlService
         return map;
     }
 
+    /**
+     * Creates JSON Map from DB links
+     * @return Created JSON Map
+     */
     public MapJson buildMapJson()
     {
         MapJson mapJson = new MapJson();
@@ -74,6 +104,7 @@ public class MapControlService
 
             List<Neighbour> neighbourList = new ArrayList<Neighbour>();
 
+            //TODO: Can be simplified?
             for(Link link: linkEntityList)
             {
                 if((link.getStartPoint().getId()) == (nodeJson.getPointEntity().getId()))
@@ -91,6 +122,11 @@ public class MapControlService
         return mapJson;
     }
 
+    /**
+     * Creates MapNew based on DB Links and points
+     * TODO: MapNew renaming
+     * @return MapNew
+     */
     public MapNew buildNewMap(){
         MapNew mapNew = new MapNew();
         mapNew.setLinkList(linkControlService.getAllLinks());

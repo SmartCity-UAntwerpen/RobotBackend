@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Timer;
 
 /**
- * Created by Dries on 10-6-2017.
+ * Runnable Timer Service
+ * Checks if bot is alive every day
+ * TODO: Multiple Bots?
+ * TODO: Daily? Too long?
  */
 @Service
 public class TimerService implements Runnable {
 
-    public TimerService(){
-
-    }
 
     @Override
     public void run() {
@@ -50,13 +50,9 @@ public class TimerService implements Runnable {
                 conn.disconnect();
 
             } catch (MalformedURLException e) {
-
                 e.printStackTrace();
-
             } catch (IOException e) {
-
                 e.printStackTrace();
-
             }
         }
     }

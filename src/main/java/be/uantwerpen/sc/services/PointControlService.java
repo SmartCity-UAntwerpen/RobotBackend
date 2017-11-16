@@ -8,29 +8,53 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Created by Niels on 3/04/2016.
+ * Service for Points
+ * TODO: Descriptive
  */
 @Service
 public class PointControlService
 {
+
+    /**
+     * Autowired Point Repository
+     */
     @Autowired
     private PointRepository pointRepository;
 
+    /**
+     * Encapsulator for getting all available points
+     * @return List of Points
+     */
     public List<Point> getAllPoints()
     {
         return pointRepository.findAll();
     }
 
+    /**
+     * Encapsulator for getting Point by ID
+     * @param id ID of point
+     * @return Point of interest
+     */
     public Point getPoint(Long id)
     {
         return pointRepository.findOne(id);
     }
 
+    /**
+     * Saves Point into Database
+     * @param point Point to save
+     * @return Saved Point ( TODO ?)
+     */
     public Point save(Point point)
     {
         return pointRepository.save(point);
     }
 
+    /**
+     * Clears all locks from the points
+     * TODO: Bullshit return
+     * @return Success
+     */
     public boolean clearAllLocks()
     {
         for(Point point : pointRepository.findAll())

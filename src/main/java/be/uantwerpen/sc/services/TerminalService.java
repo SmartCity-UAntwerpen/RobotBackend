@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Thomas on 25/02/2016.
+ * Service for running the Terminal
  */
 @Service
 public class TerminalService
@@ -38,6 +38,9 @@ public class TerminalService
     
     private Terminal terminal;
 
+    /**
+     * Default constructor that binds the Terminal's ExecuteCommand to ParseCommand
+     */
     public TerminalService()
     {
         terminal = new Terminal()
@@ -50,6 +53,9 @@ public class TerminalService
         };
     }
 
+    /**
+     * Starts TimerService and activates Terminal
+     */
     public void systemReady()
     {
         try {
@@ -62,11 +68,22 @@ public class TerminalService
 
         terminal.printTerminal("\nSmartCity Core [Version " + getClass().getPackage().getImplementationVersion() + "]\n(c) 2015-2017 University of Antwerp. All rights reserved.");
         terminal.printTerminal("Type 'help' to display the possible commands.");
-
-
         terminal.activateTerminal();
     }
 
+    /**
+     * Parses Terminal commands
+     * Commands:
+     *      job [botID] [command]
+     *      show [bots]         TODO: Shit command, only Bots? Add Traffic Lights or something
+     *      reset
+     *      delete [botID]
+     *      exit
+     *      help
+     *      ?
+     *      calcweight [start] [stop]
+     * @param commandString
+     */
     private void parseCommand(String commandString)
     {
         String command = commandString.split(" ", 2)[0].toLowerCase();
@@ -175,11 +192,19 @@ public class TerminalService
         }
     }
 
+    /**
+     * Program exits, used as command
+     */
     private void exitSystem()
     {
         System.exit(0);
     }
 
+    /**
+     * Prints help, used as command
+     * TODO: Bullshit function, doesn't use parameter
+     * @param command Command to get help about
+     */
     private void printHelp(String command)
     {
         switch(command)
@@ -198,6 +223,9 @@ public class TerminalService
         }
     }
 
+    /**
+     * Prints information about all available Bots
+     */
     private void printAllBots()
     {
         List<Bot> bots = botControlService.getAllBots();
@@ -226,6 +254,10 @@ public class TerminalService
         }
     }
 
+    /**
+     * Deletes Bot, used as command
+     * @param botID ID of the Bot to delete
+     */
     private void deleteBot(int botID)
     {
         if(botControlService.deleteBot(botID))
@@ -238,6 +270,9 @@ public class TerminalService
         }
     }
 
+    /**
+     * Resets available bots, used as command
+     */
     private void resetBots()
     {
         if(botControlService.resetBots())
@@ -250,18 +285,23 @@ public class TerminalService
         }
     }
 
+    /**
+     * Clears all point locks, used as command
+     */
     private void clearPointLocks()
     {
         if(pointControlService.clearAllLocks())
-        {
             terminal.printTerminalInfo("All points are released.");
-        }
         else
-        {
             terminal.printTerminalError("Could not release all points.");
-        }
     }
 
+    /**
+     * Sends Job to defined bot
+     * TODO: Check comments
+     * @param botId ID of bot
+     * @param command Command to send
+     */
     private void sendJob(Long botId, String command)
     {
         if(botControlService.getBot((long)botId) == null)
@@ -282,6 +322,13 @@ public class TerminalService
         }*/
     }
 
+    /**
+     * Parses Int from String with exception
+     * TODO: Bullshit function
+     * @param value String to parse for int
+     * @return Int found
+     * @throws Exception If string is not an int
+     */
     private int parseInteger(String value) throws Exception
     {
         int parsedInt;
@@ -298,6 +345,13 @@ public class TerminalService
         return parsedInt;
     }
 
+    /**
+     * Parses long from String with exception
+     * TODO: Bullshit function
+     * @param value String to parse for long
+     * @return Long found
+     * @throws Exception If string is not a long
+     */
     private long parseLong(String value) throws Exception
     {
         Long parsedLong;

@@ -7,10 +7,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by Niels on 26/03/2016.
+ * Traffic Light repository
+ * Interface for connecting with database
  */
 @Repository
 public interface TrafficLightRepository extends CrudRepository<TrafficLight, Long>
 {
+    /**
+     * Retrieve list of all available traffic lights
+     * @return List of TrafficLights
+     */
     List<TrafficLight> findAll();
 }
