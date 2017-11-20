@@ -127,6 +127,7 @@ public class MqttLightSubscriber {
         }
         catch(MqttException e)
         {
+            System.out.println(e);
             throw new Exception("Could not subscribe to topics of MQTT service!");
         }
     }

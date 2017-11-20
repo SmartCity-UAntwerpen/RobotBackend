@@ -122,6 +122,10 @@ public class BotController
         return "Something";
     }
 
+    /**
+     * Robot calls this GET 
+     * @return
+     */
     @RequestMapping(value = "newRobot", method = RequestMethod.GET)
     public Long newRobot()
     {
@@ -277,6 +281,11 @@ public class BotController
         return id;
     }
 
+    /**
+     * Gets New Bot ID for running a job? Something something calcweight
+     * TODO: Timeout HTTP
+     * @return Bot ID
+     */
     public int getNewId(){
         String data = "";
         try {

@@ -29,27 +29,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Dries on 11-5-2017.
+ * @author  Dries on 11-5-2017.
+ * @author Reinout
+ *
+ * Cost Controller
+ * TODO uses, working?
  */
 @RestController
 @RequestMapping("/cost/")
 public class CostController {
 
+    /**
+     * Autowired path planning service
+     */
     @Autowired
     private PathPlanningService pathPlanningService;
 
+    /**
+     * Autowired Bot Control Service
+     */
     @Autowired
     private BotControlService botControlService;
 
+    /**
+     * Autowired Point Control Service
+     */
     @Autowired
     private PointControlService pointControlService;
 
+    /**
+     * Autowired Link Control Service
+     */
     @Autowired
     private LinkControlService linkControlService;
 
+    /**
+     * Core IP
+     * TODO: Why static? Perhaps server
+     */
     String coreIp = "143.129.39.151";
+    /**
+     * Core Port
+     * TODO: Why static?
+     */
     String corePort = "10000";
 
+    /**
+     * HTTP function
+     * Used by TODO
+     * Assumedly calculates best ID of vehicle that has the lowest cost for given values
+     * TODO Test & Check if assumption is true
+     * @param start
+     * @param stop
+     * @return
+     */
     @RequestMapping(value = "calcWeight/{start}/{stop}",method = RequestMethod.GET)
     public String calcWeight(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {

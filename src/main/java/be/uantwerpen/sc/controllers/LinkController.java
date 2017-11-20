@@ -11,15 +11,28 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * Created by Niels on 30/03/2016.
+ * @author  Niels on 30/03/2016.
+ * @author Reinout
+ * HTTP INTERFACE
+ *
+ * Link Controller
+ *
  */
 @RestController
 @RequestMapping("/link/")
 public class LinkController
 {
+    /**
+     * Autowired Link Control Service
+     */
     @Autowired
     private LinkControlService linkControlService;
 
+    /**
+     * Get <- TODO
+     * Get list of all available
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET)
     public List<Link> allBots()
     {

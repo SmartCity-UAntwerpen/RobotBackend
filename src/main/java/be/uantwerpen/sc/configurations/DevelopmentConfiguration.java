@@ -22,7 +22,6 @@ public class DevelopmentConfiguration
     {
         ServletRegistrationBean registrationBean = new ServletRegistrationBean(new WebServlet());
         registrationBean.addUrlMappings("/h2console/*");
-
         return registrationBean;
     }
 }
