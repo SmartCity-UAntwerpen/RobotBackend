@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -52,16 +53,15 @@ public class MapControlService
     private TrafficLightControlService trafficLightControlService;
 
     /**
-     * IP Address
-     * TODO Better position/dynamic/?
+     * BackBone IP (Probably)(TODO)
      */
-    String coreIp = "143.129.39.151";
-
+    @Value("${backbone.ip:default}")
+    String coreIp;
     /**
-     * Port
-     * TODO Better position/dynamic/?
+     * BackBone Port (Probably)(TODO)
      */
-    String corePort = "10000";
+    @Value("${backbone.port:default}")
+    String corePort;
 
     /**
      * Creates map from DB links

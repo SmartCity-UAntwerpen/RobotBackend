@@ -13,23 +13,43 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 
 /**
- * Created by Dries on 10-5-2017.
+ * @author  Dries on 10-5-2017.
+ * @author Reinout
  */
 @Service
 public class MqttLightPublisher
 {
+    /**
+     * MQTT IP
+     */
     @Value("${mqtt.ip:localhost}")
     private String mqttIP;
 
+    /**
+     * MQTT Port
+     */
     @Value("#{new Integer(${mqtt.port}) ?: 1883}")
     private int mqttPort;
 
+    /**
+     * MQTT Username
+     */
     @Value("${mqtt.username:default}")
     private String mqttUsername;
 
+    /**
+     * MQTT Pwd
+     */
     @Value("${mqtt.password:default}")
     private String mqttPassword;
 
+    /**
+     * Fuck decent naming amirite
+     * Publish Trafficlight over MQTT
+     * @param light Trafficlight
+     * @param tlID Traffic Light ID
+     * @return
+     */
     public boolean publishLight(TrafficLight light, long tlID)
     {
         String content  = "Light{id:"+tlID+"/ state:"+light.getState()+"}";

@@ -15,41 +15,75 @@ import javax.annotation.PostConstruct;
 import java.util.Random;
 
 /**
- * Created by Arthur on 9/05/2016.
+ * @author  Arthur on 9/05/2016.
+ * @author Reinout
+ *
+ * TODO what exactly
  */
 @Service
 public class MqttLocationSubscriber
 {
+    /**
+     * Autowired Bot Controller
+     */
     @Autowired
     private BotController botController;
 
+    /**
+     * Autowired Environment
+     * TODO What Dis
+     */
     @Autowired
     private Environment environment;
 
+    /**
+     * MQTT IP
+     */
     @Value("${mqtt.ip:localhost}")
     private String mqttIP;
 
+    /**
+     * MQTT Port
+     * TODO How does it work?
+     */
     @Value("#{new Integer(${mqtt.port}) ?: 1883}")
     private int mqttPort;
 
+    /**
+     * MQTT Username
+     */
     @Value("${mqtt.username:default}")
     private String mqttUsername;
 
+    /**
+     * MQTT Password
+     */
     @Value("${mqtt.password:default}")
     private String mqttPassword;
 
+    /**
+     * MQTT Disabled
+     */
     @Value("${mqtt.disabled:false}")
     private boolean mqttDisable;
 
-    private String brokerURL;
 
+    /**
+     * MQTT Client
+     */
     private MqttClient mqttSubscribeClient;
 
+    /**
+     * Empty Constructor
+     */
     public MqttLocationSubscriber()
     {
-
     }
 
+
+    /**
+     * Postconstruct TODO what dis
+     */
     @PostConstruct
     private void postConstruct()
     {
@@ -65,7 +99,7 @@ public class MqttLocationSubscriber
         }
 
         //IP / port-values are initialised at the end of the constructor
-        brokerURL = "tcp://" + mqttIP + ":" + mqttPort;
+        String brokerURL = "tcp://" + mqttIP + ":" + mqttPort;
 
         Terminal.printTerminalInfo("Connecting to MQTT service");
 
@@ -113,11 +147,19 @@ public class MqttLocationSubscriber
         }
     }
 
+    /**
+     * TODO
+     * NEW PHONE WHO DIS
+     */
     public void updateLocation()
     {
 
     }
 
+    /**
+     * Start MQTT Subscribe Client
+     * @throws Exception
+     */
     private void start() throws Exception
     {
         try

@@ -7,7 +7,9 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
- * Created by Arthur on 9/05/2016.
+ * @author  Arthur on 9/05/2016.
+ * @author Reinout
+ * TODO what exactly
  */
 public class MqttLocationSubscriberCallback implements MqttCallback
 {
@@ -18,12 +20,22 @@ public class MqttLocationSubscriberCallback implements MqttCallback
         this.botController = botController;
     }
 
+    /**
+     * TODO Reconnect
+     * @param cause
+     */
     @Override
     public void connectionLost(Throwable cause)
     {
         //This is called when the connection is lost. We could reconnect here.
     }
 
+    /**
+     * Message arrived containing bot location (probably)
+     * @param topic Topic containing Bot ID
+     * @param mqttMessage Message
+     * @throws Exception
+     */
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception
     {
@@ -62,6 +74,10 @@ public class MqttLocationSubscriberCallback implements MqttCallback
         }
     }
 
+    /**
+     * TODO what
+     * @param iMqttDeliveryToken
+     */
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken)
     {

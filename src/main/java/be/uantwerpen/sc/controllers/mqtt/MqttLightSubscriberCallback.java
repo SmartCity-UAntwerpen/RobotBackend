@@ -8,23 +8,43 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.mockito.internal.matchers.Null;
 
 /**
- * Created by Dries on 10-5-2017.
+ * @author  Dries on 10-5-2017.
+ * @author Reinout
  */
 public class MqttLightSubscriberCallback implements MqttCallback
 {
+    /**
+     * TrafficLight Controller
+     * TODO Why not autowired?
+     */
     TrafficLightController trafficLightController;
 
+    /**
+     * Constructor
+     * TODO why not autowired?
+     * @param trafficLightController
+     */
     public MqttLightSubscriberCallback(TrafficLightController trafficLightController)
     {
         this.trafficLightController = trafficLightController;
     }
 
+    /**
+     * TODO
+     * @param cause
+     */
     @Override
     public void connectionLost(Throwable cause)
     {
         //This is called when the connection is lost. We could reconnect here.
     }
 
+    /**
+     * Message arrived: Heartbeat
+     * @param topic
+     * @param mqttMessage
+     * @throws Exception
+     */
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception
     {
@@ -51,6 +71,10 @@ public class MqttLightSubscriberCallback implements MqttCallback
         trafficLightController.updateState(Integer.parseInt(id), state);
     }
 
+    /**
+     * TODO
+     * @param iMqttDeliveryToken
+     */
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken)
     {

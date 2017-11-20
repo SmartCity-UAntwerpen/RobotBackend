@@ -14,97 +14,124 @@ import javax.annotation.PostConstruct;
 import java.util.Random;
 
 /**
- * Created by Dries on 10-5-2017.
+ * @author Dries on 10-5-2017.
+ * @author Reinout
+ * TODO: Check egality with Location Subscriber
  */
 @Service
 public class MqttLightSubscriber {
-        @Autowired
-        private TrafficLightController trafficLightController;
 
-        @Autowired
-        private Environment environment;
 
-        @Value("${mqtt.ip:localhost}")
-        private String mqttIP;
+    /**
+     * Autowired Traffic Light Controller
+     */
+    @Autowired
+    private TrafficLightController trafficLightController;
 
-        @Value("#{new Integer(${mqtt.port}) ?: 1883}")
-        private int mqttPort;
+    /**
+     * Autowired Environment
+     * TODO What Dis
+     */
+    @Autowired
+    private Environment environment;
 
-        @Value("${mqtt.username:default}")
-        private String mqttUsername;
+    /**
+     * MQTT IP
+     */
+    @Value("${mqtt.ip:localhost}")
+    private String mqttIP;
 
-        @Value("${mqtt.password:default}")
-        private String mqttPassword;
+    /**
+     * MQTT Port
+     */
+    @Value("#{new Integer(${mqtt.port}) ?: 1883}")
+    private int mqttPort;
 
-        @Value("${mqtt.disabled:false}")
-        private boolean mqttDisable;
+    /**
+     * MQTT Username
+     */
+    @Value("${mqtt.username:default}")
+    private String mqttUsername;
 
-        private String brokerURL;
+    /**
+     * MQTT Subscriber
+     */
+    @Value("${mqtt.password:default}")
+    private String mqttPassword;
 
-        private MqttClient mqttSubscribeClient;
+    /**
+     * MQTT Disabled Status
+     */
+    @Value("${mqtt.disabled:false}")
+    private boolean mqttDisable;
 
-        @PostConstruct
-        private void postConstruct()
+    /**
+     * MQTT Client
+     */
+    private MqttClient mqttSubscribeClient;
+
+    @PostConstruct
+    private void postConstruct()
+    {
+        //Check to disable MQTT service
+        for(String profile : environment.getActiveProfiles())
         {
-            //Check to disable MQTT service
+            if(profile.equals("dev") && mqttDisable)
+            {
+                //Disable MQTT
+                Terminal.printTerminalInfo("MQTT will not be available! System will not be operational.");
+                return;
+            }
+        }
+
+        //IP / port-values are initialised at the end of the constructor
+        String brokerURL = "tcp://" + mqttIP + ":" + mqttPort;
+
+        Terminal.printTerminalInfo("Connecting to MQTT service");
+
+        try
+        {
+            //Generate unique client ID
+            mqttSubscribeClient = new MqttClient(brokerURL, "SmartCity Core Subscriber_" + new Random().nextLong());
+        }
+        catch(MqttException e)
+        {
+            Terminal.printTerminalError("Could not connect to MQTT Broker!");
+            e.printStackTrace();
+
+            Terminal.printTerminalError("System will exit!");
+            System.exit(1);
+        }
+
+        try
+        {
+            start();
+        }
+        catch(Exception e)
+        {
+            Terminal.printTerminalError(e.getMessage());
+            e.printStackTrace();
+
+            boolean devMode = false;
             for(String profile : environment.getActiveProfiles())
             {
-                if(profile.equals("dev") && mqttDisable)
+                if(profile.equals("dev"))
                 {
-                    //Disable MQTT
-                    Terminal.printTerminalInfo("MQTT will not be available! System will not be operational.");
-                    return;
+                    devMode = true;
                 }
             }
 
-            //IP / port-values are initialised at the end of the constructor
-            brokerURL = "tcp://" + mqttIP + ":" + mqttPort;
-
-            Terminal.printTerminalInfo("Connecting to MQTT service");
-
-            try
+            if(devMode)
             {
-                //Generate unique client ID
-                mqttSubscribeClient = new MqttClient(brokerURL, "SmartCity Core Subscriber_" + new Random().nextLong());
+                Terminal.printTerminalInfo("MQTT is not available! System will not be operational.");
             }
-            catch(MqttException e)
+            else
             {
-                Terminal.printTerminalError("Could not connect to MQTT Broker!");
-                e.printStackTrace();
-
                 Terminal.printTerminalError("System will exit!");
                 System.exit(1);
             }
-
-            try
-            {
-                start();
-            }
-            catch(Exception e)
-            {
-                Terminal.printTerminalError(e.getMessage());
-                e.printStackTrace();
-
-                boolean devMode = false;
-                for(String profile : environment.getActiveProfiles())
-                {
-                    if(profile.equals("dev"))
-                    {
-                        devMode = true;
-                    }
-                }
-
-                if(devMode)
-                {
-                    Terminal.printTerminalInfo("MQTT is not available! System will not be operational.");
-                }
-                else
-                {
-                    Terminal.printTerminalError("System will exit!");
-                    System.exit(1);
-                }
-            }
         }
+    }
 
     public void updateLocation()
     {

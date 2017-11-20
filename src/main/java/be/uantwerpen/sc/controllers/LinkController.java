@@ -40,6 +40,12 @@ public class LinkController
         return linkEntityList;
     }
 
+    /**
+     * Get <- WHO
+     * Request Link Lock
+     * @param id ID of link to lock
+     * @return Success
+     */
     @RequestMapping(value = "requestlock/{id}", method = RequestMethod.GET)
     public boolean requestLinkLock(@PathVariable("id") Long id)
     {
@@ -47,12 +53,10 @@ public class LinkController
         {
             Link link = linkControlService.getLink(id);
 
-            if(link == null)
+            if(link == null) //Link not found
             {
-                //Point not found
                 return false;
             }
-
             switch(link.getLocked())
             {
                 case 1: //Point already locked
@@ -62,14 +66,17 @@ public class LinkController
                     link.setTrafficWeight(link.getTrafficWeight()+10);
                     linkControlService.save(link);
                     return true;
-                default:
-                    break;
             }
         }
 
         return false;
     }
 
+    /**
+     * Unlock link
+     * @param id ID of link to lock
+     * @return Success
+     */
     @RequestMapping(value = "Unlock/{id}", method = RequestMethod.GET)
     public boolean LinkUnLock(@PathVariable("id") Long id)
     {
@@ -77,9 +84,8 @@ public class LinkController
         {
             Link link = linkControlService.getLink(id);
 
-            if(link == null)
+            if(link == null)//Link not found
             {
-                //Point not found
                 return false;
             }
 
@@ -92,11 +98,8 @@ public class LinkController
                     return true;
                 case 0: //Point not locked -> attempt lock
                     return false;
-                default:
-                    break;
             }
         }
-
         return false;
     }
 }

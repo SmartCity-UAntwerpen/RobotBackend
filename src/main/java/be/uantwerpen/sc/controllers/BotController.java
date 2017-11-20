@@ -55,9 +55,16 @@ public class BotController
         return botControlService.getAllBots();
     }
 
-    //NOG AANPASSEN
-    String coreIp = "143.129.39.151";
-    String corePort = "10000";
+    /**
+     * BackBone IP (Probably)(TODO)
+     */
+    @Value("${backbone.ip:default}")
+    String coreIp;
+    /**
+     * BackBone Port (Probably)(TODO)
+     */
+    @Value("${backbone.port:default}")
+    String corePort;
 
     @RequestMapping(value = "{id}",method = RequestMethod.GET)
     public Bot getBot(@PathVariable("id") Long id)
@@ -123,7 +130,7 @@ public class BotController
     }
 
     /**
-     * Robot calls this GET 
+     * Robot calls this GET
      * @return
      */
     @RequestMapping(value = "newRobot", method = RequestMethod.GET)
@@ -263,6 +270,12 @@ public class BotController
         }
     }
 
+    /**
+     * 1st Function at Bot Boot
+     * Creates Bot, initiates entry for database, and returns its ID
+     * @param modus Type: Independent, partial or full server
+     * @return
+     */
     @RequestMapping(value = "initiate/{modus}", method = RequestMethod.GET)
     public long initiate(@PathVariable("modus") String modus){
         Bot bot = new Bot();

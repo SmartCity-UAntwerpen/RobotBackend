@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -64,15 +65,15 @@ public class CostController {
     private LinkControlService linkControlService;
 
     /**
-     * Core IP
-     * TODO: Why static? Perhaps server
+     * BackBone IP (Probably)(TODO)
      */
-    String coreIp = "143.129.39.151";
+    @Value("${backbone.ip:default}")
+    String coreIp;
     /**
-     * Core Port
-     * TODO: Why static?
+     * BackBone Port (Probably)(TODO)
      */
-    String corePort = "10000";
+    @Value("${backbone.port:default}")
+    String corePort;
 
     /**
      * HTTP function
