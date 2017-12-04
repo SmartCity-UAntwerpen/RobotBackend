@@ -43,26 +43,21 @@ public class PointControlService
     /**
      * Saves Point into Database
      * @param point Point to save
-     * @return Saved Point ( TODO ?)
      */
-    public Point save(Point point)
+    public void save(Point point)
     {
-        return pointRepository.save(point);
+         pointRepository.save(point);
     }
 
     /**
      * Clears all locks from the points
-     * TODO: Bullshit return
-     * @return Success
      */
-    public boolean clearAllLocks()
+    public void clearAllLocks()
     {
         for(Point point : pointRepository.findAll())
         {
             point.setPointLock(0);
             this.save(point);
         }
-
-        return true;
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
  * Mainly Data class, no function
  * TODO: Usage, comments
  */
-public class Vertex implements Comparable<Vertex>
+public class Vertex
 {
     /**
      * Vertex ID
@@ -116,17 +116,6 @@ public class Vertex implements Comparable<Vertex>
      */
     public void setPrevious(Vertex previous) {
         this.previous = previous;
-    }
-
-    /**
-     * Compares 2 Vertices
-     * TODO: Unimplemented
-     * @param o Vertex to compare
-     * @return
-     */
-    @Override
-    public int compareTo(Vertex o) {
-        return 0;
     }
 
     /**

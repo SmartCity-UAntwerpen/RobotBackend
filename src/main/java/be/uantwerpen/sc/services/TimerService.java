@@ -3,6 +3,7 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.sc.controllers.BotController;
 import be.uantwerpen.sc.models.Bot;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -24,21 +25,31 @@ import java.util.Timer;
  */
 @Service
 public class TimerService implements Runnable {
+    /**
+     * Autowired Bot Controller
+     */
+    @Autowired
+    private BotController botController;
 
-
+    /**
+     * Own Port
+     */
+    @Value("${server.port:default}")
+    String port;
     @Override
     public void run() {
 
         while (true) {
             long startTime = System.currentTimeMillis();
             long elapsedTime = 0L;
-            while (elapsedTime < 24*60*60*1000) {
+            //Wait 1 minute
+            while (elapsedTime < 10*1000) {
                 elapsedTime = (new Date()).getTime() - startTime;
             }
-
-            String data = "";
+            botController.checkTimer();
+/*
             try {
-                URL url = new URL("http://143.129.39.151:8083/bot/checkTimer");
+                URL url = new URL("http://localhost:"+port+"/bot/checkTimer");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Accept", "application/json");
@@ -54,6 +65,7 @@ public class TimerService implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            */
         }
     }
 }

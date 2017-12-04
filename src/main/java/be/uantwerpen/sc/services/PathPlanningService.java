@@ -33,8 +33,7 @@ public class PathPlanningService implements IPathplanning
     private MapControlService mapControlService;
 
     /**
-     * Link entity List
-     * TODO Wat is dis
+     * List of Link entities
      */
     private List<Link> linkEntityList;
 
@@ -55,8 +54,7 @@ public class PathPlanningService implements IPathplanning
 
     /**
      * Calculates Path
-     * TODO UWOTM8
-     * TODO Como yo mango el gato
+     * TODO Not Sure
      * @param start
      * @param stop
      * @return
@@ -156,6 +154,11 @@ public class PathPlanningService implements IPathplanning
         return vertexList;
     }
 
+    /**
+     * TODO Json?
+     * @param links
+     * @return
+     */
     private List<Vertex> mapToVertexes(List<Link> links){
         MapJson mapJsonServer = mapControlService.buildMapJson();
         List<Vertex> vertexes = new ArrayList<>();

@@ -114,8 +114,7 @@ public class TrafficLightController
         trafficLight.setPlaceLink(progress);
         trafficLight.setDirection(direction);
         trafficLight.setState(state);
-        trafficLightControlService.updateTL(trafficLight);
-
+        trafficLightControlService.saveTl(trafficLight);
         return id;
     }
 

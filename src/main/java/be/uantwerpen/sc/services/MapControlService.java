@@ -43,17 +43,6 @@ public class MapControlService
     private TrafficLightControlService trafficLightControlService;
 
     /**
-     * BackBone IP (Probably)(TODO)
-     */
-    @Value("${backbone.ip:default}")
-    String coreIp;
-    /**
-     * BackBone Port (Probably)(TODO)
-     */
-    @Value("${backbone.port:default}")
-    String corePort;
-
-    /**
      * Creates map from DB links
      * @return Created Map
      */

@@ -31,27 +31,18 @@ public class Job
     private long idVehicle;
 
     /**
-     * Default Constructor
-     * TODO Better
-     */
-    public Job(){}
-    /**
      * Job Description?
-     * TODO Description
-     * @param jobDescription
      */
-    public Job(String jobDescription)
+    public Job()
     {
         this.jobId = 0L;
     }
 
     /**
      * Create Job with defined ID
-     * TODO Description
      * @param jobId
-     * @param jobDescription
      */
-    public Job(Long jobId, String jobDescription)
+    public Job(Long jobId)
     {
         this.jobId = jobId;
     }

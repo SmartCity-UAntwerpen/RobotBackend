@@ -50,16 +50,6 @@ public class TrafficLightControlService
     }
 
     /**
-     * Update given trafficlight information into database
-     * @param trafficlightEntity TrafficLight to update
-     */
-    public void updateTL(TrafficLight trafficlightEntity){
-        TrafficLight dbTL = trafficLightRepository.findOne(trafficlightEntity.getId());
-        dbTL = trafficlightEntity;
-        trafficLightRepository.save(dbTL);
-    }
-
-    /**
      * Save given trafficlight into database
       * @param tl TrafficLight to save
      */

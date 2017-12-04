@@ -60,15 +60,15 @@ public class MapController
     private LinkControlService linkControlService;
 
     /**
-     * BackBone IP (Probably)(TODO)
+     * BackBone IP
      */
     @Value("${backbone.ip:default}")
-    String coreIp;
+    String backboneIp;
     /**
-     * BackBone Port (Probably)(TODO)
+     * BackBone Port
      */
     @Value("${backbone.port:default}")
-    String corePort;
+    String backbonePort;
 
     /**
      * Get Map
@@ -195,7 +195,7 @@ public class MapController
         String data =  "";
         try {
 
-            URL url = new URL("http://"+coreIp+":"+corePort+"/map/stringmapjson/robot");
+            URL url = new URL("http://"+backboneIp+":"+backbonePort+"/map/stringmapjson/robot");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -209,10 +209,8 @@ public class MapController
                     (conn.getInputStream())));
 
             String output;
-            System.out.println("Output from Server .... \n");
             while ((output = br.readLine()) != null) {
                 data = data + output;
-                System.out.println(output);
             }
 
             conn.disconnect();
@@ -240,7 +238,6 @@ public class MapController
                 p.setId(new Long(point.getInt("id")));
                 p.setRfid(point.getString("rfid"));
                 p.setPointLock(point.getInt("pointLock"));
-                System.out.println(p.toString());
                 points.add(p);
                 pointControlService.save(p);
             }
@@ -255,7 +252,6 @@ public class MapController
                 l.setStartDirection(link.getString("startDirection"));
                 l.setStopDirection(link.getString("stopDirection"));
                 l.setWeight(link.getInt("weight"));
-                System.out.println(l.toString());
                 links.add(l);
                 linkControlService.save(l);
             }

@@ -29,15 +29,15 @@ public class BotControlService
     /**
      * Encapsulator to save Bot to DB
      * @param bot Bot to save
-     * @return Bot TODO Useful?
      */
-    public Bot saveBot(Bot bot)
+    public void saveBot(Bot bot)
     {
-        return botRepository.save(bot);
+        botRepository.save(bot);
     }
 
     /**
      * Encapsulator to get Bot by ID
+     * TODO: Remove, id is unneccesary
      * @param id ID of Bot to get
      * @return Bot
      */
@@ -48,19 +48,18 @@ public class BotControlService
 
     /**
      * Gets Bot with core ID
+     * TODO: fix repository findall to work with coreid
      * @param idCore Core ID of bot to find
      * @return Bot
      */
     public Bot getBotWithCoreId(Long idCore){
         List<Bot> bots = botRepository.findAll();
-        long finalId = 0;
-        for (Bot b:bots){
-            long idcore = b.getIdCore();
-            if(idcore==idCore){
-                finalId = b.getId();
+        for (Bot bot:bots){
+            if(bot.getIdCore().equals(idCore)){
+                return bot;
             }
         }
-        return botRepository.findOne(finalId);
+        return null;
     }
 
     /**
@@ -73,16 +72,6 @@ public class BotControlService
     }
 
     /**
-     * Updates specified bot info into DB
-     * TODO why comment there?
-     * @param bot Bot to update
-     */
-    public void updateBot(Bot bot)
-    {
-        botRepository.save(bot);
-    }
-
-    /**
      * Deletes Bot with specified ID
      * @param rid ID of bot to remove
      * @return Success
@@ -90,20 +79,13 @@ public class BotControlService
     public boolean deleteBot(long bid)
     {
         if(this.getBot(bid) == null)
-        {
             return false;
-        }
-        else
-        {
-            botRepository.delete(bid);
-            return true;
-        }
+        botRepository.delete(bid);
+        return true;
     }
 
     /**
      * Deletes all available bots
-     * TODO Not the same as an actual reset, rename?
-     * TODO Pointless return
      * @return
      */
     public void deleteBots()

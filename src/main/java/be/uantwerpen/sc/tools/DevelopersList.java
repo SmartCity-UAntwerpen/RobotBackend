@@ -23,7 +23,7 @@ public class DevelopersList
 {
     /**
      * DevelopersList
-     * TODO: Where does it come from? Backend?
+     * Found on backend
      */
     private static String DEVELOPERSLIST = "DevelopersList.xml";
 

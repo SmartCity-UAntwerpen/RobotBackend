@@ -43,10 +43,9 @@ public class LinkControlService
     /**
      * Encapsulator for saving a link
      * @param link link to save
-     * @return link TODO useful?
      */
-    public Link save(Link link)
+    public void save(Link link)
     {
-        return linkRepository.save(link);
+        linkRepository.save(link);
     }
 }

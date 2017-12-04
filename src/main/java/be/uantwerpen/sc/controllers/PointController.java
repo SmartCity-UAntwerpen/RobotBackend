@@ -101,7 +101,6 @@ public class PointController
     /**
      *
      * Locks / unlocks point
-     * Used e.g. when Bot boots: But bot unlocks every point: Why? Todo
      * TODO Why used?
      * @param id
      * @param value

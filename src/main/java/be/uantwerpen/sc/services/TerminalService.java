@@ -35,7 +35,9 @@ public class TerminalService
 
     @Autowired
     private JobController jobController;
-    
+    @Autowired
+    private TimerService timerService;
+
     private Terminal terminal;
 
     /**
@@ -59,14 +61,13 @@ public class TerminalService
     public void systemReady()
     {
         try {
-            TimerService t = new TimerService();
-            new Thread(t).start();
+            new Thread(timerService).start();
             System.out.println("Timer started");
         }catch(Exception e){
             System.out.println("Timer not started");
         }
 
-        terminal.printTerminal("\nSmartCity Core [Version " + getClass().getPackage().getImplementationVersion() + "]\n(c) 2015-2017 University of Antwerp. All rights reserved.");
+        terminal.printTerminal("\nSmartCity Backend [Version " + getClass().getPackage().getImplementationVersion() + "]\n(c) 2015-2017 University of Antwerp. All rights reserved.");
         terminal.printTerminal("Type 'help' to display the possible commands.");
         terminal.activateTerminal();
     }
@@ -282,10 +283,8 @@ public class TerminalService
      */
     private void clearPointLocks()
     {
-        if(pointControlService.clearAllLocks())
-            terminal.printTerminalInfo("All points are released.");
-        else
-            terminal.printTerminalError("Could not release all points.");
+        pointControlService.clearAllLocks();
+        terminal.printTerminalInfo("All points are released.");
     }
 
     /**

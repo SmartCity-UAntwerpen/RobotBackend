@@ -56,15 +56,15 @@ public class BotController
     }
 
     /**
-     * BackBone IP (Probably)(TODO)
+     * BackBone IP
      */
     @Value("${backbone.ip:default}")
-    String coreIp;
+    String backboneIP;
     /**
-     * BackBone Port (Probably)(TODO)
+     * BackBone Port
      */
     @Value("${backbone.port:default}")
-    String corePort;
+    String backbonePort;
 
     @RequestMapping(value = "{id}",method = RequestMethod.GET)
     public Bot getBot(@PathVariable("id") Long id)
@@ -81,7 +81,7 @@ public class BotController
     @RequestMapping(value = "{id}",method = RequestMethod.PUT)
     public void updateBot(@PathVariable("id") Long id, @RequestBody Bot bot)
     {
-        botControlService.updateBot(bot);
+        botControlService.saveBot(bot);
     }
 
     @RequestMapping(value = "updateBotTest/{id}",method = RequestMethod.GET)
@@ -90,7 +90,7 @@ public class BotController
         Bot botEntity = new Bot();
         botEntity.setId(id);
         botEntity.setState("Updated");
-        botControlService.updateBot(botEntity);
+        botControlService.saveBot(botEntity);
     }
 
     @RequestMapping(value = "test",method = RequestMethod.GET)
@@ -139,7 +139,7 @@ public class BotController
         Bot bot = new Bot();
         System.out.println(bot);
         //Save bot in database and get bot new rid
-        bot = botControlService.saveBot(bot);
+        botControlService.saveBot(bot);
 
         Date date = new Date();
         System.out.println("New robot created!! - " + date.toString());
@@ -160,7 +160,7 @@ public class BotController
             if(link != null)
             {
                 bot.setLinkId(link);
-                botControlService.updateBot(bot);
+                botControlService.saveBot(bot);
                 System.out.println(bot.getIdCore());
             }
             else
@@ -194,7 +194,7 @@ public class BotController
         botControlService.deleteBot(b.getId());
 
         try {
-            String u = "http://"+coreIp+":"+corePort+"/bot/delete/"+rid;
+            String u = "http://"+backboneIP+":"+backbonePort+"/bot/delete/"+rid;
             URL url = new URL(u);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -259,6 +259,7 @@ public class BotController
 
     @RequestMapping(value = "checkTimer", method = RequestMethod.GET)
     public void checkTimer(){
+        System.out.println("Checking Alive Bots");
         mapController.updateMap();
         List<Bot> bots = botControlService.getAllBots();
         for(Bot b : bots){
@@ -292,9 +293,7 @@ public class BotController
         bot.setBusy(0);
         bot.setAlive(true);
         //id ook doorgeven naar robot zelf
-        System.out.println(bot.getId());
         botControlService.saveBot(bot);
-        System.out.println(bot.getId());
         return bot.getIdCore();
     }
 
@@ -306,7 +305,7 @@ public class BotController
     public int getNewId(){
         String data = "";
         try {
-            URL url = new URL("http://"+coreIp+":"+corePort+"//bot/newBot/robot");
+            URL url = new URL("http://"+backboneIP+":"+backbonePort+"//bot/newBot/robot");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
