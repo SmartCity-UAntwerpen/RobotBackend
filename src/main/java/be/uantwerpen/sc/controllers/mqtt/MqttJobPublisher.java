@@ -50,6 +50,7 @@ public class MqttJobPublisher
     public boolean publishJob(Job job, long botID)
     {
         String content  = "Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getIdVehicle().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString()+"}";
+        System.out.println(content);
         int qos         = 2;
         String topic    = "BOT/" + botID + "/Job";
         String broker   = "tcp://" + mqttIP + ":" + mqttPort;

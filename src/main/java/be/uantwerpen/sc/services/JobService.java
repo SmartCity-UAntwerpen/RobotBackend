@@ -21,8 +21,8 @@ public class JobService
      * Send job over MQTT
      * @param botId ID of bot for job
      * @param jobId ID of job for bot
-     * @param idStart ID start TODO ?
-     * @param idStop ID stop TODO ?
+     * @param idStart ID start Point
+     * @param idStop ID stop Point
      * @return Success
      */
     public boolean sendJob(Long botId, Long jobId, long idStart, long idStop)

@@ -137,14 +137,14 @@ public class BotController
     public Long newRobot()
     {
         Bot bot = new Bot();
-
+        System.out.println(bot);
         //Save bot in database and get bot new rid
         bot = botControlService.saveBot(bot);
 
         Date date = new Date();
         System.out.println("New robot created!! - " + date.toString());
 
-        return bot.getId();
+        return bot.getIdCore();
     }
 
     @RequestMapping(value = "{id}/lid/{lid}", method = RequestMethod.GET)
@@ -161,6 +161,7 @@ public class BotController
             {
                 bot.setLinkId(link);
                 botControlService.updateBot(bot);
+                System.out.println(bot.getIdCore());
             }
             else
             {
@@ -189,6 +190,7 @@ public class BotController
     public void deleteBot(@PathVariable("rid") Long rid)
     {
         Bot b = botControlService.getBotWithCoreId(rid);
+        System.out.println(b.getId());
         botControlService.deleteBot(b.getId());
 
         try {
@@ -217,10 +219,10 @@ public class BotController
         System.out.println("Bot with id: " + rid + " deleted from DB");
     }
 
-    @RequestMapping(value = "/resetbots}",method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteBots}",method = RequestMethod.GET)
     public void resetBots()
     {
-        botControlService.resetBots();
+        botControlService.deleteBots();
     }
 
     @RequestMapping(value = "posAll", method = RequestMethod.GET)
@@ -238,7 +240,7 @@ public class BotController
             }else if(b.getBusy()==0){
                 loc.setStartID(b.getLinkId().getStartPoint().getId());
                 loc.setStopID(b.getLinkId().getStartPoint().getId());
-                loc.setPercentage((long) 100);
+                loc.setPercentage( (long)100);
             }
 
             //opslaan in json file
@@ -290,8 +292,10 @@ public class BotController
         bot.setBusy(0);
         bot.setAlive(true);
         //id ook doorgeven naar robot zelf
+        System.out.println(bot.getId());
         botControlService.saveBot(bot);
-        return id;
+        System.out.println(bot.getId());
+        return bot.getIdCore();
     }
 
     /**
@@ -333,6 +337,7 @@ public class BotController
             e.printStackTrace();
 
         }
+        System.out.println(data);
         return Integer.parseInt(data);
     }
 

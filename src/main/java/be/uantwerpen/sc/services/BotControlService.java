@@ -28,7 +28,6 @@ public class BotControlService
 
     /**
      * Encapsulator to save Bot to DB
-     * TODO useful?
      * @param bot Bot to save
      * @return Bot TODO Useful?
      */
@@ -49,7 +48,6 @@ public class BotControlService
 
     /**
      * Gets Bot with core ID
-     * TODO: What the fuck is a core ID
      * @param idCore Core ID of bot to find
      * @return Bot
      */
@@ -81,10 +79,7 @@ public class BotControlService
      */
     public void updateBot(Bot bot)
     {
-        Bot dbBot = botRepository.findOne(bot.getId());
-        dbBot = bot;
-        //dbBot.setLinkId(bot.getLinkId());
-        botRepository.save(dbBot);
+        botRepository.save(bot);
     }
 
     /**
@@ -96,7 +91,6 @@ public class BotControlService
     {
         if(this.getBot(bid) == null)
         {
-            //Could not find bot with rid
             return false;
         }
         else
@@ -112,9 +106,8 @@ public class BotControlService
      * TODO Pointless return
      * @return
      */
-    public boolean resetBots()
+    public void deleteBots()
     {
         botRepository.deleteAll();
-        return true;
     }
 }

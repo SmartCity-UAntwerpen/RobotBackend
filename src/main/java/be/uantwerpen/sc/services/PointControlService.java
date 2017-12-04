@@ -1,8 +1,8 @@
 package be.uantwerpen.sc.services;
 
+import be.uantwerpen.sc.models.Point;
 import be.uantwerpen.sc.repositories.PointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import be.uantwerpen.sc.models.Point;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

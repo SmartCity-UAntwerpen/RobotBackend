@@ -74,7 +74,7 @@ public class TerminalService
     /**
      * Parses Terminal commands
      * Commands:
-     *      job [botID] [command]
+     *      job [botID] [command] //TODO Kanker
      *      show [bots]         TODO: Shit command, only Bots? Add Traffic Lights or something
      *      reset
      *      delete [botID]
@@ -130,7 +130,7 @@ public class TerminalService
                 }
                 break;
             case "reset":
-                this.resetBots();
+                this.deleteBots();
                 this.clearPointLocks();
                 break;
             case "delete":
@@ -140,11 +140,9 @@ public class TerminalService
                 }
                 else
                 {
-                    int parsedInt;
-
                     try
                     {
-                        parsedInt = this.parseInteger(commandString.split(" ", 2)[1]);
+                        int parsedInt = this.parseInteger(commandString.split(" ", 2)[1]);
 
                         this.deleteBot(parsedInt);
                     }
@@ -170,7 +168,7 @@ public class TerminalService
                 {
                     int parsedInt;
 
-                    try
+                    try//TODO
                     {
                         parsedInt = this.parseInteger(commandString.split(" ", 3)[1]);
                         //JSONArray a = costController.calcWeight(parsedInt, this.parseInteger(commandString.split(" ", 3)[2]));
@@ -273,16 +271,10 @@ public class TerminalService
     /**
      * Resets available bots, used as command
      */
-    private void resetBots()
+    private void deleteBots()
     {
-        if(botControlService.resetBots())
-        {
-            terminal.printTerminalInfo("All bot entries cleared from database.");
-        }
-        else
-        {
-            terminal.printTerminalError("Could not clear all robots from the database.");
-        }
+        botControlService.deleteBots();
+        terminal.printTerminalInfo("All bot entries cleared from database.");
     }
 
     /**

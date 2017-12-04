@@ -59,14 +59,12 @@ public class JobController
 
     /**
      * Maas IP
-     * TODO: Dees is fout, waarschijnlijk moet hier de backbone IP komen
      */
     @Value("${maas.ip:default}")
     private String maasIp;
 
     /**
      * Maas Port
-     * TODO: Dees is fout, waarschijnlijk moet hier de backbone Port komen
      */
     @Value("${maas.port:default}")
     private String maasPort;
@@ -78,16 +76,18 @@ public class JobController
      * @param robotUri URI of the robot
      * @param job Job to be sent
      */
+    //TODO: Does nothing?
+    /*
     public void sendJob(String robotUri, String job)
     {
         RestTemplate restTemplate = new RestTemplate();
         String result = restTemplate.postForObject(robotUri, job, String.class);
         System.out.println(result);
     }
+    */
 
     /**
      * HTTP RECEIVE ->
-     * TODO: Who uses this?
      * @param idJob
      * @param idVehicle
      * @param idstart
@@ -99,7 +99,7 @@ public class JobController
     {
         Bot b;
         try {
-            b = botControlService.getBotWithCoreId((long) idVehicle);
+            b = botControlService.getBot((long) idVehicle);
         }catch(Exception e){
             return "HTTP status : 404";
         }
@@ -141,7 +141,7 @@ public class JobController
 
     /**
      * HTTP GET -> MAAS
-     * TODO Not sure what does
+     * Notifies that job is completed
      * @param id
      */
     public void completeJob(long id){
