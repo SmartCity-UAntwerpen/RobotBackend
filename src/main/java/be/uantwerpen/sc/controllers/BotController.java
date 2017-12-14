@@ -1,9 +1,11 @@
 package be.uantwerpen.sc.controllers;
 
+import be.uantwerpen.sc.controllers.mqtt.MqttKeepaliveSubscriber;
 import be.uantwerpen.sc.models.*;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.LinkControlService;
 import be.uantwerpen.sc.services.TimerService;
+import org.apache.http.client.utils.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import org.json.JSONObject;
@@ -89,7 +92,7 @@ public class BotController
     {
         Bot botEntity = new Bot();
         botEntity.setId(id);
-        botEntity.setState("Updated");
+        botEntity.setWorkingMode("Updated");
         botControlService.saveBot(botEntity);
     }
 
@@ -103,10 +106,11 @@ public class BotController
     public void saveBotTest()
     {
         Bot bot = new Bot();
-        bot.setState("test");
+        bot.setWorkingMode("test");
         botControlService.saveBot(bot);
     }
 
+    //TODO
     @RequestMapping(value = "goto/{id}/{rid}",method = RequestMethod.GET)
     public String goTo(@PathVariable("id") Long id, @PathVariable("rid") Long rid)
     {
@@ -126,7 +130,7 @@ public class BotController
             System.out.println("Robot does not exist");
         }
 
-        return "Something";
+        return "Something";//todo
     }
 
     /**
@@ -263,12 +267,19 @@ public class BotController
         mapController.updateMap();
         List<Bot> bots = botControlService.getAllBots();
         for(Bot b : bots){
-            if(b.getAlive()==false){
-                deleteBot(b.getIdCore());
-
-            }else{
-                b.setAlive(false);
-                botControlService.saveBot(b);
+            System.out.println(b.getId());
+            System.out.println(b.getLastUpdated());
+            System.out.println(new Timestamp(new Date().getTime()+2*60*1000));
+            if(b.getStatus()!=BotState.Unknown.ordinal()){
+                if(b.getLastUpdated().getTime()>new Timestamp(new Date().getTime()+2*60*1000).getTime()) {
+                    b.setStatus(BotState.Unknown.ordinal());
+                    botControlService.saveBot(b);
+                }
+            }
+            else {
+                if ( b.getLastUpdated().getTime() > new Timestamp(new Date().getTime() + 6 * 60 * 1000).getTime()) {
+                   botControlService.deleteBot(b.getId());
+                }
             }
         }
     }
@@ -284,14 +295,14 @@ public class BotController
         Bot bot = new Bot();
         long id = (long) getNewId();
         bot.setIdCore(id);
-        bot.setState(modus);  //werkingsmodus
+        bot.setWorkingMode(modus);
         bot.setJobId((long) 0);
         bot.setLinkId(linkControlService.getLink((long) 1));
         bot.setPercentageCompleted(100);
         bot.setIdStart((long) 1);
         bot.setIdStop((long) 1);
         bot.setBusy(0);
-        bot.setAlive(true);
+        bot.setStatus(BotState.Alive.ordinal());
         //id ook doorgeven naar robot zelf
         botControlService.saveBot(bot);
         return bot.getIdCore();
@@ -328,24 +339,13 @@ public class BotController
             conn.disconnect();
 
         } catch (MalformedURLException e) {
-
             e.printStackTrace();
-
         } catch (IOException e) {
 
             e.printStackTrace();
-
         }
         System.out.println(data);
         return Integer.parseInt(data);
     }
 
-    //-------- TESTING --------
-    @RequestMapping(value = "alive/{id}", method = RequestMethod.GET)
-    public void alive(@PathVariable("id") long id){
-        Bot b = botControlService.getBot(id);
-        b.setAlive(true);
-        botControlService.saveBot(b);
-        System.out.println("Bot geeft tegen van leven");
-    }
 }

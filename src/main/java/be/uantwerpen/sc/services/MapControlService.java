@@ -68,35 +68,29 @@ public class MapControlService
     }
 
     /**
-     * Creates JSON Map from DB links
+     * Gets all links and points from the database
+     * Connects all links to their specific nodes and sets them as neighbors
+     * Adds all these nodes to the map
+     * Map creates both real (Correct RFID) as simulated (letter of the alphabet) maps
      * @return Created JSON Map
      */
     public MapJson buildMapJson()
     {
         MapJson mapJson = new MapJson();
-
         List<Link> linkEntityList = linkControlService.getAllLinks();
-
-        for(Point point : pointControlService.getAllPoints())
+        List<Point> points=pointControlService.getAllPoints();
+        for(Point point : points)
         {
             NodeJson nodeJson = new NodeJson(point);
+            List<Neighbour> neighbourList = new ArrayList<>();
 
-            List<Neighbour> neighbourList = new ArrayList<Neighbour>();
-
-            //TODO: Can be simplified?
             for(Link link: linkEntityList)
-            {
                 if((link.getStartPoint().getId()) == (nodeJson.getPointEntity().getId()))
-                {
                     neighbourList.add(new Neighbour(link));
-                }
-            }
 
             nodeJson.setNeighbours(neighbourList);
             mapJson.addNodeJson(nodeJson);
         }
-
-        mapJson.setSize(mapJson.getNodeJsons().size());
 
         return mapJson;
     }

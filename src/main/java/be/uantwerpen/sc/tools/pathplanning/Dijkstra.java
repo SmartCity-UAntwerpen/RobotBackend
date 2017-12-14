@@ -3,25 +3,23 @@ package be.uantwerpen.sc.tools.pathplanning;
 import be.uantwerpen.sc.tools.Edge;
 import be.uantwerpen.sc.tools.Vertex;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
- * Calculates Dijkstra Path for Robot TODO
+ * Calculates Dijkstra Path for Robot
  */
 public class Dijkstra
 {
     /**
      * Computes Dijkstra path based on Source Vertex and list of possible Vertices to visit
-     * @param source Source (start) Vertex
+     * @param sourceID Source ID of Vertex
      * @param vertexes Map Vertices
      */
-    public void computePaths(Vertex source, List<Vertex> vertexes)
+    public void computePaths(int sourceId, List<Vertex> vertexes)
     {
+        Vertex source=getVertexByID(vertexes, sourceId);
         source.setMinDistance(0);
-        PriorityQueue<Vertex> vertexQueue = new PriorityQueue<Vertex>();
+        Queue<Vertex> vertexQueue = new LinkedList<>();
         vertexQueue.add(source);
         List<Vertex> vertexList = new ArrayList<>();
         while (!vertexQueue.isEmpty()) {
@@ -52,31 +50,35 @@ public class Dijkstra
 
     /**
      * Calculates shortest path between given Vertex and list of available Vertices
-     * @param target Start or End point TODO
+     * Better alternative to arraylist possible?
+     * @param targetId End ID of Vertex
      * @param vertexes List of available Vertices
      * @return
      */
-    public List<Vertex> getShortestPathTo(Vertex target, List<Vertex> vertexes)
+    public List<Vertex> getShortestPathTo(int targetId, List<Vertex> vertexes)
     {
+        Vertex target=getVertexByID(vertexes, targetId);
         List<Vertex> path = new ArrayList<Vertex>();
-       /* int i;
-        for (Vertex vertex = target; vertex != null;  i = vertex.getPrevious())
+        for (Vertex vertex = target; vertex != null;  vertex = vertex.getPrevious())
             path.add(vertex);
-        int i;
+
+        /*
         Vertex vertex = target;
         path.add(vertex);
         i = vertex.getPrevious();
-        vertex= vertexes.get(i);*/
+        vertex= vertexes.get(i);
 
 
         int i = (int)(target.getId() % Integer.MAX_VALUE);
         do {
             for (Vertex v : vertexes){
-                if(v.getId() == i)
-                    path.add(vertexes.get(i-1));
+                if(v.getId() == i) {
+                    path.add(getVertexByID(vertexes,i - 1));
+                    break;
+                }
             }
             try {
-                i = (int)(vertexes.get(i-1).getPrevious().getId() % Integer.MAX_VALUE);
+                i = (int)(getVertexByID(vertexes,i-1).getPrevious().getId() % Integer.MAX_VALUE);
             }catch (Exception e){
                i = 0;
             }
@@ -92,5 +94,13 @@ public class Dijkstra
 
         Collections.reverse(path);
         return path;
+    }
+
+    private Vertex getVertexByID(List<Vertex> list, int target){
+        for(Vertex v : list){
+            if(v.getId()==target)
+                return v;
+        }
+        return null;
     }
 }

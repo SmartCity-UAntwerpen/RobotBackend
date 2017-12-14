@@ -27,11 +27,10 @@ public class JobService
      */
     public boolean sendJob(Long botId, Long jobId, long idStart, long idStop)
     {
-        Job job = new Job();
-        job.setIdEnd(idStop);
+        Job job = new Job(jobId);
         job.setIdStart(idStart);
+        job.setIdEnd(idStop);
         job.setIdVehicle(botId);
-        job.setJobId(jobId);
 
         return mqttJobPublisher.publishJob(job, botId);
     }

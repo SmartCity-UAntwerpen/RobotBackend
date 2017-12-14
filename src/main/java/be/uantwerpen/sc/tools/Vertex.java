@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Vertex class
  * Mainly Data class, no function
- * TODO: Usage, comments
+ * Path between 2 Nodes
  */
 public class Vertex
 {
@@ -24,12 +24,12 @@ public class Vertex
     private List<Edge> adjacencies = new ArrayList<>();
 
     /**
-     * Minimum distance between TODO
+     * Minimum distance between
      */
     private double minDistance = Double.POSITIVE_INFINITY;
 
     /**
-     * Previous Vertex TODO
+     * Previous (visited) Vertex
      */
     private Vertex previous;
 
@@ -87,7 +87,7 @@ public class Vertex
     }
 
     /**
-     * Get min distance between TODO
+     * Get min distance between
      * @return Min Distance
      */
     public double getMinDistance() {
@@ -95,7 +95,7 @@ public class Vertex
     }
 
     /**
-     * Set min distance between TODO
+     * Set min distance between start point
      * @param minDistance Min Distance
      */
     public void setMinDistance(double minDistance) {
@@ -103,7 +103,7 @@ public class Vertex
     }
 
     /**
-     * Get previous Vertex TODO
+     * Get previous Vertex
      * @return Previous Vertex
      */
     public Vertex getPrevious() {
@@ -111,7 +111,7 @@ public class Vertex
     }
 
     /**
-     * Set Previous Vertex TODO
+     * Set Previous Vertex
      * @param previous Previous Vertex
      */
     public void setPrevious(Vertex previous) {
@@ -126,4 +126,5 @@ public class Vertex
     public String toString() {
         return "Vertex{" + "id=" + id + '}';
     }
+
 }

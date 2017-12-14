@@ -73,7 +73,6 @@ public class MapController
     /**
      * Get Map
      * Updates and returns map
-     * GET <- TODO WHO
      * @return Map
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -86,7 +85,7 @@ public class MapController
     /**
      * Get Map as JSON
      * Doesnt update and returns map
-     * GET <- TODO WHO
+     * TODO: Why?
      * @return MapJson
      */
     @RequestMapping(value = "json", method = RequestMethod.GET)
@@ -100,22 +99,19 @@ public class MapController
     /**
      * Get New Map
      * Updates and returns New map
-     * GET <- TODO WHO
      * TODO WHY NEW MAP
      * WHATS THE DIFFERENCE
      * FOR THE LOVE OF GOD
      * @return Map
      */
-    @RequestMapping(value = "getMap", method = RequestMethod.GET)
+    @RequestMapping(value = "getmap", method = RequestMethod.GET)
     public MapNew getNewMap()
     {
         updateMap();
-        MapNew mapNew = mapControlService.buildNewMap();
-        return mapNew;
+        return mapControlService.buildNewMap();
     }
 
     /**
-     * GET <- TODO WHO
      * Calculates path with given start and stop ID
      * @param start Start Vertex ID TODO probably
      * @param stop Stop Vertex ID TODO Probably
@@ -131,7 +127,6 @@ public class MapController
     }
 
     /**
-     * GET <- TODO WHO
      * Calculates Test path with given start and stop ID
      * TODO OH WHAT YOU DO TO ME
      * NO ONE KNOWS
@@ -187,8 +182,8 @@ public class MapController
     }
 
     /**
-     * Update map from BackBone (Probably)
-     *
+     * Update map from BackBone
+     *TODO: Future Work: Databases moeten bottom->up uitgelezen worden met steeds minder details. Momenteel wordt hij bottom->down gekopieerd
      */
     public void updateMap()
     {
@@ -212,7 +207,7 @@ public class MapController
             while ((output = br.readLine()) != null) {
                 data = data + output;
             }
-
+            System.out.println(output);
             conn.disconnect();
 
         } catch (MalformedURLException e) {

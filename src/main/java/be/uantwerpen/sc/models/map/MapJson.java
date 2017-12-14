@@ -11,7 +11,6 @@ import java.util.List;
 public class MapJson implements AbstractMap
 {
     private List<NodeJson> nodeJsons;
-    private int size;
 
     public MapJson() {
         this.nodeJsons = new ArrayList<>();
@@ -29,19 +28,12 @@ public class MapJson implements AbstractMap
         this.nodeJsons = nodeJsons;
     }
 
-    public int getSize() {
-        return size;
-    }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
 
     @Override
     public String toString() {
         return "MapJson{" +
                 "nodeJsons=" + nodeJsons +
-                ", size=" + size +
                 '}';
     }
 }

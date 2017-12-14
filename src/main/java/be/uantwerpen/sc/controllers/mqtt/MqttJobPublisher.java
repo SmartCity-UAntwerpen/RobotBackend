@@ -49,6 +49,7 @@ public class MqttJobPublisher
      */
     public boolean publishJob(Job job, long botID)
     {
+        System.out.println("Publishing Job");
         String content  = "Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getIdVehicle().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString()+"}";
         System.out.println(content);
         int qos         = 2;
@@ -66,11 +67,9 @@ public class MqttJobPublisher
             connectOptions.setUserName(mqttUsername);
             connectOptions.setPassword(mqttPassword.toCharArray());
             client.connect(connectOptions);
-
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
             client.publish(topic, message);
-
             client.disconnect();
         }
         catch(MqttException e)

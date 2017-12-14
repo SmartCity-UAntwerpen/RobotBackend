@@ -65,19 +65,19 @@ public class CostController {
     private LinkControlService linkControlService;
 
     /**
-     * BackBone IP (Probably)(TODO)
+     * BackBone IP
      */
     @Value("${backbone.ip:default}")
-    String coreIp;
+    String backboneIP;
     /**
-     * BackBone Port (Probably)(TODO)
+     * BackBone Port
      */
     @Value("${backbone.port:default}")
-    String corePort;
+    String backbonePort;
 
     /**
      * HTTP function
-     * Used by TODO
+     * Used by MAAS
      * Assumedly calculates best ID of vehicle that has the lowest cost for given values
      * TODO Test & Check if assumption is true
      * @param start

@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Node of Map
+ * Crossing
  */
 public class Node {
 
@@ -44,7 +45,6 @@ public class Node {
 
     /**
      * Sets Node ID
-     * TODO: Useful?
      * @param nodeId new ID of node
      */
     public void setNodeId(Long nodeId) {

@@ -98,11 +98,10 @@ public class PathPlanningService implements IPathplanning
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
 
-        Vertex v = vertexes.get(start-1);
 
-        dijkstra.computePaths(v,vertexes); // run Dijkstra
+        dijkstra.computePaths(start,vertexes); // run Dijkstra
         //System.out.println("Distance to " + vertexes.get(stop-1) + ": " + vertexes.get(stop-1).getMinDistance());
-        List<Vertex> path = dijkstra.getShortestPathTo(vertexes.get(stop-1),vertexes);
+        List<Vertex> path = dijkstra.getShortestPathTo(stop,vertexes);
         //System.out.println("Path: " + path);
         //return ("Distance to " + vertexes.get(stop-1) + ": " + vertexes.get(stop-1).minDistance) + ( "Path: " + path);
         return path;
@@ -118,11 +117,10 @@ public class PathPlanningService implements IPathplanning
      */
     @Override
     public List<Vertex> Calculatepath(int start, int stop, List<Link> links) {
-
         List<Vertex> vertexes = mapToVertexes(links);
-        Vertex v = vertexes.get(start-1);
-        dijkstra.computePaths(v,vertexes);
-        List<Vertex> path = dijkstra.getShortestPathTo(vertexes.get(stop-1),vertexes);
+
+        dijkstra.computePaths(start,vertexes);
+        List<Vertex> path = dijkstra.getShortestPathTo(stop,vertexes);
         return path;
     }
 
@@ -155,32 +153,37 @@ public class PathPlanningService implements IPathplanning
     }
 
     /**
-     * TODO Json?
+     * What the fuck, optimise this shit.
+     * Quadruple nested for?
+     * Really?
      * @param links
      * @return
      */
     private List<Vertex> mapToVertexes(List<Link> links){
         MapJson mapJsonServer = mapControlService.buildMapJson();
         List<Vertex> vertexes = new ArrayList<>();
-        for (NodeJson nj : mapJsonServer.getNodeJsons()){
+
+        for (NodeJson nj : mapJsonServer.getNodeJsons())
             vertexes.add(new Vertex(nj));
-        }
 
         ArrayList<Edge> edges;
         List<ArrayList<Edge>> edgeslistinlist = new ArrayList<>();
         Link realLink = new Link();
         int i = 0;
-        for (NodeJson nj : mapJsonServer.getNodeJsons()){
+        for (NodeJson node : mapJsonServer.getNodeJsons()){//TODO: double getNodeJsons, single request
             edges = new ArrayList<>();
-            for (Neighbour neighbour : nj.getNeighbours()){
+            for (Neighbour neighbour : node.getNeighbours()){
                 for (Vertex v : vertexes){
                     if(v.getId() == neighbour.getPointEntity().getId()){
+
+                        //Check of 2 edges een van de links bevat
                         for(Link linkEntity: links){
-                            if(linkEntity.getStopPoint().getId() == v.getId() && linkEntity.getStartPoint().getId() == nj.getPointEntity().getId()){
+                            if(linkEntity.getStopPoint().getId() == v.getId() && linkEntity.getStartPoint().getId() == node.getPointEntity().getId()){
                                 //System.out.println(linkEntity.toString() +" " + linkEntity);
                                 realLink = linkEntity;
                             }
                         }
+
                         //edges.add(new Edge(v.getId(),neighbour.getWeight(),linkControlService.getLink(neighbour.getPointEntity().getPid())));
                         edges.add(new Edge(v.getId(),neighbour.getWeight(),realLink));
                     }
@@ -190,7 +193,7 @@ public class PathPlanningService implements IPathplanning
             i++;
         }
 
-        for (int j = 0; j < vertexes.size();j++){
+        for (int j = 0; j < vertexes.size();j++){//Todo: zet dit in de quatro 4 loop
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
 

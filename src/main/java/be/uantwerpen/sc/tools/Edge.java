@@ -50,7 +50,7 @@ public class Edge
     }
 
     /**
-     * Return Target TODO
+     * Return Target
      * @return Edge Target
      */
     public Long getTarget()
@@ -68,7 +68,7 @@ public class Edge
     }
 
     /**
-     * Return Weight TODO
+     * Return Weight
      * @return Edge Weight
      */
     public int getWeight()
@@ -86,7 +86,7 @@ public class Edge
     }
 
     /**
-     * Return Edge Link TODO
+     * Return Edge Link
      * @return Edge Link
      */
     public Link getLinkEntity()

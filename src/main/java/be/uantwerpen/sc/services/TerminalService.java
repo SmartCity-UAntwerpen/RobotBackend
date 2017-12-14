@@ -104,7 +104,7 @@ public class TerminalService
                     {
                         parsedInt = this.parseInteger(commandString.split(" ", 3)[1]);
 
-                        this.sendJob((long)parsedInt, commandString.split(" ", 3)[2]);
+                      //TODO  this.sendJob((long)parsedInt, commandString.split(" ", 3)[2]);
 
                     }
                     catch(Exception e)
@@ -248,7 +248,7 @@ public class TerminalService
                     linkId = link.getId();
                 }
 
-                terminal.printTerminal("\t" + bot.getId() + "\t\t" + linkId + "\t\t\t" + bot.getState());
+                terminal.printTerminal("\t" + bot.getId() + "\t\t" + linkId + "\t\t\t" + bot.getStatus());
             }
         }
     }
@@ -293,9 +293,9 @@ public class TerminalService
      * @param botId ID of bot
      * @param command Command to send
      */
-    private void sendJob(Long botId, String command)
+    private void sendJob(Long botId,Long jobID, long start, long stop)
     {
-        if(botControlService.getBot((long)botId) == null)
+        if(botControlService.getBotWithCoreId((long)botId) == null)
         {
             //Could not find bot in database
             terminal.printTerminalError("Could not find bot with id: " + botId + "!");

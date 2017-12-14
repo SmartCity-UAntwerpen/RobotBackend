@@ -2,6 +2,7 @@ package be.uantwerpen.sc.controllers.mqtt;
 
 import be.uantwerpen.sc.controllers.BotController;
 import be.uantwerpen.sc.models.Bot;
+import be.uantwerpen.sc.models.BotState;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -66,7 +67,7 @@ public class MqttLocationSubscriberCallback implements MqttCallback
             int Progress = Integer.parseInt(progress);
             botController.updateLocation((long) Id, (long) VertexId, Progress);
             Bot b = botController.getBot((long) Id);
-            b.setAlive(true);
+            b.setStatus(BotState.Alive.ordinal());
         }
         catch(Exception e)
         {

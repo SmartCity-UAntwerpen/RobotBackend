@@ -77,7 +77,7 @@ public class LinkController
      * @param id ID of link to lock
      * @return Success
      */
-    @RequestMapping(value = "Unlock/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "unlock/{id}", method = RequestMethod.GET)
     public boolean LinkUnLock(@PathVariable("id") Long id)
     {
         synchronized(this)

@@ -1,6 +1,8 @@
 package be.uantwerpen.sc.models;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Bot Data Class
@@ -16,10 +18,13 @@ public class Bot
     private Long jobId;
     private Long travelledDistance;
     private Integer percentageCompleted;
-    private String state;
+    private String workingMode;
     private int busy;
     private Link link;
-    private boolean alive;
+    private int status;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastupdated;
+
 
     @Id
     @Column(name = "\"id\"")
@@ -102,14 +107,14 @@ public class Bot
 
     @Basic
     @Column(name = "\"workingmode\"")
-    public String getState()
+    public String getWorkingMode()
     {
-        return state;
+        return workingMode;
     }
 
-    public void setState(String state)
+    public void setWorkingMode(String state)
     {
-        this.state = state;
+        this.workingMode = state;
     }
 
     @Override
@@ -153,11 +158,25 @@ public class Bot
         this.link = link;
     }
 
-    public boolean getAlive(){
-        return alive;
+    @Basic
+    @Column(name = "\"status\"")
+    public int getStatus(){
+        return status;
     }
 
-    public void setAlive(boolean alive){
-        this.alive = alive;
+    public void setStatus(int status){
+        setLastUpdated(new Timestamp(new Date().getTime()));
+        this.status = status;
     }
+
+
+    @Basic
+    @Column(name = "\"lastupdated\"")
+    public Date getLastUpdated() {
+        return lastupdated;
+    }
+    public void setLastUpdated(Date lastupdated) {
+        this.lastupdated= lastupdated;
+    }
+
 }

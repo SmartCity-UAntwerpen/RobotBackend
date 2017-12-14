@@ -52,9 +52,7 @@ public class PointController
             Point point = pointService.getPoint(id);
 
             if(point == null)//Point not found
-            {
                 return false;
-            }
 
             switch(point.getPointLock())
             {

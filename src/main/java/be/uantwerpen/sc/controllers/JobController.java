@@ -1,6 +1,7 @@
 package be.uantwerpen.sc.controllers;
 
 import be.uantwerpen.sc.models.Bot;
+import be.uantwerpen.sc.models.BotState;
 import be.uantwerpen.sc.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,24 +71,8 @@ public class JobController
     private String maasPort;
 
     /**
-     * HTTP SEND -> Robot
-     * Send job over rest to Robot
-     * TODO: Test
-     * @param robotUri URI of the robot
-     * @param job Job to be sent
-     */
-    //TODO: Does nothing?
-    /*
-    public void sendJob(String robotUri, String job)
-    {
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.postForObject(robotUri, job, String.class);
-        System.out.println(result);
-    }
-    */
-
-    /**
-     * HTTP RECEIVE ->
+     * HTTP RECEIVE from MAAS
+     * Uses COREID
      * @param idJob
      * @param idVehicle
      * @param idstart
@@ -99,7 +84,7 @@ public class JobController
     {
         Bot b;
         try {
-            b = botControlService.getBot((long) idVehicle);
+            b = botControlService.getBotWithCoreId((long) idVehicle);
         }catch(Exception e){
             return "HTTP status : 404";
         }
@@ -121,6 +106,7 @@ public class JobController
         b.setBusy(1);
         b.setIdStart((long) idstart);
         b.setIdStop((long) idstop);
+        b.setStatus(BotState.Busy.ordinal());
         botControlService.saveBot(b);
 
         jobService.sendJob((long) idVehicle,  (long) idJob, (long) idstart, (long) idstop);

@@ -15,8 +15,8 @@ public class Point
     private Long id;
 
     /**
-     * RF ID?
-     * TODO
+     * RFID
+     * RFID of tag on crossroad
      */
     private String rfid;
 

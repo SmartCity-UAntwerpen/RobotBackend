@@ -1,7 +1,8 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
 import be.uantwerpen.sc.controllers.BotController;
-import be.uantwerpen.sc.services.TimerService;
+import be.uantwerpen.sc.controllers.TrafficLightController;
+import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.tools.Terminal;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -15,19 +16,17 @@ import javax.annotation.PostConstruct;
 import java.util.Random;
 
 /**
- * @author  Arthur on 9/05/2016.
  * @author Reinout
- *
- * TODO what exactly
  */
 @Service
-public class MqttLocationSubscriber
-{
+public class MqttKeepaliveSubscriber {
+
+
     /**
-     * Autowired Bot Controller
+     * Autowired Traffic Light Controller
      */
     @Autowired
-    private BotController botController;
+    private BotControlService botControlService;
 
     /**
      * Autowired Environment
@@ -55,34 +54,22 @@ public class MqttLocationSubscriber
     private String mqttUsername;
 
     /**
-     * MQTT Password
+     * MQTT Subscriber
      */
     @Value("${mqtt.password:default}")
     private String mqttPassword;
 
     /**
-     * MQTT Disabled
+     * MQTT Disabled Status
      */
     @Value("${mqtt.disabled:false}")
     private boolean mqttDisable;
-
 
     /**
      * MQTT Client
      */
     private MqttClient mqttSubscribeClient;
 
-    /**
-     * Empty Constructor
-     */
-    public MqttLocationSubscriber()
-    {
-    }
-
-
-    /**
-     * Postconstruct TODO what dis
-     */
     @PostConstruct
     private void postConstruct()
     {
@@ -105,7 +92,7 @@ public class MqttLocationSubscriber
         try
         {
             //Generate unique client ID
-            mqttSubscribeClient = new MqttClient(brokerURL, "SmartCity_Core_Subscriber_" + new Random().nextLong());
+            mqttSubscribeClient = new MqttClient(brokerURL, "SmartCity Core Subscriber_" + new Random().nextLong());
         }
         catch(MqttException e)
         {
@@ -136,7 +123,7 @@ public class MqttLocationSubscriber
 
             if(devMode)
             {
-                Terminal.printTerminalInfo("MQTT will not be available! System will not be operational.");
+                Terminal.printTerminalInfo("MQTT is not available! System will not be operational.");
             }
             else
             {
@@ -146,36 +133,23 @@ public class MqttLocationSubscriber
         }
     }
 
-    /**
-     * TODO
-     * NEW PHONE WHO DIS
-     */
-    public void updateLocation()
-    {
-
-    }
-
-    /**
-     * Start MQTT Subscribe Client
-     * @throws Exception
-     */
     private void start() throws Exception
     {
         try
         {
-            mqttSubscribeClient.setCallback(new MqttLocationSubscriberCallback(botController));
+            mqttSubscribeClient.setCallback(new MqttBotSubscriberCallback(botControlService));
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             connOpts.setUserName(mqttUsername);
             connOpts.setPassword(mqttPassword.toCharArray());
             mqttSubscribeClient.connect(connOpts);
-
-            //Subscribe to all subtopics of bots
-            mqttSubscribeClient.subscribe("BOT/#");
+            mqttSubscribeClient.subscribe("BOT/alive/#");
         }
         catch(MqttException e)
         {
-            throw new Exception("Could not subscribe to topics of MQTT service!");
+            System.out.println(e);
+            throw new Exception("Could not subscribe to Keepalive topic of MQTT service!");
         }
     }
 }
+

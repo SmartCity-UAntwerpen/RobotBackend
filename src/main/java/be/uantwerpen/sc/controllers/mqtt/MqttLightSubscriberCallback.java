@@ -5,7 +5,6 @@ import be.uantwerpen.sc.controllers.TrafficLightController;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.mockito.internal.matchers.Null;
 
 /**
  * @author  Dries on 10-5-2017.
