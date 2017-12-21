@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import org.json.JSONObject;
@@ -264,21 +265,22 @@ public class BotController
     @RequestMapping(value = "checkTimer", method = RequestMethod.GET)
     public void checkTimer(){
         System.out.println("Checking Alive Bots");
-        mapController.updateMap();
+        //mapController.updateMap();
         List<Bot> bots = botControlService.getAllBots();
         for(Bot b : bots){
+            long currentDate=new Date().getTime();
             System.out.println(b.getId());
             System.out.println(b.getLastUpdated());
-            System.out.println(new Timestamp(new Date().getTime()+2*60*1000));
+            System.out.println(currentDate-b.getLastUpdated().getTime());
             if(b.getStatus()!=BotState.Unknown.ordinal()){
-                if(b.getLastUpdated().getTime()>new Timestamp(new Date().getTime()+2*60*1000).getTime()) {
-                    b.setStatus(BotState.Unknown.ordinal());
+                if(new Date().getTime()-b.getLastUpdated().getTime()>1000*60*5) {
+                    b.updateStatus(BotState.Unknown.ordinal());
                     botControlService.saveBot(b);
                 }
             }
-            else {
-                if ( b.getLastUpdated().getTime() > new Timestamp(new Date().getTime() + 6 * 60 * 1000).getTime()) {
-                   botControlService.deleteBot(b.getId());
+            else{
+                if(new Date().getTime()-b.getLastUpdated().getTime()>1000*60*5) {
+                    botControlService.deleteBot(b.getId());
                 }
             }
         }
@@ -302,7 +304,7 @@ public class BotController
         bot.setIdStart((long) 1);
         bot.setIdStop((long) 1);
         bot.setBusy(0);
-        bot.setStatus(BotState.Alive.ordinal());
+        bot.updateStatus(BotState.Alive.ordinal());
         //id ook doorgeven naar robot zelf
         botControlService.saveBot(bot);
         return bot.getIdCore();

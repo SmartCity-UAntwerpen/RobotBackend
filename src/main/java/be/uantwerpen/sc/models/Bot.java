@@ -2,6 +2,8 @@ package be.uantwerpen.sc.models;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -22,7 +24,6 @@ public class Bot
     private int busy;
     private Link link;
     private int status;
-    @Temporal(TemporalType.TIMESTAMP)
     private Date lastupdated;
 
 
@@ -158,6 +159,12 @@ public class Bot
         this.link = link;
     }
 
+    public void updateStatus(int status){
+        setLastUpdated(new Date());
+        System.out.println("UpdateStatus");
+        setStatus(status);
+
+    }
     @Basic
     @Column(name = "\"status\"")
     public int getStatus(){
@@ -165,18 +172,18 @@ public class Bot
     }
 
     public void setStatus(int status){
-        setLastUpdated(new Timestamp(new Date().getTime()));
         this.status = status;
     }
 
 
-    @Basic
-    @Column(name = "\"lastupdated\"")
+    @Column(name = "\"lastupdated\"", columnDefinition="DATETIME")
+    @Temporal(TemporalType.TIMESTAMP)
     public Date getLastUpdated() {
         return lastupdated;
     }
     public void setLastUpdated(Date lastupdated) {
         this.lastupdated= lastupdated;
     }
+
 
 }

@@ -43,10 +43,10 @@ public class TimerService implements Runnable {
             long startTime = System.currentTimeMillis();
             long elapsedTime = 0L;
             //Wait 1 minute
-            while (elapsedTime < 6*1000) {
+            while (elapsedTime < 60*1000) {
                 elapsedTime = (new Date()).getTime() - startTime;
             }
-          //  botController.checkTimer();
+            botController.checkTimer();
 /*
             try {
                 URL url = new URL("http://localhost:"+port+"/bot/checkTimer");

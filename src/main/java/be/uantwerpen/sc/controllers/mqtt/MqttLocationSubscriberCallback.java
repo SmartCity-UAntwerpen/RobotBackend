@@ -67,7 +67,7 @@ public class MqttLocationSubscriberCallback implements MqttCallback
             int Progress = Integer.parseInt(progress);
             botController.updateLocation((long) Id, (long) VertexId, Progress);
             Bot b = botController.getBot((long) Id);
-            b.setStatus(BotState.Alive.ordinal());
+            b.updateStatus(BotState.Alive.ordinal());
         }
         catch(Exception e)
         {

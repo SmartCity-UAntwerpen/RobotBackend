@@ -106,10 +106,10 @@ public class JobController
         b.setBusy(1);
         b.setIdStart((long) idstart);
         b.setIdStop((long) idstop);
-        b.setStatus(BotState.Busy.ordinal());
+        b.updateStatus(BotState.Busy.ordinal());
         botControlService.saveBot(b);
 
-        jobService.sendJob((long) idVehicle,  (long) idJob, (long) idstart, (long) idstop);
+        jobService.sendJob((long) idJob,  (long) idVehicle, (long) idstart, (long) idstop);
 
         return "HTTP status : 200";
     }

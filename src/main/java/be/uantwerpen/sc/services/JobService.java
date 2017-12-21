@@ -25,7 +25,7 @@ public class JobService
      * @param idStop ID stop Point
      * @return Success
      */
-    public boolean sendJob(Long botId, Long jobId, long idStart, long idStop)
+    public boolean sendJob(Long jobId, Long botId, long idStart, long idStop)
     {
         Job job = new Job(jobId);
         job.setIdStart(idStart);

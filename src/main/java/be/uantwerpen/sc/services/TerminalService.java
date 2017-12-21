@@ -94,17 +94,17 @@ public class TerminalService
             case "job":
                 if(commandString.split(" ", 3).length <= 2)
                 {
-                    terminal.printTerminalInfo("Missing arguments! 'job {botId} {command}");
+                    terminal.printTerminalInfo("Missing arguments! 'job {jobId} {botId} {startId} {stopId}");
                 }
                 else
                 {
-                    int parsedInt;
-
                     try
                     {
-                        parsedInt = this.parseInteger(commandString.split(" ", 3)[1]);
-
-                      //TODO  this.sendJob((long)parsedInt, commandString.split(" ", 3)[2]);
+                        int jobid = this.parseInteger(commandString.split(" ", 3)[1]);
+                        int botid = this.parseInteger(commandString.split(" ", 3)[2]);
+                        int start = this.parseInteger(commandString.split(" ", 3)[3]);
+                        int stop = this.parseInteger(commandString.split(" ", 3)[4]);
+                        this.sendJob((long)jobid,(long)botid,start,stop);
 
                     }
                     catch(Exception e)
@@ -291,9 +291,8 @@ public class TerminalService
      * Sends Job to defined bot
      * TODO: Check comments
      * @param botId ID of bot
-     * @param command Command to send
      */
-    private void sendJob(Long botId,Long jobID, long start, long stop)
+    private void sendJob(Long jobId,Long botId, long start, long stop)
     {
         if(botControlService.getBotWithCoreId((long)botId) == null)
         {
@@ -303,14 +302,14 @@ public class TerminalService
             return;
         }
 
-        /*if(jobService.sendJob(botId, command))
+        if(jobService.sendJob(botId, jobId,start,stop))
         {
             terminal.printTerminalInfo("Job send to bot with id: " + botId + ".");
         }
         else
         {
             terminal.printTerminalError("Could not send job to bot with id: " + botId + "!");
-        }*/
+        }
     }
 
     /**

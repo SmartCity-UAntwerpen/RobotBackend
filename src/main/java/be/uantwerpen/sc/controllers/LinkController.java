@@ -41,8 +41,7 @@ public class LinkController
     }
 
     /**
-     * Get <- WHO
-     * Request Link Lock
+     * Called by bot to lock a link
      * @param id ID of link to lock
      * @return Success
      */
@@ -73,7 +72,7 @@ public class LinkController
     }
 
     /**
-     * Unlock link
+     * Called by bot to unlock a link
      * @param id ID of link to lock
      * @return Success
      */
