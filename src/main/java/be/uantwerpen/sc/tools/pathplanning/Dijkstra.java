@@ -12,7 +12,7 @@ public class Dijkstra
 {
     /**
      * Computes Dijkstra path based on Source Vertex and list of possible Vertices to visit
-     * @param sourceID Source ID of Vertex
+     * @param sourceId Source ID of Vertex
      * @param vertexes Map Vertices
      */
     public void computePaths(int sourceId, List<Vertex> vertexes)

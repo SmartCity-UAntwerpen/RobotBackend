@@ -32,13 +32,18 @@ public class Point
      */
     private int pointLock;
 
+    public Point(Long id){
+        this.id=id;
+    }
+    public Point(){
+        this.id=0L;
+    }
     /**
      * Get Point ID
      * @return Point ID
      */
     @Id
     @Column(name = "idpoint")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId()
     {
         return id;

@@ -1,5 +1,6 @@
 package be.uantwerpen.sc.controllers;
 
+import be.uantwerpen.sc.models.Bot;
 import be.uantwerpen.sc.models.Link;
 import be.uantwerpen.sc.models.Point;
 import be.uantwerpen.sc.models.map.Map;
@@ -7,6 +8,7 @@ import be.uantwerpen.sc.models.map.MapJson;
 import be.uantwerpen.sc.models.map.MapNew;
 import be.uantwerpen.sc.models.map.Path;
 import be.uantwerpen.sc.services.*;
+import be.uantwerpen.sc.tools.DriveDir;
 import be.uantwerpen.sc.tools.Vertex;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,6 +61,8 @@ public class MapController
     @Autowired
     private LinkControlService linkControlService;
 
+    @Autowired
+    private BotControlService botControlService;
     /**
      * BackBone IP
      */
@@ -113,6 +117,21 @@ public class MapController
 
     /**
      * Calculates path with given start and stop ID
+     * @return Generated Path
+     */
+    @RequestMapping(value = "getdirections/{id}", method = RequestMethod.GET)
+    public DriveDir[] PathPlanning(@PathVariable("id") int id)
+    {
+        Bot b=botControlService.getBot((long) id);
+        List<Link> links = linkControlService.getAllLinks();
+        List<Vertex> path = pathPlanningService.CalculatePath((int)(long)b.getIdStart(),(int)(long)b.getIdStop());
+        List<DriveDir> dirs=pathPlanningService.createBotDriveDirs(path);
+        DriveDir[] output=new DriveDir[dirs.size()];
+        output=dirs.toArray(output);
+        return output;
+    }
+    /**
+     * Calculates path with given start and stop ID
      * @param start Start Vertex ID TODO probably
      * @param stop Stop Vertex ID TODO Probably
      * @return Generated Path
@@ -120,8 +139,8 @@ public class MapController
     @RequestMapping(value = "{start}/path/{stop}", method = RequestMethod.GET)
     public Path PathPlanning(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        List<Link> links = new ArrayList<>();
-        List<Vertex> path = pathPlanningService.Calculatepath(start,stop, links);
+        List<Link> links = linkControlService.getAllLinks();
+        List<Vertex> path = pathPlanningService.CalculatePath(start,stop);
 
         return new Path(path);
     }
@@ -176,7 +195,7 @@ public class MapController
     public Path randomPath(@PathVariable("start") int start)
     {
         List<Link> links = new ArrayList<>();
-        List<Vertex> vertexes = pathPlanningService.nextRandomPath(null,start, links);
+        List<Vertex> vertexes = pathPlanningService.nextRandomPath(null,start);
         Path pathClass = new Path(vertexes);
         return pathClass;
     }
@@ -229,8 +248,7 @@ public class MapController
 
             for(int i = 0; i < pointList.length(); i++){
                 JSONObject point = pointList.getJSONObject(i);
-                Point p = new Point();
-                p.setId(new Long(point.getInt("id")));
+                Point p = new Point(new Long(point.getInt("id")));
                 p.setRfid(point.getString("rfid"));
                 p.setPointLock(point.getInt("pointLock"));
                 points.add(p);
@@ -239,8 +257,7 @@ public class MapController
 
             for(int j = 0; j < linkList.length(); j++){
                 JSONObject link = linkList.getJSONObject(j);
-                Link l = new Link();
-                l.setId(new Long(link.getInt("id")));
+                Link l = new Link(new Long(link.getInt("id")));
                 l.setLength(new Long(link.getInt("length")));
                 l.setStartPoint(points.get(link.getInt("startPoint")-1));
                 l.setStopPoint(points.get(link.getInt("stopPoint")-1));

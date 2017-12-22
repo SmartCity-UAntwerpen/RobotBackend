@@ -47,25 +47,6 @@ public class TimerService implements Runnable {
                 elapsedTime = (new Date()).getTime() - startTime;
             }
             botController.checkTimer();
-/*
-            try {
-                URL url = new URL("http://localhost:"+port+"/bot/checkTimer");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Accept", "application/json");
-
-                if (conn.getResponseCode() != 200) {
-                    throw new RuntimeException("Failed : HTTP error code : "
-                            + conn.getResponseCode());
-                }
-                conn.disconnect();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            */
         }
     }
 }

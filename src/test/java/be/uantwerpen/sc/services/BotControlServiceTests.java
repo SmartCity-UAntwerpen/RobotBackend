@@ -43,9 +43,9 @@ public class BotControlServiceTests {
     @Before
     public void init() {
         Link l1 = new Link();
-        bot1 = new Bot();
+        //bot1 = new Bot();
         botList = new ArrayList<>();
-        botList.add(bot1);
+        //TODO botList.add(bot1);
 
         MockitoAnnotations.initMocks(this);
     }

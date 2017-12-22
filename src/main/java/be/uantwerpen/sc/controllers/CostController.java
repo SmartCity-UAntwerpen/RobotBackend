@@ -78,8 +78,7 @@ public class CostController {
     /**
      * HTTP function
      * Used by MAAS
-     * Assumedly calculates best ID of vehicle that has the lowest cost for given values
-     * TODO Test & Check if assumption is true
+     * Returns list of all bots with the weight to their start point and the weight from start to end
      * @param start
      * @param stop
      * @return
@@ -93,32 +92,22 @@ public class CostController {
         JSONArray array = new JSONArray();
         for (Bot b : bots) {
             JSONObject obj = new JSONObject();
-            long weightFromStartToStop = 0;
             long weightToStart = 0;
             Cost c = new Cost();
             c.setIdVehicle(b.getIdCore());
 
-            List<Vertex> vertices1 = pathPlanningService.Calculatepath(start, stop, links);
+            List<Vertex> vertices1 = pathPlanningService.CalculatePath(start, stop);
             List<Point> points1 = new ArrayList<>();
             for (Vertex v1 : vertices1){
                 points1.add(points.get(v1.getId().intValue()));
             }
 
-            int size1 = vertices1.size();
-            for (int i = 0; i<size1-1; i++){
-                for(Link l1 : links){
-                    if(l1.getStartPoint().getId()== points1.get(i).getId()-1 && l1.getStopPoint().getId()==points1.get(i+1).getId()-1){
-                        weightFromStartToStop = weightFromStartToStop + (l1.getWeight()*l1.getLength()) +  l1.getTrafficWeight();
-                    }
-                }
-            }
-
-            Long w1 = new Long(weightFromStartToStop);
-            c.setWeight(w1);
+            Long weightFromStartToStop= (long) vertices1.get(vertices1.size()-1).getMinDistance();
+            c.setWeight(weightFromStartToStop);
 
             long l = b.getLinkId().getStartPoint().getId();
             int linkId = (int) (l);
-            List<Vertex> vertices2 = pathPlanningService.Calculatepath(linkId, start, links);
+            List<Vertex> vertices2 = pathPlanningService.CalculatePath(linkId, start);
             List<Point> points2 = new ArrayList<>();
             for (Vertex v2 : vertices2){
                 points2.add(points.get(v2.getId().intValue()));
@@ -148,4 +137,19 @@ public class CostController {
         return array.toString();
     }
 
+
+    /**
+     * HTTP function
+     * Used by MAAS
+     * Returns list of all bots with the weight to their start point and the weight from start to end
+     * @param start
+     * @param stop
+     * @return
+     */
+    @RequestMapping(value = "calcpathweight/{start}/{stop}",method = RequestMethod.GET)
+    public double calcPathWeight(@PathVariable("start") int start, @PathVariable("stop") int stop)
+    {
+        List<Link> links = linkControlService.getAllLinks();
+        return pathPlanningService.CalculatePathWeight(start, stop);
+    }
 }

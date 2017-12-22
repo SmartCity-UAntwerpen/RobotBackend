@@ -91,22 +91,16 @@ public class BotController
     @RequestMapping(value = "updateBotTest/{id}",method = RequestMethod.GET)
     public void updateBotTest(@PathVariable("id") Long id)
     {
-        Bot botEntity = new Bot();
-        botEntity.setId(id);
+        Bot botEntity = new Bot(id);
         botEntity.setWorkingMode("Updated");
         botControlService.saveBot(botEntity);
     }
 
-    @RequestMapping(value = "test",method = RequestMethod.GET)
-    public Bot testRestBot()
-    {
-        return new Bot();
-    }
 
     @RequestMapping(value = "savetest",method = RequestMethod.GET)
     public void saveBotTest()
     {
-        Bot bot = new Bot();
+        Bot bot = new Bot((long) getNewId());
         bot.setWorkingMode("test");
         botControlService.saveBot(bot);
     }
@@ -141,7 +135,7 @@ public class BotController
     @RequestMapping(value = "newRobot", method = RequestMethod.GET)
     public Long newRobot()
     {
-        Bot bot = new Bot();
+        Bot bot = new Bot((long) getNewId());
         System.out.println(bot);
         //Save bot in database and get bot new rid
         botControlService.saveBot(bot);
@@ -194,34 +188,7 @@ public class BotController
     @RequestMapping(value = "delete/{rid}",method = RequestMethod.GET)
     public void deleteBot(@PathVariable("rid") Long rid)
     {
-        Bot b = botControlService.getBotWithCoreId(rid);
-        System.out.println(b.getId());
-        botControlService.deleteBot(b.getId());
-
-        try {
-            String u = "http://"+backboneIP+":"+backbonePort+"/bot/delete/"+rid;
-            URL url = new URL(u);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
-            }
-            conn.disconnect();
-
-        } catch (MalformedURLException e) {
-
-            e.printStackTrace();
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        }
-
-        System.out.println("Bot with id: " + rid + " deleted from DB");
+        botControlService.deleteBot(rid);
     }
 
     @RequestMapping(value = "/deleteBots}",method = RequestMethod.GET)
@@ -269,7 +236,7 @@ public class BotController
         List<Bot> bots = botControlService.getAllBots();
         for(Bot b : bots){
             long currentDate=new Date().getTime();
-            System.out.println(b.getId());
+            System.out.println(b.getIdCore());
             System.out.println(b.getLastUpdated());
             System.out.println(currentDate-b.getLastUpdated().getTime());
             if(b.getStatus()!=BotState.Unknown.ordinal()){
@@ -280,7 +247,7 @@ public class BotController
             }
             else{
                 if(new Date().getTime()-b.getLastUpdated().getTime()>1000*60*5) {
-                    botControlService.deleteBot(b.getId());
+                    botControlService.deleteBot(b.getIdCore());
                 }
             }
         }
@@ -294,9 +261,7 @@ public class BotController
      */
     @RequestMapping(value = "initiate/{modus}", method = RequestMethod.GET)
     public long initiate(@PathVariable("modus") String modus){
-        Bot bot = new Bot();
-        long id = (long) getNewId();
-        bot.setIdCore(id);
+        Bot bot = new Bot((long) getNewId());
         bot.setWorkingMode(modus);
         bot.setJobId((long) 0);
         bot.setLinkId(linkControlService.getLink((long) 1));

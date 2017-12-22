@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Bot Data Class
@@ -13,7 +14,6 @@ import java.util.Date;
 @Table(name = "robots", schema = "", catalog = "\"robotDB\"")
 public class Bot
 {
-    private Long id;
     private Long idCore;
     private Long idStart;
     private Long idStop;
@@ -25,19 +25,11 @@ public class Bot
     private Link link;
     private int status;
     private Date lastupdated;
-
-
-    @Id
-    @Column(name = "\"id\"")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId()
-    {
-        return id;
+    public Bot(Long coreId){
+        this.idCore=coreId;
     }
-
-    public void setId(Long id)
-    {
-        this.id = id;
+    public Bot(){
+        idCore=new Random().nextLong();
     }
 
     @Basic
@@ -64,13 +56,12 @@ public class Bot
         this.idStop = idStop;
     }
 
-    @Basic
+    @Id
     @Column(name = "\"idcore\"")
     public Long getIdCore()
     {
         return idCore;
     }
-
     public void setIdCore(Long idCore)
     {
         this.idCore = idCore;
@@ -126,7 +117,7 @@ public class Bot
 
         Bot that = (Bot) o;
 
-        if(id != that.id) return false;
+        if(idCore != that.idCore) return false;
         if(jobId != null ? !jobId.equals(that.jobId) : that.jobId != null) return false;
         if(percentageCompleted != null ? !percentageCompleted.equals(that.percentageCompleted) : that.percentageCompleted != null)
             return false;
@@ -138,7 +129,7 @@ public class Bot
     @Override
     public int hashCode()
     {
-        int result = (int)(id % Integer.MAX_VALUE);
+        int result = (int)(idCore % Integer.MAX_VALUE);
 
         result = 31 * result + (jobId != null ? jobId.hashCode() : 0);
         result = 31 * result + (percentageCompleted != null ? percentageCompleted.hashCode() : 0);

@@ -14,7 +14,7 @@ import java.util.List;
 public interface PointRepository extends CrudRepository<Point, Long>
 {
     /**
-     * Returns list of available points TODO Whatapoint?
+     * Returns list of available points
      * @return List of Points
      */
     List<Point> findAll();

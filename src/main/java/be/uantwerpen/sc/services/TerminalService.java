@@ -9,7 +9,6 @@ import be.uantwerpen.sc.tools.Terminal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ public class TerminalService
 {
     @Autowired
     private JobService jobService;
-    
+
     @Autowired
     private BotControlService botControlService;
 
@@ -75,9 +74,12 @@ public class TerminalService
     /**
      * Parses Terminal commands
      * Commands:
-     *      job [botID] [command] //TODO Kanker
-     *      show [bots]         TODO: Shit command, only Bots? Add Traffic Lights or something
-     *      reset
+     *      generatebot
+     *      job [botID] [command]
+     *      showbots
+     *      clearbots
+     *      clearlocks
+     *      clearall
      *      delete [botID]
      *      exit
      *      help
@@ -91,6 +93,10 @@ public class TerminalService
 
         switch(command)
         {
+            case "generatebot":
+                long id=botController.initiate("INDEPENDENT");
+                terminal.printTerminal("Bot ID: "+id);
+                break;
             case "job":
                 if(commandString.split(" ", 3).length <= 2)
                 {
@@ -100,11 +106,11 @@ public class TerminalService
                 {
                     try
                     {
-                        int jobid = this.parseInteger(commandString.split(" ", 3)[1]);
-                        int botid = this.parseInteger(commandString.split(" ", 3)[2]);
-                        int start = this.parseInteger(commandString.split(" ", 3)[3]);
-                        int stop = this.parseInteger(commandString.split(" ", 3)[4]);
-                        this.sendJob((long)jobid,(long)botid,start,stop);
+                        long jobid = Long.parseLong(commandString.split(" ", 3)[1]);
+                        long botid = Long.parseLong(commandString.split(" ", 3)[2]);
+                        long start = Long.parseLong(commandString.split(" ", 3)[3]);
+                        long stop = Long.parseLong(commandString.split(" ", 3)[4]);
+                        this.sendJob(jobid,botid,start,stop);
 
                     }
                     catch(Exception e)
@@ -113,42 +119,30 @@ public class TerminalService
                     }
                 }
                 break;
-            case "show":
-                if(commandString.split(" ", 2).length <= 1)
-                {
-                    terminal.printTerminalInfo("Missing arguments! 'show {bots}'");
-                }
-                else
-                {
-                    if(commandString.split(" ", 2)[1].equals("bots"))
-                    {
-                        this.printAllBots();
-                    }
-                    else
-                    {
-                        terminal.printTerminalInfo("Unknown arguments! 'show {bots}'");
-                    }
-                }
+            case "showbots":
+                this.printAllBots();
                 break;
-            case "reset":
+            case "clearbots":
+                this.deleteBots();
+                break;
+            case "clearlocks":
+                this.clearPointLocks();
+                break;
+            case "clearall":
                 this.deleteBots();
                 this.clearPointLocks();
                 break;
             case "delete":
                 if(commandString.split(" ", 2).length <= 1)
-                {
                     terminal.printTerminalInfo("Missing arguments! 'delete {botId}'");
-                }
                 else
                 {
                     try
                     {
-                        int parsedInt = this.parseInteger(commandString.split(" ", 2)[1]);
-
+                        int parsedInt = Integer.parseInt(commandString.split(" ", 2)[1]);
                         this.deleteBot(parsedInt);
                     }
-                    catch(Exception e)
-                    {
+                    catch(Exception e){
                         terminal.printTerminalError(e.getMessage());
                     }
                 }
@@ -158,26 +152,17 @@ public class TerminalService
                 break;
             case "help":
             case "?":
-                printHelp("");
+                printHelp();
                 break;
             case "calcweight":
                 if(commandString.split(" ", 3).length <= 2)
-                {
                     terminal.printTerminalInfo("Missing arguments! 'calcWeight {start} {stop}");
-                }
                 else
                 {
-                    int parsedInt;
-
-                    try//TODO
+                    try
                     {
-                        parsedInt = this.parseInteger(commandString.split(" ", 3)[1]);
-                        //JSONArray a = costController.calcWeight(parsedInt, this.parseInteger(commandString.split(" ", 3)[2]));
-                        //JSONArray b = botController.posAll();
-                        String data = "{\"pointList\" :[{\"id\" : 1, \"rfid\" :\"4e\", \"pointLock\" : 0}, {\"id\" : 2, \"rfid\" :\"3r\", \"pointLock\" : 0}, {\"id\" : 3, \"rfid\" :\"9d\", \"pointLock\" : 0}, {\"id\" : 4, \"rfid\" :\"1y\", \"pointLock\" : 0}], \"linkList\" :[{\"id\" : 1, \"length\" : 1, \"startPoint\" : 1, \"stopPoint\" : 3, \"startDirection\" : \"N\", \"stopDirection\" : \"Z\", \"weight\" :1}, {\"id\" : 2, \"length\" : 1, \"startPoint\" : 3, \"stopPoint\" : 1, \"startDirection\" : \"Z\", \"stopDirection\" : \"N\", \"weight\" :1}, {\"id\" : 3, \"length\" : 1, \"startPoint\" : 3, \"stopPoint\" : 4, \"startDirection\" : \"N\", \"stopDirection\" : \"Z\", \"weight\" :1}, {\"id\" : 4, \"length\" : 1, \"startPoint\" : 4, \"stopPoint\" : 3, \"startDirection\" : \"Z\", \"stopDirection\" : \"N\", \"weight\" :1}, {\"id\" : 5, \"length\" : 1, \"startPoint\" : 4, \"stopPoint\" : 2, \"startDirection\" : \"W\", \"stopDirection\" : \"O\", \"weight\" :1}, {\"id\" : 6, \"length\" : 1, \"startPoint\" : 2, \"stopPoint\" : 4, \"startDirection\" : \"O\", \"stopDirection\" : \"W\", \"weight\" :1}]}";
-                        //costController.getMap();
-                        botController.getNewId();
-                        //System.out.println(b.toString());
+                        String[] ints= (commandString.split(" ", 3));
+                        costController.calcPathWeight(Integer.parseInt(ints[1]), Integer.parseInt(ints[2]));
                     }
                     catch(Exception e)
                     {
@@ -201,25 +186,22 @@ public class TerminalService
 
     /**
      * Prints help, used as command
-     * TODO: Bullshit function, doesn't use parameter
-     * @param command Command to get help about
+     * TODO Update
      */
-    private void printHelp(String command)
+    private void printHelp()
     {
-        switch(command)
-        {
-            default:
-                terminal.printTerminal("Available commands:");
-                terminal.printTerminal("-------------------");
-                terminal.printTerminal("calcWeight {start} {stop}");
-                terminal.printTerminal("'job {botId} {command}' : send a job to the bot with the given id.");
-                terminal.printTerminal("'show {bots}' : show all bots in the database.");
-                terminal.printTerminal("'reset' : remove all bots from the database and release all point locks.");
-                terminal.printTerminal("'delete {botId}' : remove the bot with the given id from the database.");
-                terminal.printTerminal("'exit' : shutdown the server.");
-                terminal.printTerminal("'help' / '?' : show all available commands.\n");
-                break;
-        }
+        terminal.printTerminal("Available commands:");
+        terminal.printTerminal("-------------------");
+        terminal.printTerminal("generatebot: : Generates a new bot ID for testing");
+        terminal.printTerminal("calcWeight {start} {stop}");
+        terminal.printTerminal("'job {botId} {command}' : send a job to the bot with the given id.");
+        terminal.printTerminal("'showbots' : show all bots in the database.");
+        terminal.printTerminal("'clearbots' : Remove all bots from the database.");
+        terminal.printTerminal("'clearlocks' : Release all point locks.");
+        terminal.printTerminal("'clearall' : Remove all bots from the database and release all point locks.");
+        terminal.printTerminal("'delete {botId}' : remove the bot with the given id from the database.");
+        terminal.printTerminal("'exit' : shutdown the server.");
+        terminal.printTerminal("'help' / '?' : show all available commands.\n");
     }
 
     /**
@@ -228,11 +210,8 @@ public class TerminalService
     private void printAllBots()
     {
         List<Bot> bots = botControlService.getAllBots();
-
         if(bots.isEmpty())
-        {
             terminal.printTerminalInfo("There are no bots available to list.");
-        }
         else
         {
             terminal.printTerminal("Bot-id\t\tLink-id\t\tStatus");
@@ -244,11 +223,9 @@ public class TerminalService
                 Link link = bot.getLinkId();
 
                 if(link != null)
-                {
                     linkId = link.getId();
-                }
 
-                terminal.printTerminal("\t" + bot.getId() + "\t\t" + linkId + "\t\t\t" + bot.getStatus());
+                terminal.printTerminal("\t" + bot.getIdCore() + "\t\t" + linkId + "\t\t\t" + bot.getStatus());
             }
         }
     }
@@ -260,13 +237,9 @@ public class TerminalService
     private void deleteBot(int botID)
     {
         if(botControlService.deleteBot(botID))
-        {
             terminal.printTerminalInfo("Bot deleted with id: " + botID + ".");
-        }
         else
-        {
             terminal.printTerminalError("Could not delete bot with id: " + botID + "!");
-        }
     }
 
     /**
@@ -296,65 +269,12 @@ public class TerminalService
     {
         if(botControlService.getBotWithCoreId((long)botId) == null)
         {
-            //Could not find bot in database
             terminal.printTerminalError("Could not find bot with id: " + botId + "!");
-
             return;
         }
-
         if(jobService.sendJob(botId, jobId,start,stop))
-        {
             terminal.printTerminalInfo("Job send to bot with id: " + botId + ".");
-        }
         else
-        {
             terminal.printTerminalError("Could not send job to bot with id: " + botId + "!");
-        }
-    }
-
-    /**
-     * Parses Int from String with exception
-     * TODO: Bullshit function
-     * @param value String to parse for int
-     * @return Int found
-     * @throws Exception If string is not an int
-     */
-    private int parseInteger(String value) throws Exception
-    {
-        int parsedInt;
-
-        try
-        {
-            parsedInt = Integer.parseInt(value);
-        }
-        catch(NumberFormatException e)
-        {
-            throw new Exception("'" + value + "' is not an integer value!");
-        }
-
-        return parsedInt;
-    }
-
-    /**
-     * Parses long from String with exception
-     * TODO: Bullshit function
-     * @param value String to parse for long
-     * @return Long found
-     * @throws Exception If string is not a long
-     */
-    private long parseLong(String value) throws Exception
-    {
-        Long parsedLong;
-
-        try
-        {
-            parsedLong = Long.parseLong(value);
-        }
-        catch(NumberFormatException e)
-        {
-            throw new Exception("'" + value + "' is not a numeric value!");
-        }
-
-        return parsedLong;
     }
 }

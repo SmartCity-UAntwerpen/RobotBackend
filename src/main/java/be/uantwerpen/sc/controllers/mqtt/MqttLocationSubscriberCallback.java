@@ -44,10 +44,11 @@ public class MqttLocationSubscriberCallback implements MqttCallback
         Long botID = Long.parseLong(botIDString);
 
         String payloadString = new String(mqttMessage.getPayload());
+        System.out.println(topic);
         System.out.println("LOC :"+payloadString);
         System.out.println("ID :"+botID);
 
-        if(!topic.endsWith("Location")){
+        if(!topic.endsWith("loc")){
             System.out.println("no location");
             return;
         }
@@ -55,13 +56,13 @@ public class MqttLocationSubscriberCallback implements MqttCallback
         try
         {
             System.out.println("MQTT LOCATION ARRIVED");
-            String temp = payloadString.split("id:")[1];
+            String content=payloadString.split("\\{")[1];
+            String temp = content.split("id:")[1];
             String id = temp.split("/")[0];
             temp = temp.split("vertexid:")[1];
             String vertexid = temp.split("/")[0];
             temp = temp.split("progress:")[1];
             String progress = temp.split("}")[0];
-
             int Id = Integer.parseInt(id);
             int VertexId = Integer.parseInt(vertexid);
             int Progress = Integer.parseInt(progress);

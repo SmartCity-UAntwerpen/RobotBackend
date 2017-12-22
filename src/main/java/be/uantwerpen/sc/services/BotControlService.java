@@ -4,8 +4,14 @@ import be.uantwerpen.sc.controllers.BotController;
 import be.uantwerpen.sc.models.Bot;
 import be.uantwerpen.sc.repositories.BotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -25,7 +31,16 @@ public class BotControlService
      */
     @Autowired
     private BotController botController;
-
+    /**
+     * BackBone IP
+     */
+    @Value("${backbone.ip:default}")
+    String backboneIP;
+    /**
+     * BackBone Port
+     */
+    @Value("${backbone.port:default}")
+    String backbonePort;
     /**
      * Encapsulator to save Bot to DB
      * @param bot Bot to save
@@ -48,18 +63,11 @@ public class BotControlService
 
     /**
      * Gets Bot with core ID
-     * TODO: fix repository findall to work with coreid
      * @param idCore Core ID of bot to find
      * @return Bot
      */
     public Bot getBotWithCoreId(Long idCore){
-        List<Bot> bots = botRepository.findAll();
-        for (Bot bot:bots){
-            if(bot.getIdCore().equals(idCore)){
-                return bot;
-            }
-        }
-        return null;
+        return botRepository.findOne(idCore);
     }
 
     /**
@@ -73,7 +81,7 @@ public class BotControlService
 
     /**
      * Deletes Bot with specified ID
-     * @param rid ID of bot to remove
+     * @param bid ID of bot to remove
      * @return Success
      */
     public boolean deleteBot(long bid)
@@ -81,6 +89,23 @@ public class BotControlService
         if(this.getBot(bid) == null)
             return false;
         botRepository.delete(bid);
+        try {
+            String u = "http://"+backboneIP+":"+backbonePort+"/bot/delete/"+bid;
+            URL url = new URL(u);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }
+            conn.disconnect();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 

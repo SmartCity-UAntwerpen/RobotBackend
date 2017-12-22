@@ -2,16 +2,14 @@ package be.uantwerpen.sc.services;
 
 import be.uantwerpen.sc.models.Link;
 import be.uantwerpen.sc.models.map.*;
+import be.uantwerpen.sc.models.map.Map;
+import be.uantwerpen.sc.tools.*;
 import be.uantwerpen.sc.tools.pathplanning.Dijkstra;
-import be.uantwerpen.sc.tools.Edge;
-import be.uantwerpen.sc.tools.Vertex;
 import be.uantwerpen.sc.tools.pathplanning.IPathplanning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Service for path planning
@@ -94,7 +92,7 @@ public class PathPlanningService implements IPathplanning
             i++;
         }
 
-         for (int j = 0; j < vertexes.size();j++){
+        for (int j = 0; j < vertexes.size();j++){
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
 
@@ -112,28 +110,31 @@ public class PathPlanningService implements IPathplanning
      * TODO Hardcoded Dijkstra
      * @param start start int (?)
      * @param stop stop int (?)
-     * @param links List of Links
      * @return List of Vertexes following the shortest path
      */
     @Override
-    public List<Vertex> Calculatepath(int start, int stop, List<Link> links) {
-        List<Vertex> vertexes = mapToVertexes(links);
+    public List<Vertex> CalculatePath(int start, int stop) {
+        List<Vertex> vertexes = mapToVertexes();
 
         dijkstra.computePaths(start,vertexes);
         List<Vertex> path = dijkstra.getShortestPathTo(stop,vertexes);
         return path;
     }
 
+    @Override
+    public double CalculatePathWeight(int start, int stop){
+        List<Vertex> vertices=CalculatePath(start,stop);
+        return vertices.get(vertices.size()-1).getMinDistance();
+    }
     /**
      *
      * @param map
      * @param start
-     * @param links
      * @return
      */
     @Override
-    public List<Vertex> nextRandomPath(Map map, int start, List<Link> links) {
-        List<Vertex> vertexes = mapToVertexes(links);
+    public List<Vertex> nextRandomPath(Map map, int start) {
+        List<Vertex> vertexes = mapToVertexes();
 
         Random random = new Random();
         Vertex currentVertex = null;
@@ -156,36 +157,24 @@ public class PathPlanningService implements IPathplanning
      * What the fuck, optimise this shit.
      * Quadruple nested for?
      * Really?
-     * @param links
      * @return
      */
-    private List<Vertex> mapToVertexes(List<Link> links){
-        MapJson mapJsonServer = mapControlService.buildMapJson();
+    private List<Vertex> mapToVertexes(){
+        Map map = mapControlService.buildMap();
         List<Vertex> vertexes = new ArrayList<>();
 
-        for (NodeJson nj : mapJsonServer.getNodeJsons())
-            vertexes.add(new Vertex(nj));
+        for (Node n : map.getNodeList())
+            vertexes.add(new Vertex(n));
 
         ArrayList<Edge> edges;
         List<ArrayList<Edge>> edgeslistinlist = new ArrayList<>();
-        Link realLink = new Link();
         int i = 0;
-        for (NodeJson node : mapJsonServer.getNodeJsons()){//TODO: double getNodeJsons, single request
+        for (Node node : map.getNodeList()){//TODO: double getNodeJsons, single request
             edges = new ArrayList<>();
-            for (Neighbour neighbour : node.getNeighbours()){
+            for (Link neighbour : node.getNeighbours()){
                 for (Vertex v : vertexes){
-                    if(v.getId() == neighbour.getPointEntity().getId()){
-
-                        //Check of 2 edges een van de links bevat
-                        for(Link linkEntity: links){
-                            if(linkEntity.getStopPoint().getId() == v.getId() && linkEntity.getStartPoint().getId() == node.getPointEntity().getId()){
-                                //System.out.println(linkEntity.toString() +" " + linkEntity);
-                                realLink = linkEntity;
-                            }
-                        }
-
-                        //edges.add(new Edge(v.getId(),neighbour.getWeight(),linkControlService.getLink(neighbour.getPointEntity().getPid())));
-                        edges.add(new Edge(v.getId(),neighbour.getWeight(),realLink));
+                    if(v.getId() == neighbour.getStopPoint().getId()){
+                        edges.add(new Edge(v.getId(),neighbour.getWeight(),neighbour));
                     }
                 }
             }
@@ -199,4 +188,151 @@ public class PathPlanningService implements IPathplanning
 
         return vertexes;
     }
+    public List<DriveDir> createBotDriveDirs(List<Vertex> path){
+        List<DriveDir> commands=new ArrayList<>();
+        //First part is always driving forward.
+        commands.add(DriveDir.FOLLOW);
+        Collections.reverse(path);
+        List<Link> links=new LinkedList<>();
+        for (Vertex v: path) {
+            if(v.getPrevious()==null)
+                break;
+            for(Edge l:v.getPrevious().getAdjacencies()) {
+                if(l.getTarget()==v.getId())
+                    links.add(l.getLinkEntity());
+            }
+        }
+        Collections.reverse(links);
+        Link previous=null;
+        for(Link l: links) {
+            if(previous==null) {
+                previous=l;
+                continue;
+            }
+            Direction stop=getDirection(l.getStartDirection());
+            Direction start=rotate(getDirection(previous.getStopDirection()));
+            DriveDir relDir=getNextRelDir(start,stop);
+            commands.add(relDir);
+            commands.add(DriveDir.FOLLOW);
+            previous=l;
+        }
+        return commands;
+    }
+
+    private Direction getDirection(String dirString){
+        switch(dirString){
+            case "N":
+                return Direction.NORTH;
+            case "E":
+                return Direction.EAST;
+            case "Z":
+                return Direction.SOUTH;
+            case "W":
+                return Direction.WEST;
+            default:
+                return Direction.NORTH;
+        }
+    }
+
+    private Direction rotate(Direction direction){
+        switch (direction){
+            case NORTH:
+                return Direction.SOUTH;
+            case SOUTH:
+                return Direction.NORTH;
+            case EAST:
+                return Direction.WEST;
+            case WEST:
+                return Direction.EAST;
+        }
+        return null;
+    }
+    private DriveDir getNextRelDir(Direction startDir, Direction stopDir){
+        //Calculate relative direction
+        switch(startDir)
+        {
+            //From NORTH
+            case NORTH:
+                switch(stopDir)
+                {
+                    //Go EAST
+                    case EAST:
+                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                    //Go SOUTH
+                    case NORTH://SOUTH:
+                        return DriveDir.FORWARD;   //Go STRAIGHT
+                    //Go WEST
+                    case WEST:
+                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                    //turn
+                    case SOUTH:
+                        return DriveDir.TURN;
+
+                }
+
+                //From EAST
+            case EAST:
+                switch(stopDir)
+                {
+                    //Go NORTH
+                    case NORTH:
+                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                    //Go SOUTH
+                    case SOUTH:
+                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                    //Go WEST
+                    case EAST://WEST:
+                        return DriveDir.FORWARD;   //Go STRAIGHT
+                    //turn
+                    case WEST:
+                        return DriveDir.TURN;
+                }
+
+                //From SOUTH
+            case SOUTH:
+                switch(stopDir)
+                {
+                    //Go NORTH
+                    case SOUTH://NORTH:
+                        return DriveDir.FORWARD;   //Go STRAIGHT
+                    //Go EAST
+                    case EAST:
+                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                    //Go WEST
+                    case WEST:
+                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                    //turn
+                    case NORTH:
+                        return DriveDir.TURN;
+
+                }
+
+                //From WEST
+            case WEST:
+                switch(stopDir)
+                {
+                    //Go NORTH
+                    case NORTH:
+                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                    //Go EAST
+                    case WEST://EAST:
+                        return DriveDir.FORWARD;   //Go STRAIGHT
+                    //Go SOUTH
+                    case SOUTH:
+                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                    //turn
+                    case EAST:
+                        return DriveDir.TURN;
+                }
+        }
+        //Invalid direction
+        return null;
+    }
+}
+
+enum Direction{
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
 }

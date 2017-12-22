@@ -20,9 +20,15 @@ public class Link
     private int trafficWeight;
     private int lockedBy;
 
+    public Link(Long id){
+        this.id=id;
+    }
+    public Link(){
+        this.id=0L;
+    }
+
     @Id
     @Column(name = "idlink")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId()
     {
         return id;

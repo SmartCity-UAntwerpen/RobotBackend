@@ -113,7 +113,6 @@ public class JobController
 
         return "HTTP status : 200";
     }
-
     /**
      *
      * @param robotId
@@ -122,6 +121,9 @@ public class JobController
     public void finished(@PathVariable("robotId") int robotId)
     {
         Bot bot = botControlService.getBotWithCoreId((long) robotId);
+        bot.setBusy(0);
+        bot.setStatus(BotState.Busy.ordinal());
+        botControlService.saveBot(bot);
         completeJob(bot.getJobId());
     }
 
