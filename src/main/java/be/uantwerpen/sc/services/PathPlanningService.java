@@ -18,22 +18,12 @@ import java.util.*;
 @Service
 public class PathPlanningService implements IPathplanning
 {
-    /**
-     * Autowired link control service
-     */
-    @Autowired
-    private LinkControlService linkControlService;
 
     /**
      * Autowired map control service
      */
     @Autowired
     private MapControlService mapControlService;
-
-    /**
-     * List of Link entities
-     */
-    private List<Link> linkEntityList;
 
     /**
      * Dijkstra Path Finder
@@ -58,7 +48,7 @@ public class PathPlanningService implements IPathplanning
      * @return
      */
     public Path CalculatePathNonInterface(int start,int stop){
-        Map map = mapControlService.buildMap();
+        Map map = mapControlService.getMap();
         List<Link> linkEntityList = new ArrayList<>();
         List<Vertex> vertexes = new ArrayList<>();
         for (Node nj : map.getNodeList()){
@@ -110,8 +100,7 @@ public class PathPlanningService implements IPathplanning
      */
     @Override
     public Path CalculatePath(int start, int stop) {
-        List<Vertex> vertexes = mapToVertexes();
-
+        List<Vertex> vertexes = mapControlService.getVertexMap();
         dijkstra.computePaths(start,vertexes);
         return dijkstra.getShortestPathTo(stop,vertexes);
     }
@@ -123,14 +112,14 @@ public class PathPlanningService implements IPathplanning
     }
 
     /**
-     *TODO What & How?
+     * Gets a random next vertex from the start vertex and returns this as path
      * @param map
      * @param start
      * @return
      */
     @Override
     public Path nextRandomPath(Map map, int start) {
-        List<Vertex> vertexes = mapToVertexes();
+        List<Vertex> vertexes = mapControlService.getVertexMap();
 
         Random random = new Random();
         Vertex currentVertex = null;
@@ -149,39 +138,6 @@ public class PathPlanningService implements IPathplanning
         return new Path(vertexList);
     }
 
-    /**
-     * What the fuck, optimise this shit.
-     * Quadruple nested for?
-     * Really?
-     * @return
-     */
-    private List<Vertex> mapToVertexes(){
-        Map map = mapControlService.buildMap();
-        List<Vertex> vertexes = new ArrayList<>();
-
-        for (Node n : map.getNodeList())
-            vertexes.add(new Vertex(n));
-
-        ArrayList<Edge> edges;
-        List<ArrayList<Edge>> edgeslistinlist = new ArrayList<>();
-        int i = 0;
-        for (Node node : map.getNodeList()){
-            edges = new ArrayList<>();
-            for (Link neighbour : node.getNeighbours()){
-                for (Vertex v : vertexes){
-                    if(v.getId() == neighbour.getStopPoint().getId()){
-                        edges.add(new Edge(v.getId(),neighbour.getWeight(),neighbour));
-                    }
-                }
-            }
-            edgeslistinlist.add(i, (edges));
-            i++;
-        }
-        for (int j = 0; j < vertexes.size();j++){//Todo: zet dit in de quatro 4 loop
-            vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
-        }
-        return vertexes;
-    }
     public List<DriveDir> createBotDriveDirs(Path path){
         List<DriveDir> commands=new ArrayList<>();
         //First part is always driving forward.
@@ -213,20 +169,18 @@ public class PathPlanningService implements IPathplanning
         }
         return commands;
     }
-
-    private Direction getDirection(String dirString){
-        switch(dirString){
+    private Direction getDirection(String s){
+        switch (s){
+            case "S":
+                return Direction.SOUTH;
             case "N":
                 return Direction.NORTH;
-            case "E":
-                return Direction.EAST;
-            case "Z":
-                return Direction.SOUTH;
             case "W":
                 return Direction.WEST;
-            default:
-                return Direction.NORTH;
+            case "E":
+                return Direction.EAST;
         }
+        return null;
     }
 
     private Direction rotate(Direction direction){

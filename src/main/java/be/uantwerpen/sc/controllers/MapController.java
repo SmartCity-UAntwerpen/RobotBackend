@@ -81,7 +81,7 @@ public class MapController
     public Map getMap()
     {
         updateMap();
-        return mapControlService.buildMap();
+        return mapControlService.getMap();
     }
 
     /**
@@ -114,7 +114,7 @@ public class MapController
     }
 
     /**
-     * Calculates path with given start and stop ID
+     * Calculates path with given start and stop ID, returning the drive commands for the robot
      * @return Generated Path
      */
     @RequestMapping(value = "getdirections/{id}", method = RequestMethod.GET)
@@ -175,7 +175,7 @@ public class MapController
     @RequestMapping(value = "stringmap", method = RequestMethod.GET)
     public String mapString()
     {
-        return mapControlService.buildMap().toString();
+        return mapControlService.getMap().toString();
     }
 
     /**
@@ -193,6 +193,7 @@ public class MapController
     /**
      * Update map from BackBone
      *TODO: Future Work: Databases moeten bottom->up uitgelezen worden met steeds minder details. Momenteel wordt hij bottom->down gekopieerd
+     * Todo: Timed service updating?
      */
     public void updateMap()
     {
