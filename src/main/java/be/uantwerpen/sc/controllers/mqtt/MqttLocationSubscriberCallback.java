@@ -10,7 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 /**
  * @author  Arthur on 9/05/2016.
  * @author Reinout
- * TODO what exactly
+ * Callback function for when a location message arrives from a bot
  */
 public class MqttLocationSubscriberCallback implements MqttCallback
 {

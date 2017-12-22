@@ -57,7 +57,7 @@ public class PathPlanningService implements IPathplanning
      * @param stop
      * @return
      */
-    public List<Vertex> CalculatePathNonInterface(int start,int stop){
+    public Path CalculatePathNonInterface(int start,int stop){
         Map map = mapControlService.buildMap();
         List<Link> linkEntityList = new ArrayList<>();
         List<Vertex> vertexes = new ArrayList<>();
@@ -98,11 +98,7 @@ public class PathPlanningService implements IPathplanning
 
 
         dijkstra.computePaths(start,vertexes); // run Dijkstra
-        //System.out.println("Distance to " + vertexes.get(stop-1) + ": " + vertexes.get(stop-1).getMinDistance());
-        List<Vertex> path = dijkstra.getShortestPathTo(stop,vertexes);
-        //System.out.println("Path: " + path);
-        //return ("Distance to " + vertexes.get(stop-1) + ": " + vertexes.get(stop-1).minDistance) + ( "Path: " + path);
-        return path;
+        return dijkstra.getShortestPathTo(stop,vertexes);
     }
 
     /**
@@ -113,27 +109,27 @@ public class PathPlanningService implements IPathplanning
      * @return List of Vertexes following the shortest path
      */
     @Override
-    public List<Vertex> CalculatePath(int start, int stop) {
+    public Path CalculatePath(int start, int stop) {
         List<Vertex> vertexes = mapToVertexes();
 
         dijkstra.computePaths(start,vertexes);
-        List<Vertex> path = dijkstra.getShortestPathTo(stop,vertexes);
-        return path;
+        return dijkstra.getShortestPathTo(stop,vertexes);
     }
 
     @Override
     public double CalculatePathWeight(int start, int stop){
-        List<Vertex> vertices=CalculatePath(start,stop);
-        return vertices.get(vertices.size()-1).getMinDistance();
+        Path p=CalculatePath(start,stop);
+        return p.getWeight();
     }
+
     /**
-     *
+     *TODO What & How?
      * @param map
      * @param start
      * @return
      */
     @Override
-    public List<Vertex> nextRandomPath(Map map, int start) {
+    public Path nextRandomPath(Map map, int start) {
         List<Vertex> vertexes = mapToVertexes();
 
         Random random = new Random();
@@ -150,7 +146,7 @@ public class PathPlanningService implements IPathplanning
         List<Vertex> vertexList = new ArrayList<>();
         vertexList.add(currentVertex);
         vertexList.add(nextVertex);
-        return vertexList;
+        return new Path(vertexList);
     }
 
     /**
@@ -169,7 +165,7 @@ public class PathPlanningService implements IPathplanning
         ArrayList<Edge> edges;
         List<ArrayList<Edge>> edgeslistinlist = new ArrayList<>();
         int i = 0;
-        for (Node node : map.getNodeList()){//TODO: double getNodeJsons, single request
+        for (Node node : map.getNodeList()){
             edges = new ArrayList<>();
             for (Link neighbour : node.getNeighbours()){
                 for (Vertex v : vertexes){
@@ -181,20 +177,19 @@ public class PathPlanningService implements IPathplanning
             edgeslistinlist.add(i, (edges));
             i++;
         }
-
         for (int j = 0; j < vertexes.size();j++){//Todo: zet dit in de quatro 4 loop
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
-
         return vertexes;
     }
-    public List<DriveDir> createBotDriveDirs(List<Vertex> path){
+    public List<DriveDir> createBotDriveDirs(Path path){
         List<DriveDir> commands=new ArrayList<>();
         //First part is always driving forward.
         commands.add(DriveDir.FOLLOW);
-        Collections.reverse(path);
+        List<Vertex> vertices=path.getPath();
+        Collections.reverse(vertices);
         List<Link> links=new LinkedList<>();
-        for (Vertex v: path) {
+        for (Vertex v: vertices) {
             if(v.getPrevious()==null)
                 break;
             for(Edge l:v.getPrevious().getAdjacencies()) {

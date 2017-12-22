@@ -28,7 +28,6 @@ public class Point
 
     /**
      * Point lock state
-     * TODO Enum?
      */
     private int pointLock;
 

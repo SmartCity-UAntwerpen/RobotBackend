@@ -52,22 +52,12 @@ public class BotControlService
 
     /**
      * Encapsulator to get Bot by ID
-     * TODO: Remove, id is unneccesary
      * @param id ID of Bot to get
      * @return Bot
      */
     public Bot getBot(Long id)
     {
         return botRepository.findOne(id);
-    }
-
-    /**
-     * Gets Bot with core ID
-     * @param idCore Core ID of bot to find
-     * @return Bot
-     */
-    public Bot getBotWithCoreId(Long idCore){
-        return botRepository.findOne(idCore);
     }
 
     /**

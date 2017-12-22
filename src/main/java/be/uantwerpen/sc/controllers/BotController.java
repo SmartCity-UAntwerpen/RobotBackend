@@ -105,28 +105,6 @@ public class BotController
         botControlService.saveBot(bot);
     }
 
-    //TODO
-    @RequestMapping(value = "goto/{id}/{rid}",method = RequestMethod.GET)
-    public String goTo(@PathVariable("id") Long id, @PathVariable("rid") Long rid)
-    {
-        Bot botEntity = botControlService.getBotWithCoreId(id);
-        /*if (!pointEntities.contains(botEntity.getLinkId().getStopId())){
-            pointEntities.add(botEntity.getLinkId().getStopId());
-        }*/
-        if (botEntity != null)
-        {
-            if (botEntity.getPercentageCompleted() >= 50)
-            {
-                // stack.push(botEntity.getLinkId().getStopId());
-            }
-        }
-        else
-        {
-            System.out.println("Robot does not exist");
-        }
-
-        return "Something";//todo
-    }
 
     /**
      * Robot calls this GET
@@ -149,7 +127,7 @@ public class BotController
     @RequestMapping(value = "{id}/lid/{lid}", method = RequestMethod.GET)
     public void locationLink(@PathVariable("id") Long id, @PathVariable("lid") Long lid)
     {
-        Bot bot = botControlService.getBotWithCoreId(id);
+        Bot bot = botControlService.getBot(id);
         Link link;
 
         if(bot != null)
@@ -175,7 +153,7 @@ public class BotController
 
     public void updateLocation(Long id, Long idvertex, int progress)
     {
-        Bot bot = botControlService.getBotWithCoreId(id);
+        Bot bot = botControlService.getBot(id);
 
         if(bot != null)
         {

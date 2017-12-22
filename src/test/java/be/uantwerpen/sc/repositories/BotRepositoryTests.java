@@ -17,8 +17,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ActiveProfiles(profiles = {"dev"}, resolver = SystemPropertyActiveProfileResolver.class)
 public class BotRepositoryTests
 {
-    @Autowired
-    private BotRepository botRepository;
 
     @Test
     public void testSaveBot()

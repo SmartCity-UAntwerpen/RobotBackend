@@ -19,9 +19,7 @@ import java.util.Timer;
 
 /**
  * Runnable Timer Service
- * Checks if bot is alive every day
- * TODO: Multiple Bots?
- * TODO: Daily? Too long?
+ * Checks if bot is alive every minute
  */
 @Service
 public class TimerService implements Runnable {

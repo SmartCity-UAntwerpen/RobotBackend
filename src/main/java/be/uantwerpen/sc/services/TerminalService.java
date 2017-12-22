@@ -262,12 +262,11 @@ public class TerminalService
 
     /**
      * Sends Job to defined bot
-     * TODO: Check comments
      * @param botId ID of bot
      */
     private void sendJob(Long jobId,Long botId, long start, long stop)
     {
-        if(botControlService.getBotWithCoreId((long)botId) == null)
+        if(botControlService.getBot(botId) == null)
         {
             terminal.printTerminalError("Could not find bot with id: " + botId + "!");
             return;

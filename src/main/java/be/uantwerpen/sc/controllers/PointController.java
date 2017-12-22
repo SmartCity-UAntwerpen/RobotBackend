@@ -14,7 +14,6 @@ import java.util.List;
  * @author  Niels on 23/03/2016.
  * @author Reinout
  * HTTP INTERFACE
- * TODO
  *
  */
 @RestController
@@ -62,8 +61,6 @@ public class PointController
                     point.setPointLock(1);
                     pointService.save(point);
                     return true;
-                default:
-                    break;
             }
         }
 
@@ -72,7 +69,7 @@ public class PointController
 
     /**
      * Get Point status
-     * GET <- WHO?
+     * GET <- WHO? Probably Robot
      * @param id Point ID
      * @return Status
      */
@@ -82,24 +79,13 @@ public class PointController
         Point point = pointService.getPoint(id);
 
         if(point == null) //Point not found
-        {
             return false;
-        }
-
-        switch(point.getPointLock())
-        {
-            case 1:
-                return true;
-            case 0:
-                return false;
-        }
-        return true;
+        return point.getPointLock()==1? true: false;
     }
 
     /**
-     *
      * Locks / unlocks point
-     * TODO Why used?
+     * Done by who? TODO
      * @param id
      * @param value
      * @return
@@ -110,16 +96,11 @@ public class PointController
         synchronized (this)
         {
             Point point = pointService.getPoint(id);
-
             if(point == null)
-            {
-                //Point not found
                 return false;
-            }
 
             point.setPointLock(value);
             pointService.save(point);
-
             return true;
         }
     }

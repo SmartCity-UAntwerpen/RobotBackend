@@ -84,7 +84,7 @@ public class JobController
     {
         Bot b;
         try {
-            b = botControlService.getBotWithCoreId((long) idVehicle);
+            b = botControlService.getBot((long) idVehicle);
         }catch(Exception e){
             return "HTTP status : 404";
         }
@@ -120,7 +120,7 @@ public class JobController
     @RequestMapping(value = "finished/{robotId}",method = RequestMethod.GET)
     public void finished(@PathVariable("robotId") int robotId)
     {
-        Bot bot = botControlService.getBotWithCoreId((long) robotId);
+        Bot bot = botControlService.getBot((long) robotId);
         bot.setBusy(0);
         bot.setStatus(BotState.Busy.ordinal());
         botControlService.saveBot(bot);

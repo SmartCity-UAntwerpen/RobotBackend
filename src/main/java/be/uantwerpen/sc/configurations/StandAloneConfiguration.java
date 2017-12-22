@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 
 /**
  * Stand-Alone configuration
- * TODO check use
+ * Used when running a stand alone application
  */
 @Profile("standalone")
 @Configuration

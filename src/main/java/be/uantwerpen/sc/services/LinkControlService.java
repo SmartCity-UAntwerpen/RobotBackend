@@ -21,7 +21,6 @@ public class LinkControlService
 
     /**
      * Encapsulator for finding all available links
-     * TODO useful?
      * @return List of links
      */
     public List<Link> getAllLinks()
@@ -31,7 +30,6 @@ public class LinkControlService
 
     /**
      * Encapsulator for finding a link by id
-     * TODO useful?
      * @param id ID of link
      * @return Link
      */

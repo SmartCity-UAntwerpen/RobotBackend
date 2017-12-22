@@ -33,8 +33,6 @@ import java.util.List;
  * @author  Niels on 3/04/2016.
  * @author Reinout
  * Map Controller
- * HTTP INTERFACE with assumedly BackBone
- * TODO
  */
 @RestController
 @RequestMapping(value = "/map/")
@@ -123,8 +121,7 @@ public class MapController
     public DriveDir[] PathPlanning(@PathVariable("id") int id)
     {
         Bot b=botControlService.getBot((long) id);
-        List<Link> links = linkControlService.getAllLinks();
-        List<Vertex> path = pathPlanningService.CalculatePath((int)(long)b.getIdStart(),(int)(long)b.getIdStop());
+        Path path=pathPlanningService.CalculatePath((int)(long)b.getIdStart(),(int)(long)b.getIdStop());
         List<DriveDir> dirs=pathPlanningService.createBotDriveDirs(path);
         DriveDir[] output=new DriveDir[dirs.size()];
         output=dirs.toArray(output);
@@ -132,17 +129,14 @@ public class MapController
     }
     /**
      * Calculates path with given start and stop ID
-     * @param start Start Vertex ID TODO probably
-     * @param stop Stop Vertex ID TODO Probably
+     * @param start Start Node/Vertex ID
+     * @param stop Stop Node/Vertex ID
      * @return Generated Path
      */
     @RequestMapping(value = "{start}/path/{stop}", method = RequestMethod.GET)
     public Path PathPlanning(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        List<Link> links = linkControlService.getAllLinks();
-        List<Vertex> path = pathPlanningService.CalculatePath(start,stop);
-
-        return new Path(path);
+        return pathPlanningService.CalculatePath(start,stop);
     }
 
     /**
@@ -150,15 +144,14 @@ public class MapController
      * TODO OH WHAT YOU DO TO ME
      * NO ONE KNOWS
      * NA NANANA NA NANANA BADUM TSS
-     * @param start Start Vertex ID TODO probably
-     * @param stop Stop Vertex ID TODO Probably
+     * @param start Start Node/Vertex ID
+     * @param stop Stop Node/Vertex ID
      * @return Generated Path
      */
     @RequestMapping(value = "testpath/{start}/path/{stop}", method = RequestMethod.GET)
     public Path PathPlanning2(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        List<Vertex> path = pathPlanningService.CalculatePathNonInterface(start,stop);
-        return new Path(path);
+        return pathPlanningService.CalculatePathNonInterface(start,stop);
     }
 
     /**
@@ -194,10 +187,7 @@ public class MapController
     @RequestMapping(value = "random/{start}", method = RequestMethod.GET)
     public Path randomPath(@PathVariable("start") int start)
     {
-        List<Link> links = new ArrayList<>();
-        List<Vertex> vertexes = pathPlanningService.nextRandomPath(null,start);
-        Path pathClass = new Path(vertexes);
-        return pathClass;
+        return pathPlanningService.nextRandomPath(null,start);
     }
 
     /**

@@ -15,13 +15,11 @@ public class Job
 
     /**
      * Start ID of Point(?)
-     * TODO: Jobs are more variable than this
      */
     private long idStart;
 
     /**
      * End ID of Point(?)
-     * TODO: Jobs are more variable than this
      */
     private long idEnd;
 

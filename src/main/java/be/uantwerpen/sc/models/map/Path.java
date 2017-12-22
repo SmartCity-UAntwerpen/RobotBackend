@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Path Data Class
- * TODO WHAT DIS
+ * The path the robot will follow
  */
 public class Path {
 
@@ -17,10 +17,9 @@ public class Path {
         this.path = path;
     }
 
-    public Path() {
-        path = new ArrayList<>();
+    public double getWeight(){
+       return path.get(path.size()-1).getMinDistance();
     }
-
     public void addVertex(Vertex vertex){this.path.add(vertex);}
     public List<Vertex> getPath() {
         return path;

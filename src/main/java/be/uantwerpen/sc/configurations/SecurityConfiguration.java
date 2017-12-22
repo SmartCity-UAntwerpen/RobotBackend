@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 /**
  * Security Configuration
- * TODO Check use
  */
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter

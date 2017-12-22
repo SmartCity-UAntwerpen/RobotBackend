@@ -26,7 +26,7 @@ public class SystemLoader implements ApplicationRunner
 
     /**
      * Starts up Terminal after waiting for 200ms
-     * TODO Why wait?
+     * Wait is implemented so that the printing is still pretty
      */
     private class StartupProcess implements Runnable
     {

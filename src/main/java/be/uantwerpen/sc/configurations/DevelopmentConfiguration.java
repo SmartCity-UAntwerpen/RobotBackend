@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile;
 
 /**
  * Development Configuration
- * TODO check use
+ * Used when developing the application
  */
 @Profile("dev")
 @Configuration

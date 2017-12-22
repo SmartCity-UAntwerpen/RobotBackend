@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 /**
  * Map Control Service
- * TODO
  */
 @Service
 public class MapControlService

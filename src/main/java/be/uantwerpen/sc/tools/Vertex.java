@@ -34,22 +34,13 @@ public class Vertex
     private Vertex previous;
 
     /**
-     * Create Vertex from NodeJson TODO
-     * @param nodeJson
-     */
-    public Vertex(NodeJson nodeJson)
-    {
-        this.id = nodeJson.getPointEntity().getId();
-    }
-
-    /**
-     * Create Vertex from Node TODO
+     * Create Vertex linking to node
      * @param node
      */
     public Vertex(Node node){this.id = node.getNodeId();}
 
     /**
-     * Create Vertex from ID TODO
+     * Create Vertex from ID
      * @param id
      */
     public Vertex(Long id){this.id=id;}

@@ -78,6 +78,7 @@ public class CostController {
     /**
      * HTTP function
      * Used by MAAS
+     * TODO Optimize
      * Returns list of all bots with the weight to their start point and the weight from start to end
      * @param start
      * @param stop
@@ -96,7 +97,7 @@ public class CostController {
             Cost c = new Cost();
             c.setIdVehicle(b.getIdCore());
 
-            List<Vertex> vertices1 = pathPlanningService.CalculatePath(start, stop);
+            List<Vertex> vertices1 = pathPlanningService.CalculatePath(start, stop).getPath();
             List<Point> points1 = new ArrayList<>();
             for (Vertex v1 : vertices1){
                 points1.add(points.get(v1.getId().intValue()));
@@ -107,7 +108,7 @@ public class CostController {
 
             long l = b.getLinkId().getStartPoint().getId();
             int linkId = (int) (l);
-            List<Vertex> vertices2 = pathPlanningService.CalculatePath(linkId, start);
+            List<Vertex> vertices2 = pathPlanningService.CalculatePath(linkId, start).getPath();
             List<Point> points2 = new ArrayList<>();
             for (Vertex v2 : vertices2){
                 points2.add(points.get(v2.getId().intValue()));

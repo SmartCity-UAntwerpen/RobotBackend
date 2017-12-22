@@ -14,13 +14,11 @@ public class MqttLightSubscriberCallback implements MqttCallback
 {
     /**
      * TrafficLight Controller
-     * TODO Why not autowired?
      */
     TrafficLightController trafficLightController;
 
     /**
      * Constructor
-     * TODO why not autowired?
      * @param trafficLightController
      */
     public MqttLightSubscriberCallback(TrafficLightController trafficLightController)

@@ -54,7 +54,7 @@ public class MqttBotSubscriberCallback implements MqttCallback
         String temp = payloadString.split("botid:")[1];
         Long id = Long.parseLong(temp.split("/")[0]);
 
-        Bot bot=service.getBotWithCoreId(id);
+        Bot bot=service.getBot(id);
         bot.updateStatus(BotState.Alive.ordinal());
         service.saveBot(bot);
     }

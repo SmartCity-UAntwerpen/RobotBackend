@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 /**
  * Link Data Class
- * Similar to point, TODO
+ * Link between 2 points, basically the path a robot follows
  */
 @Entity
 @Table(name = "links", schema = "", catalog = "\"robotDB\"")

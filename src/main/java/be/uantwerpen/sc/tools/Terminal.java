@@ -10,7 +10,6 @@ import java.util.Observer;
 
 /**
  * Abstract Terminal Class
- * TODO comments
  */
 public abstract class Terminal
 {
@@ -26,23 +25,18 @@ public abstract class Terminal
     {
         terminalReader = new TerminalReader();
 
-        terminalReader.getObserver().addObserver(new Observer()
-        {
-            @Override
-            public void update(Observable source, Object object)
+        terminalReader.getObserver().addObserver((source, object) -> {
+            if(object != null)
             {
-                if(object != null)
+                String command = ((String)object).trim();
+
+                if(!command.equals(""))
                 {
-                    String command = ((String)object).trim();
-
-                    if(!command.equals(""))
-                    {
-                        executeCommand((String) object);
-                    }
+                    executeCommand((String) object);
                 }
-
-                activateTerminal();
             }
+
+            activateTerminal();
         });
     }
 
@@ -88,19 +82,18 @@ public abstract class Terminal
     }
 
     /**
-     * Run ? TODO
+     * Run entered command string
       * @param commandString
      */
     abstract public void executeCommand(String commandString);
 
     /**
      * TerminalReader Subclass
-     * TODO Function, comments
      */
     private class TerminalReader implements Runnable
     {
         /**
-         * Terminal Observer TODO
+         * Terminal Observer
          */
         private TerminalObserver observer;
 

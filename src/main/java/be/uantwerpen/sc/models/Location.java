@@ -2,7 +2,8 @@ package be.uantwerpen.sc.models;
 
 /**
  * Location
- * TODO What dis?
+ * Current location of a robot
+ * TODO 0 usage
  */
 public class Location {
 
