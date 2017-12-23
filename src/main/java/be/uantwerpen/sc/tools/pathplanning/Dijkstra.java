@@ -22,7 +22,6 @@ public class Dijkstra
         source.setMinDistance(0);
         Queue<Vertex> vertexQueue = new LinkedList<>();
         vertexQueue.add(source);
-        List<Vertex> vertexList = new ArrayList<>();
         while (!vertexQueue.isEmpty()) {
             Vertex u = vertexQueue.poll();
             Vertex v = new Vertex(1L);
@@ -32,13 +31,11 @@ public class Dijkstra
                 for (Vertex w : vertexes){
                     if(Objects.equals(w.getId(), e.getTarget())){
                         v =w;
-                        vertexList.add(v);
                         break;
                     }
                 }
 
-                double weight = e.getWeight();
-                double distanceThroughU = u.getMinDistance() + weight;
+                double distanceThroughU = u.getMinDistance() + e.getWeight();
                 if (distanceThroughU < v.getMinDistance()) {
                     vertexQueue.remove(v);
 

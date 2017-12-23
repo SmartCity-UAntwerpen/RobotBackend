@@ -2,6 +2,7 @@ package be.uantwerpen.sc.models.map;
 
 import be.uantwerpen.sc.tools.Vertex;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +15,10 @@ public class Path {
 
     public Path(List<Vertex> path) {
         this.path = path;
+    }
+
+    public Path() {
+        this.path =new ArrayList<>();
     }
 
     public double getWeight(){
