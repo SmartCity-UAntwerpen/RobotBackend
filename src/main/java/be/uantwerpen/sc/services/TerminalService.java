@@ -154,6 +154,23 @@ public class TerminalService
             case "?":
                 printHelp();
                 break;
+            case "calcpathweight":
+                if(commandString.split(" ", 3).length <= 2)
+                    terminal.printTerminalInfo("Missing arguments! 'calcpathweight {start} {stop}");
+                else
+                {
+                    try
+                    {
+                        String[] ints= (commandString.split(" ", 3));
+                        System.out.println(costController.calcPathWeight(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
+
+                    }
+                    catch(Exception e)
+                    {
+                        terminal.printTerminalError(e.getMessage());
+                    }
+                }
+                break;
             case "calcweight":
                 if(commandString.split(" ", 3).length <= 2)
                     terminal.printTerminalInfo("Missing arguments! 'calcWeight {start} {stop}");
@@ -162,7 +179,7 @@ public class TerminalService
                     try
                     {
                         String[] ints= (commandString.split(" ", 3));
-                        costController.calcPathWeight(Integer.parseInt(ints[1]), Integer.parseInt(ints[2]));
+                        System.out.println(costController.calcWeight(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
                     }
                     catch(Exception e)
                     {
@@ -193,7 +210,8 @@ public class TerminalService
         terminal.printTerminal("Available commands:");
         terminal.printTerminal("-------------------");
         terminal.printTerminal("generatebot: : Generates a new bot ID for testing");
-        terminal.printTerminal("calcWeight {start} {stop}");
+        terminal.printTerminal("calcweight {start} {stop} : Calculate weight for all current bots for a given path");
+        terminal.printTerminal("calcpathweight {start} {stop} : Calculate weight for a given path");
         terminal.printTerminal("'job {botId} {command}' : send a job to the bot with the given id.");
         terminal.printTerminal("'showbots' : show all bots in the database.");
         terminal.printTerminal("'clearbots' : Remove all bots from the database.");

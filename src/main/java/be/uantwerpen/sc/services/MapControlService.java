@@ -88,6 +88,12 @@ public class MapControlService
         }
         return vertexes;
     }
+    public void resetVertex(){
+        for(Vertex v: getVertexMap()){
+            v.setMinDistance(Double.POSITIVE_INFINITY);
+            v.setPrevious(null);
+        }
+    }
     /**
      * Gets all links and points from the database
      * Connects all links to their specific nodes and sets them as neighbors

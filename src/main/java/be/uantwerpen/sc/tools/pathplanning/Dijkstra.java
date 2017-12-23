@@ -33,6 +33,7 @@ public class Dijkstra
                     if(w.getId() == e.getTarget()){
                         v =w;
                         vertexList.add(v);
+                        break;
                     }
                 }
 

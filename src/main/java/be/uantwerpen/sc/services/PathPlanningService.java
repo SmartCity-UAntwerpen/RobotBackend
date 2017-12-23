@@ -101,6 +101,7 @@ public class PathPlanningService implements IPathplanning
     @Override
     public Path CalculatePath(int start, int stop) {
         List<Vertex> vertexes = mapControlService.getVertexMap();
+        mapControlService.resetVertex();
         dijkstra.computePaths(start,vertexes);
         return dijkstra.getShortestPathTo(stop,vertexes);
     }
@@ -120,6 +121,7 @@ public class PathPlanningService implements IPathplanning
     @Override
     public Path nextRandomPath(Map map, int start) {
         List<Vertex> vertexes = mapControlService.getVertexMap();
+
 
         Random random = new Random();
         Vertex currentVertex = null;

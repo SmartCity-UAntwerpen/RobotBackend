@@ -61,7 +61,7 @@ public class MqttJobPublisher
         try
         {
             //Generate unique client ID
-            MqttClient client = new MqttClient(broker, "SmartCity_Core_Publisher_" + new Random().nextLong(), persistence);
+            MqttClient client = new MqttClient(broker, "Robot Backend Publisher" + new Random().nextLong(), persistence);
             MqttConnectOptions connectOptions = new MqttConnectOptions();
             connectOptions.setCleanSession(true);
             connectOptions.setUserName(mqttUsername);

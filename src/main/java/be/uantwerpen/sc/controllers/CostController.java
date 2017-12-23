@@ -78,7 +78,6 @@ public class CostController {
     /**
      * HTTP function
      * Used by MAAS
-     * TODO Optimize
      * Returns list of all bots with the weight to their start point and the weight from start to end
      * @param start
      * @param stop
@@ -88,43 +87,18 @@ public class CostController {
     public String calcWeight(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
         List<Bot> bots = botControlService.getAllBots();
-        List<Link> links = linkControlService.getAllLinks();
-        List<Point> points = pointControlService.getAllPoints();
         JSONArray array = new JSONArray();
         for (Bot b : bots) {
             JSONObject obj = new JSONObject();
-            long weightToStart = 0;
             Cost c = new Cost();
             c.setIdVehicle(b.getIdCore());
 
-            List<Vertex> vertices1 = pathPlanningService.CalculatePath(start, stop).getPath();
-            List<Point> points1 = new ArrayList<>();
-            for (Vertex v1 : vertices1){
-                points1.add(points.get(v1.getId().intValue()));
-            }
-
-            Long weightFromStartToStop= (long) vertices1.get(vertices1.size()-1).getMinDistance();
+            double weightFromStartToStop=pathPlanningService.CalculatePathWeight(start, stop);
             c.setWeight(weightFromStartToStop);
 
-            long l = b.getLinkId().getStartPoint().getId();
-            int linkId = (int) (l);
-            List<Vertex> vertices2 = pathPlanningService.CalculatePath(linkId, start).getPath();
-            List<Point> points2 = new ArrayList<>();
-            for (Vertex v2 : vertices2){
-                points2.add(points.get(v2.getId().intValue()));
-            }
-
-            int size2 = vertices2.size();
-            for (int i = 0; i<size2-1; i++){
-                for(Link l2 : links){
-                    if(l2.getStartPoint().getId()== points2.get(i).getId()-1 && l2.getStopPoint().getId()==points2.get(i+1).getId()-1){
-                        weightToStart = weightToStart + (l2.getWeight()*l2.getLength()) +  l2.getTrafficWeight();
-                    }
-                }
-            }
-
-            Long w2 = new Long(weightToStart);
-            c.setWeightToStart(w2);
+            int pid = Math.toIntExact(b.getLinkId().getStartPoint().getId());
+            double weightToStart = pathPlanningService.CalculatePathWeight(pid, start);
+            c.setWeightToStart(weightToStart);
 
             try{
                 obj.put("status", c.getStatus());
@@ -133,7 +107,6 @@ public class CostController {
                 obj.put("idVehicle", c.getIdVehicle());
             }catch (JSONException e) { }
             array.put(obj);
-
         }
         return array.toString();
     }

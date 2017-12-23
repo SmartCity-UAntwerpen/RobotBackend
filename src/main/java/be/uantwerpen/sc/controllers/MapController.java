@@ -94,7 +94,6 @@ public class MapController
     public MapJson getMapJson()
     {
         MapJson mapJson = mapControlService.buildMapJson();
-
         return mapJson;
     }
 

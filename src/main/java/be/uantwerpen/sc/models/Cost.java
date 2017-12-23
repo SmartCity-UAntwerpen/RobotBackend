@@ -6,8 +6,8 @@ package be.uantwerpen.sc.models;
  */
 public class Cost {
     private boolean status;
-    private long weightToStart;
-    private long weight;
+    private double weightToStart;
+    private double weight;
     private long idVehicle;
 
     public Cost(){
@@ -24,22 +24,22 @@ public class Cost {
         this.status = st;
     }
 
-    public Long getWeightToStart()
+    public double getWeightToStart()
     {
         return weightToStart;
     }
 
-    public void setWeightToStart(Long w)
+    public void setWeightToStart(double w)
     {
         this.weightToStart = w;
     }
 
-    public Long getWeight()
+    public double getWeight()
     {
         return weight;
     }
 
-    public void setWeight(Long w)
+    public void setWeight(double w)
     {
         this.weight = w;
     }
