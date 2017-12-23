@@ -1,12 +1,7 @@
 package be.uantwerpen.sc.tools.pathplanning;
 
-import be.uantwerpen.sc.models.Link;
 import be.uantwerpen.sc.models.map.Map;
 import be.uantwerpen.sc.models.map.Path;
-import be.uantwerpen.sc.tools.Vertex;
-import org.springframework.security.access.method.P;
-
-import java.util.List;
 
 /**
  * Path Planning interface TODO

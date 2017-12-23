@@ -1,14 +1,9 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
-import be.uantwerpen.sc.models.*;
-import be.uantwerpen.sc.models.map.MapJson;
+import be.uantwerpen.sc.models.Bot;
+import be.uantwerpen.sc.models.Cost;
 import be.uantwerpen.sc.services.BotControlService;
-import be.uantwerpen.sc.services.LinkControlService;
 import be.uantwerpen.sc.services.PathPlanningService;
-import be.uantwerpen.sc.services.PointControlService;
-import be.uantwerpen.sc.tools.Edge;
-import be.uantwerpen.sc.tools.Vertex;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,14 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +21,6 @@ import java.util.List;
  * @author Reinout
  *
  * Cost Controller
- * TODO uses, working?
  */
 @RestController
 @RequestMapping("/cost/")
@@ -51,18 +37,6 @@ public class CostController {
      */
     @Autowired
     private BotControlService botControlService;
-
-    /**
-     * Autowired Point Control Service
-     */
-    @Autowired
-    private PointControlService pointControlService;
-
-    /**
-     * Autowired Link Control Service
-     */
-    @Autowired
-    private LinkControlService linkControlService;
 
     /**
      * BackBone IP
@@ -93,19 +67,16 @@ public class CostController {
             Cost c = new Cost();
             c.setIdVehicle(b.getIdCore());
 
-            double weightFromStartToStop=pathPlanningService.CalculatePathWeight(start, stop);
-            c.setWeight(weightFromStartToStop);
-
+            c.setWeight(pathPlanningService.CalculatePathWeight(start, stop));
             int pid = Math.toIntExact(b.getLinkId().getStartPoint().getId());
-            double weightToStart = pathPlanningService.CalculatePathWeight(pid, start);
-            c.setWeightToStart(weightToStart);
+            c.setWeightToStart(pathPlanningService.CalculatePathWeight(pid, start));
 
             try{
                 obj.put("status", c.getStatus());
                 obj.put("weightToStart", c.getWeightToStart());
                 obj.put("weight", c.getWeight());
                 obj.put("idVehicle", c.getIdVehicle());
-            }catch (JSONException e) { }
+            }catch (JSONException e) { e.printStackTrace();}
             array.put(obj);
         }
         return array.toString();
@@ -123,7 +94,6 @@ public class CostController {
     @RequestMapping(value = "calcpathweight/{start}/{stop}",method = RequestMethod.GET)
     public double calcPathWeight(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        List<Link> links = linkControlService.getAllLinks();
         return pathPlanningService.CalculatePathWeight(start, stop);
     }
 }

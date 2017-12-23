@@ -3,7 +3,6 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.sc.RobotBackendApplication;
 import be.uantwerpen.sc.configurations.SystemPropertyActiveProfileResolver;
 import be.uantwerpen.sc.models.Bot;
-import be.uantwerpen.sc.models.Link;
 import be.uantwerpen.sc.services.BotControlService;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,10 +1,11 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
-import be.uantwerpen.sc.controllers.BotController;
 import be.uantwerpen.sc.controllers.TrafficLightController;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.util.Objects;
 
 /**
  * @author  Dries on 10-5-2017.
@@ -61,7 +62,7 @@ public class MqttLightSubscriberCallback implements MqttCallback
         temp = temp.split("state:")[1];
         String state = temp.split("}")[0];
 
-        if(state == "")
+        if(Objects.equals(state, ""))
         {
             return;
         }

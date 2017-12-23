@@ -1,12 +1,13 @@
 package be.uantwerpen.sc.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Traffic Light
  */
 @Entity
-@Table(name = "tlights", schema = "", catalog = "\"robotDB\"")
+@Table(name = "tlights", catalog = "\"robotDB\"")
 public class TrafficLight
 {
     /**
@@ -63,7 +64,7 @@ public class TrafficLight
 
         TrafficLight that = (TrafficLight) o;
 
-        if(id != that.id) return false;
+        if(!Objects.equals(id, that.id)) return false;
         if(direction != null ? !direction.equals(that.direction) : that.direction != null) return false;
         if(state != null ? !state.equals(that.state) : that.state != null) return false;
 

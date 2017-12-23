@@ -1,8 +1,5 @@
 package be.uantwerpen.sc.models;
 
-import javax.persistence.*;
-import java.util.List;
-
 /**
  * Job Data Class
  */

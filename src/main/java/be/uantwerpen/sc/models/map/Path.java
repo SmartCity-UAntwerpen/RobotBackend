@@ -2,7 +2,6 @@ package be.uantwerpen.sc.models.map;
 
 import be.uantwerpen.sc.tools.Vertex;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -1,13 +1,14 @@
 package be.uantwerpen.sc.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Link Data Class
  * Link between 2 points, basically the path a robot follows
  */
 @Entity
-@Table(name = "links", schema = "", catalog = "\"robotDB\"")
+@Table(name = "links", catalog = "\"robotDB\"")
 public class Link
 {
     private Long id;
@@ -83,7 +84,7 @@ public class Link
 
         Link that = (Link) o;
 
-        if(id != that.id) return false;
+        if(!Objects.equals(id, that.id)) return false;
         if(length != null ? !length.equals(that.length) : that.length != null) return false;
         if(startDirection != null ? !startDirection.equals(that.startDirection) : that.startDirection != null)
             return false;

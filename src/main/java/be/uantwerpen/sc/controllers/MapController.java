@@ -9,7 +9,6 @@ import be.uantwerpen.sc.models.map.MapNew;
 import be.uantwerpen.sc.models.map.Path;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.tools.DriveDir;
-import be.uantwerpen.sc.tools.Vertex;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,8 +92,7 @@ public class MapController
     @RequestMapping(value = "json", method = RequestMethod.GET)
     public MapJson getMapJson()
     {
-        MapJson mapJson = mapControlService.buildMapJson();
-        return mapJson;
+        return mapControlService.buildMapJson();
     }
 
     /**
@@ -196,7 +194,7 @@ public class MapController
      */
     public void updateMap()
     {
-        String data =  "";
+        StringBuilder data = new StringBuilder();
         try {
 
             URL url = new URL("http://"+backboneIp+":"+backbonePort+"/map/stringmapjson/robot");
@@ -214,7 +212,7 @@ public class MapController
 
             String output;
             while ((output = br.readLine()) != null) {
-                data = data + output;
+                data.append(output);
             }
             System.out.println(output);
             conn.disconnect();
@@ -229,16 +227,16 @@ public class MapController
 
         }
 
-        List<Point> points = new ArrayList<Point>();
-        List<Link> links = new ArrayList<Link>();
+        List<Point> points = new ArrayList<>();
+        List<Link> links = new ArrayList<>();
         try{
-            JSONObject object = new JSONObject(data);
+            JSONObject object = new JSONObject(data.toString());
             JSONArray pointList =  object.getJSONArray("pointList");
             JSONArray linkList = object.getJSONArray("linkList");
 
             for(int i = 0; i < pointList.length(); i++){
                 JSONObject point = pointList.getJSONObject(i);
-                Point p = new Point(new Long(point.getInt("id")));
+                Point p = new Point((long) point.getInt("id"));
                 p.setRfid(point.getString("rfid"));
                 p.setPointLock(point.getInt("pointLock"));
                 points.add(p);
@@ -247,8 +245,8 @@ public class MapController
 
             for(int j = 0; j < linkList.length(); j++){
                 JSONObject link = linkList.getJSONObject(j);
-                Link l = new Link(new Long(link.getInt("id")));
-                l.setLength(new Long(link.getInt("length")));
+                Link l = new Link((long) link.getInt("id"));
+                l.setLength((long) link.getInt("length"));
                 l.setStartPoint(points.get(link.getInt("startPoint")-1));
                 l.setStopPoint(points.get(link.getInt("stopPoint")-1));
                 l.setStartDirection(link.getString("startDirection"));
@@ -258,6 +256,6 @@ public class MapController
                 linkControlService.save(l);
             }
 
-        }catch (JSONException e) { }
+        }catch (JSONException e) { e.printStackTrace();}
     }
 }

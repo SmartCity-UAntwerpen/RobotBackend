@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
 
@@ -26,11 +25,6 @@ public class BotControlService
     @Autowired
     private BotRepository botRepository;
 
-    /**
-     * Autowired Bot controller
-     */
-    @Autowired
-    private BotController botController;
     /**
      * BackBone IP
      */

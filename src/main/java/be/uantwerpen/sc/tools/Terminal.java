@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Observable;
-import java.util.Observer;
 
 /**
  * Abstract Terminal Class

@@ -36,8 +36,7 @@ public class LinkController
     @RequestMapping(method = RequestMethod.GET)
     public List<Link> allBots()
     {
-        List<Link> linkEntityList = linkControlService.getAllLinks();
-        return linkEntityList;
+        return linkControlService.getAllLinks();
     }
 
     /**

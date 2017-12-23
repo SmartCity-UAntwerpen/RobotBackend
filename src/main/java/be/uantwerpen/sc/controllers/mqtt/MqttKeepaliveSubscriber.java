@@ -1,7 +1,5 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
-import be.uantwerpen.sc.controllers.BotController;
-import be.uantwerpen.sc.controllers.TrafficLightController;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.tools.Terminal;
 import org.eclipse.paho.client.mqttv3.MqttClient;

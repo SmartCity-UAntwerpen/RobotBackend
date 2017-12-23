@@ -1,11 +1,8 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.controllers.mqtt.MqttKeepaliveSubscriber;
 import be.uantwerpen.sc.models.*;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.LinkControlService;
-import be.uantwerpen.sc.services.TimerService;
-import org.apache.http.client.utils.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +15,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import org.json.JSONObject;
@@ -42,12 +37,6 @@ public class BotController
      */
     @Autowired
     private LinkControlService linkControlService;
-
-    /**
-     * Autowired Map Control Service
-     */
-    @Autowired
-    private MapController mapController;
 
     /**
      * Get All Bots
@@ -141,14 +130,10 @@ public class BotController
                 System.out.println(bot.getIdCore());
             }
             else
-            {
                 System.out.println("Link with id: " + lid + " not found!");
-            }
         }
         else
-        {
             System.out.println("Bot with id:" + id + " not found!");
-        }
     }
 
     public void updateLocation(Long id, Long idvertex, int progress)
@@ -175,6 +160,10 @@ public class BotController
         botControlService.deleteBots();
     }
 
+    /**
+     * Get all bot positions
+     * @return
+     */
     @RequestMapping(value = "posAll", method = RequestMethod.GET)
     public String posAll(){
         List<Bot> bots = botControlService.getAllBots();
@@ -193,7 +182,6 @@ public class BotController
                 loc.setPercentage( (long)100);
             }
 
-            //opslaan in json file
             JSONObject obj = new JSONObject();
             try{
                 obj.put("idVehicle", loc.getVehicleID());
@@ -201,7 +189,7 @@ public class BotController
                 obj.put("idEnd", loc.getStopID());
                 obj.put("percentage", loc.getPercentage());
             }
-            catch (JSONException e) { }
+            catch (JSONException e) {e.printStackTrace(); }
             array.put(obj);
         }
         return array.toString();
@@ -210,15 +198,11 @@ public class BotController
     @RequestMapping(value = "checkTimer", method = RequestMethod.GET)
     public void checkTimer(){
         System.out.println("Checking Alive Bots");
-        //mapController.updateMap();
         List<Bot> bots = botControlService.getAllBots();
+        long currentDate=new Date().getTime();
         for(Bot b : bots){
-            long currentDate=new Date().getTime();
-            System.out.println(b.getIdCore());
-            System.out.println(b.getLastUpdated());
-            System.out.println(currentDate-b.getLastUpdated().getTime());
             if(b.getStatus()!=BotState.Unknown.ordinal()){
-                if(new Date().getTime()-b.getLastUpdated().getTime()>1000*60*5) {
+                if(currentDate-b.getLastUpdated().getTime()>1000*60*5) {
                     b.updateStatus(BotState.Unknown.ordinal());
                     botControlService.saveBot(b);
                 }
@@ -259,7 +243,7 @@ public class BotController
      * @return Bot ID
      */
     public int getNewId(){
-        String data = "";
+        StringBuilder data = new StringBuilder();
         try {
             URL url = new URL("http://"+backboneIP+":"+backbonePort+"//bot/newBot/robot");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -277,7 +261,7 @@ public class BotController
             String output;
             System.out.println("Output from Server .... \n");
             while ((output = br.readLine()) != null) {
-                data = data + output;
+                data.append(output);
                 System.out.println(output);
             }
 
@@ -290,7 +274,7 @@ public class BotController
             e.printStackTrace();
         }
         System.out.println(data);
-        return Integer.parseInt(data);
+        return Integer.parseInt(data.toString());
     }
 
 }

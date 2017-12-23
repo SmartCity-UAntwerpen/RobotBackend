@@ -74,13 +74,11 @@ public class PointController
      * @return Status
      */
     @RequestMapping(value = "getlock/{id}", method = RequestMethod.GET)
-    public boolean getPointStatus(@PathVariable("id") Long id)
-    {
+    public boolean getPointStatus(@PathVariable("id") Long id) {
         Point point = pointService.getPoint(id);
 
-        if(point == null) //Point not found
-            return false;
-        return point.getPointLock()==1? true: false;
+        //Point not found
+        return point != null && (point.getPointLock() == 1 ? true : false);
     }
 
     /**

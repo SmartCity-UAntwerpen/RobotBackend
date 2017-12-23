@@ -1,24 +1,21 @@
 package be.uantwerpen.sc.models;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Random;
 
 /**
  * Bot Data Class
  */
 @Entity
-@Table(name = "robots", schema = "", catalog = "\"robotDB\"")
+@Table(name = "robots",catalog = "\"robotDB\"")
 public class Bot
 {
     private Long idCore;
     private Long idStart;
     private Long idStop;
     private Long jobId;
-    private Long travelledDistance;
     private Integer percentageCompleted;
     private String workingMode;
     private int busy;
@@ -117,7 +114,7 @@ public class Bot
 
         Bot that = (Bot) o;
 
-        if(idCore != that.idCore) return false;
+        if(!Objects.equals(idCore, that.idCore)) return false;
         if(jobId != null ? !jobId.equals(that.jobId) : that.jobId != null) return false;
         if(percentageCompleted != null ? !percentageCompleted.equals(that.percentageCompleted) : that.percentageCompleted != null)
             return false;

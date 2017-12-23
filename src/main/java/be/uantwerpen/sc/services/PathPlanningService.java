@@ -53,9 +53,7 @@ public class PathPlanningService implements IPathplanning
         List<Vertex> vertexes = new ArrayList<>();
         for (Node nj : map.getNodeList()){
             vertexes.add(new Vertex(nj));
-            for(Link linkEntity : nj.getNeighbours()){
-                linkEntityList.add(linkEntity);
-            }
+            linkEntityList.addAll(nj.getNeighbours());
         }
 
         ArrayList<Edge> edges;
@@ -66,9 +64,9 @@ public class PathPlanningService implements IPathplanning
             edges = new ArrayList<>();
             for (Link neighbour : nj.getNeighbours()){
                 for (Vertex v : vertexes){
-                    if(v.getId() == neighbour.getStopPoint().getId()){
+                    if(Objects.equals(v.getId(), neighbour.getStopPoint().getId())){
                         for(Link linkEntity: linkEntityList){
-                            if(linkEntity.getStopPoint().getId() == v.getId() && linkEntity.getStartPoint().getId() == nj.getPointEntity().getId()){
+                            if(Objects.equals(linkEntity.getStopPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), nj.getPointEntity().getId())){
                                 System.out.println(linkEntity.toString() +" " + linkEntity);
                                 realLink = linkEntity;
                             }
@@ -151,7 +149,7 @@ public class PathPlanningService implements IPathplanning
             if(v.getPrevious()==null)
                 break;
             for(Edge l:v.getPrevious().getAdjacencies()) {
-                if(l.getTarget()==v.getId())
+                if(Objects.equals(l.getTarget(), v.getId()))
                     links.add(l.getLinkEntity());
             }
         }

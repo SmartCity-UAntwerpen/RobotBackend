@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -28,18 +27,6 @@ import java.net.URL;
 @RequestMapping("/job/")
 public class JobController
 {
-    /**
-     * Autowired Path Planning Service
-     */
-    @Autowired
-    private PathPlanningService pathPlanningService;
-
-    /**
-     * Autowired Link Control Service
-     */
-    @Autowired
-    private LinkControlService linkControlService;
-
     /**
      * Autowired Bot Control Service
      */
@@ -80,11 +67,11 @@ public class JobController
      * @return
      */
     @RequestMapping(value = "executeJob/{idJob}/{idVehicle}/{idStart}/{idStop}",method = RequestMethod.GET)
-    public String executeJob(@PathVariable("idJob") int idJob, @PathVariable("idVehicle") int idVehicle, @PathVariable("idStart") int idstart, @PathVariable("idStop") int idstop)
+    public String executeJob(@PathVariable("idJob") long idJob, @PathVariable("idVehicle") long idVehicle, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
     {
         Bot b;
         try {
-            b = botControlService.getBot((long) idVehicle);
+            b = botControlService.getBot( idVehicle);
         }catch(Exception e){
             return "HTTP status : 404";
         }
@@ -92,24 +79,24 @@ public class JobController
             return "HTTP status : 403";
         }
         try {
-            pointControlService.getPoint((long) idstart);
+            pointControlService.getPoint( idstart);
         }catch (Exception e){
             return "HTTP status : 404";
         }
         try {
-            pointControlService.getPoint((long) idstop);
+            pointControlService.getPoint( idstop);
         }catch (Exception e){
             return "HTTP status : 404";
         }
 
-        b.setJobId((long) idJob);
+        b.setJobId( idJob);
         b.setBusy(1);
-        b.setIdStart((long) idstart);
-        b.setIdStop((long) idstop);
+        b.setIdStart(idstart);
+        b.setIdStop(idstop);
         b.updateStatus(BotState.Busy.ordinal());
         botControlService.saveBot(b);
 
-        jobService.sendJob((long) idJob,  (long) idVehicle, (long) idstart, (long) idstop);
+        jobService.sendJob(idJob, idVehicle, idstart, idstop);
 
         return "HTTP status : 200";
     }
@@ -118,11 +105,11 @@ public class JobController
      * @param robotId
      */
     @RequestMapping(value = "finished/{robotId}",method = RequestMethod.GET)
-    public void finished(@PathVariable("robotId") int robotId)
+    public void finished(@PathVariable("robotId") long robotId)
     {
-        Bot bot = botControlService.getBot((long) robotId);
+        Bot bot = botControlService.getBot( robotId);
         bot.setBusy(0);
-        bot.setStatus(BotState.Busy.ordinal());
+        bot.setStatus(BotState.Alive.ordinal());
         botControlService.saveBot(bot);
         completeJob(bot.getJobId());
     }
@@ -134,7 +121,6 @@ public class JobController
      */
     public void completeJob(long id){
         try {
-            // Ander ip adres en poort - Maas
             String u = "http://"+maasIp+":"+maasPort+"/completeJob/" + id;
             URL url = new URL(u);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

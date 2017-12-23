@@ -30,7 +30,7 @@ public class Dijkstra
             for (Edge e : u.getAdjacencies())
             {
                 for (Vertex w : vertexes){
-                    if(w.getId() == e.getTarget()){
+                    if(Objects.equals(w.getId(), e.getTarget())){
                         v =w;
                         vertexList.add(v);
                         break;
@@ -60,7 +60,7 @@ public class Dijkstra
     public Path getShortestPathTo(int targetId, List<Vertex> vertexes)
     {
         Vertex target=getVertexByID(vertexes, targetId);
-        List<Vertex> path = new ArrayList<Vertex>();
+        List<Vertex> path = new ArrayList<>();
         for (Vertex vertex = target; vertex != null;  vertex = vertex.getPrevious())
             path.add(vertex);
         Collections.reverse(path);

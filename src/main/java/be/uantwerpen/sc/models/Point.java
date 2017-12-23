@@ -1,12 +1,13 @@
 package be.uantwerpen.sc.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Point
  */
 @Entity
-@Table(name = "points", schema = "", catalog = "\"robotDB\"")
+@Table(name = "points", catalog = "\"robotDB\"")
 public class Point
 {
     /**
@@ -105,7 +106,7 @@ public class Point
 
         Point that = (Point) o;
 
-        if(id != that.id) return false;
+        if(!Objects.equals(id, that.id)) return false;
         if(rfid != null ? !rfid.equals(that.rfid) : that.rfid != null) return false;
         if(type != null ? !type.equals(that.type) : that.type != null) return false;
 

@@ -2,9 +2,7 @@ package be.uantwerpen.sc.models.map;
 
 import be.uantwerpen.sc.models.Bot;
 import be.uantwerpen.sc.models.TrafficLight;
-import be.uantwerpen.sc.services.MapControlService;
 import be.uantwerpen.sc.tools.pathplanning.AbstractMap;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;

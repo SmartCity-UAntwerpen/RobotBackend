@@ -5,7 +5,6 @@ import be.uantwerpen.sc.models.map.*;
 import be.uantwerpen.sc.tools.Edge;
 import be.uantwerpen.sc.tools.Vertex;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -75,7 +74,7 @@ public class MapControlService
             edges = new ArrayList<>();
             for (Link neighbour : node.getNeighbours()){
                 for (Vertex v : vertexes){
-                    if(v.getId() == neighbour.getStopPoint().getId()){
+                    if(Objects.equals(v.getId(), neighbour.getStopPoint().getId())){
                         edges.add(new Edge(v.getId(),neighbour.getWeight(),neighbour));
                     }
                 }
@@ -140,7 +139,7 @@ public class MapControlService
             List<Neighbour> neighbourList = new ArrayList<>();
 
             for(Link link: linkEntityList)
-                if((link.getStartPoint().getId()) == (nodeJson.getPointEntity().getId()))
+                if(Objects.equals(link.getStartPoint().getId(), nodeJson.getPointEntity().getId()))
                     neighbourList.add(new Neighbour(link));
 
             nodeJson.setNeighbours(neighbourList);
