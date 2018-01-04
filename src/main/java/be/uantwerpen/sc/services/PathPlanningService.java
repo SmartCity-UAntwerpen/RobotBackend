@@ -204,8 +204,11 @@ public class PathPlanningService implements IPathplanning
                 previous=l;
                 continue;
             }
-            if(l.getAngle()==0){
+            if(l.getAngle()==null){
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
+            }
+            else if(l.getAngle()==0){
+                commands.addDriveDir(new DriveDir(DriveDirEnum.FORWARD));
             }
             else if(l.getAngle()<0) {
                 DriveDir d=new DriveDir(DriveDirEnum.LEFT);

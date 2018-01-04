@@ -5,7 +5,7 @@
 
 	<groupId>be.uantwerpen.sc</groupId>
 	<artifactId>RobotBackend</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Robot Backend</name>
@@ -166,10 +166,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>local-repository</id>
-			<url>target/RobotBackend.jar</url>
-		</repository>
-	</distributionManagement>
 </project>

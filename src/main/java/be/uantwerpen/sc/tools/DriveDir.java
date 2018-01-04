@@ -16,7 +16,7 @@ public class DriveDir{
 
     DriveDirEnum dir;
 
-    private double angle=0;
+    private double angle;
 
     public DriveDir(DriveDirEnum dir){
         this.dir = dir;

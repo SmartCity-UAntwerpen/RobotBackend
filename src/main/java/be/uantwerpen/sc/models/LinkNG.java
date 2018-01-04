@@ -13,7 +13,7 @@ public class LinkNG
 {
     private Long id;
     private Long length;
-    private double angle;
+    private Double angle;
     private Point startPoint;
     private Point stopPoint;
     private int weight;
@@ -146,11 +146,11 @@ public class LinkNG
 
     @Basic
     @Column(name = "angle")
-    public double getAngle() {
+    public Double getAngle() {
         return angle;
     }
 
-    public void setAngle(double angle) {
+    public void setAngle(Double angle) {
         this.angle = angle;
     }
 }

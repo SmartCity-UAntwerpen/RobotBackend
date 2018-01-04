@@ -8,7 +8,7 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-@SpringBootApplication(exclude = {EmbeddedServletContainerAutoConfiguration.class})
+@SpringBootApplication//(exclude = {EmbeddedServletContainerAutoConfiguration.class})
 public class RobotBackendApplication extends SpringBootServletInitializer
 {
 	public static void main(String[] args)

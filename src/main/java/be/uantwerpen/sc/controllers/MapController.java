@@ -299,9 +299,9 @@ public class MapController
             }
 
         }catch (JSONException e) { e.printStackTrace();}
-        ShitMap();
+        DemoMap();
     }
-    public void ShitMap(){
+    public void DemoMap(){
 
         List<Point> points = new ArrayList<>();
         List<LinkNG> links=new ArrayList<>();
@@ -331,11 +331,10 @@ public class MapController
             pointControlService.save(p);
         }
         //X1Links
-        LinkNG l = new LinkNG((long) 2111);
+        LinkNG l = new LinkNG((long) 2010);
         l.setLength((long) 1);
         l.setStartPoint(points.get(2));
         l.setStopPoint(points.get(0));
-        l.setAngle(0);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -343,7 +342,7 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(0));
         l.setStopPoint(points.get(1));
-        l.setAngle(180);
+        l.setAngle((double) 180);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -352,7 +351,6 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(1));
         l.setStopPoint(points.get(3));
-        l.setAngle(0);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -360,7 +358,7 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(3));
         l.setStopPoint(points.get(8));
-        l.setAngle(-90);
+        l.setAngle((double) -90);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -368,7 +366,6 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(8));
         l.setStopPoint(points.get(5));
-        l.setAngle(0);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -376,7 +373,7 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(5));
         l.setStopPoint(points.get(6));
-        l.setAngle(90);
+        l.setAngle((double) 90);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -384,7 +381,7 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(7));
         l.setStopPoint(points.get(4));
-        l.setAngle(-90);
+        l.setAngle((double) -90);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -392,7 +389,6 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(4));
         l.setStopPoint(points.get(9));
-        l.setAngle(0);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -400,7 +396,7 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(9));
         l.setStopPoint(points.get(2));
-        l.setAngle(90);
+        l.setAngle((double) 90);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -409,7 +405,6 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(6));
         l.setStopPoint(points.get(11));
-        l.setAngle(0);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -417,7 +412,7 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(11));
         l.setStopPoint(points.get(10));
-        l.setAngle(180);
+        l.setAngle((double) 180);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
@@ -425,42 +420,50 @@ public class MapController
         l.setLength((long) 1);
         l.setStartPoint(points.get(10));
         l.setStopPoint(points.get(7));
-        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 2520);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(7));
+        l.setStopPoint(points.get(2));
+        l.setAngle((double) 0);
         l.setWeight(1);
         links.add(l);
         linkNGControlService.save(l);
         //XXLinks
-        l = new LinkNG((long) 11020);
-        l.setLength((long) 1);
-        l.setStartPoint(points.get(0));
-        l.setStopPoint(points.get(2));
-        l.setAngle(0);
-        l.setWeight(1);
-        links.add(l);
-        linkNGControlService.save(l);
-        l = new LinkNG((long) 12010);
-        l.setLength((long) 1);
-        l.setStartPoint(points.get(2));
-        l.setStopPoint(points.get(0));
-        l.setAngle(0);
-        l.setWeight(1);
-        links.add(l);
-        linkNGControlService.save(l);
-        l = new LinkNG((long) 13020);
-        l.setLength((long) 1);
-        l.setStartPoint(points.get(10));
-        l.setStopPoint(points.get(2));
-        l.setAngle(0);
-        l.setWeight(1);
-        links.add(l);
-        linkNGControlService.save(l);
-        l = new LinkNG((long) 12030);
-        l.setLength((long) 1);
-        l.setStartPoint(points.get(2));
-        l.setStopPoint(points.get(10));
-        l.setAngle(0);
-        l.setWeight(1);
-        links.add(l);
-        linkNGControlService.save(l);
+        Link x;
+        x = new Link((long) 11020);
+        x.setLength((long) 1);
+        x.setStartPoint(points.get(0));
+        x.setStopPoint(points.get(2));
+        x.setStartDirection("W");
+        x.setStopDirection("E");
+        x.setWeight(1);
+        linkControlService.save(x);
+        x = new Link((long) 12010);
+        x.setLength((long) 1);
+        x.setStartPoint(points.get(2));
+        x.setStopPoint(points.get(0));
+        x.setStartDirection("E");
+        x.setStopDirection("W");
+        x.setWeight(1);
+        linkControlService.save(x);
+        x = new Link((long) 13020);
+        x.setLength((long) 1);
+        x.setStartPoint(points.get(10));
+        x.setStopPoint(points.get(2));
+        x.setStartDirection("E");
+        x.setStopDirection("W");
+        x.setWeight(1);
+        linkControlService.save(x);
+        x = new Link((long) 12030);
+        x.setLength((long) 1);
+        x.setStartPoint(points.get(2));
+        x.setStopPoint(points.get(10));
+        x.setStartDirection("W");
+        x.setStopDirection("E");
+        x.setWeight(1);
+        linkControlService.save(x);
     }
 }

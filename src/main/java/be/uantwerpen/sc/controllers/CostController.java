@@ -68,7 +68,7 @@ public class CostController {
             c.setIdVehicle(b.getIdCore());
 
             c.setWeight(pathPlanningService.CalculatePathWeight(start, stop));
-            int pid = Math.toIntExact(b.getLinkId().getStartPoint().getId());
+            int pid = Math.toIntExact((b.getLinkId().getStartPoint().getId()));//TODO Can crash due to Link=null
             c.setWeightToStart(pathPlanningService.CalculatePathWeight(pid, start));
 
             try{
