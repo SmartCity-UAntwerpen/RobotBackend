@@ -149,7 +149,6 @@ public class Bot
 
     public void updateStatus(int status){
         setLastUpdated(new Date());
-        System.out.println("UpdateStatus");
         setStatus(status);
 
     }

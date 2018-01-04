@@ -3,6 +3,7 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.sc.models.*;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.LinkControlService;
+import be.uantwerpen.sc.services.PointControlService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,12 @@ public class BotController
      */
     @Autowired
     private LinkControlService linkControlService;
+
+    /**
+     * Autowired Link Control Service
+     */
+    @Autowired
+    private PointControlService pointControlService;
 
     /**
      * Get All Bots
@@ -142,8 +149,10 @@ public class BotController
 
         if(bot != null)
         {
-            bot.setLinkId(linkControlService.getLink(idvertex));
+            //System.out.println(.getLink(idvertex));
+            //bot.setLinkId(pointControlService.getPoint(idvertex));
             bot.setPercentageCompleted(progress);
+            bot.updateStatus(BotState.Alive.ordinal());
             botControlService.saveBot(bot);
         }
     }

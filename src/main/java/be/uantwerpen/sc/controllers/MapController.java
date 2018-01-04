@@ -2,13 +2,14 @@ package be.uantwerpen.sc.controllers;
 
 import be.uantwerpen.sc.models.Bot;
 import be.uantwerpen.sc.models.Link;
+import be.uantwerpen.sc.models.LinkNG;
 import be.uantwerpen.sc.models.Point;
-import be.uantwerpen.sc.models.map.Map;
-import be.uantwerpen.sc.models.map.MapJson;
-import be.uantwerpen.sc.models.map.MapNew;
-import be.uantwerpen.sc.models.map.Path;
+import be.uantwerpen.sc.models.map.*;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.tools.DriveDir;
+import be.uantwerpen.sc.tools.DriveDirEncapsulator;
+import be.uantwerpen.sc.tools.DriveDirEnum;
+import be.uantwerpen.sc.tools.Vertex;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,6 +58,9 @@ public class MapController
 
     @Autowired
     private LinkControlService linkControlService;
+
+    @Autowired
+    private LinkNGControlService linkNGControlService;
 
     @Autowired
     private BotControlService botControlService;
@@ -109,21 +113,35 @@ public class MapController
         updateMap();
         return mapControlService.buildNewMap();
     }
-
+    @RequestMapping(value = "getmapng", method = RequestMethod.GET)
+    public MapNG getNewMapng()
+    {
+        updateMap();
+        return mapControlService.buildMapNG();
+    }
     /**
      * Calculates path with given start and stop ID, returning the drive commands for the robot
      * @return Generated Path
      */
-    @RequestMapping(value = "getdirections/{id}", method = RequestMethod.GET)
-    public DriveDir[] PathPlanning(@PathVariable("id") int id)
+    @RequestMapping(value = "getdirections/{start}/{end}", method = RequestMethod.GET)
+    public DriveDirEncapsulator getDirections(@PathVariable("start") int start, @PathVariable("end") int end)
     {
-        Bot b=botControlService.getBot((long) id);
-        Path path=pathPlanningService.CalculatePath((int)(long)b.getIdStart(),(int)(long)b.getIdStop());
-        List<DriveDir> dirs=pathPlanningService.createBotDriveDirs(path);
-        DriveDir[] output=new DriveDir[dirs.size()];
-        output=dirs.toArray(output);
-        return output;
+        Path path=pathPlanningService.CalculatePath(start,end);
+        List<DriveDirEnum> dirs=pathPlanningService.createBotDriveDirs(path);
+        DriveDirEncapsulator directions=new DriveDirEncapsulator();
+        for(int i =0; i<dirs.size(); i++){
+            directions.addDriveDir(new DriveDir(dirs.get(i)));
+        }
+        return directions;
     }
+    @RequestMapping(value = "getdirectionsng/{start}/{end}", method = RequestMethod.GET)
+    public DriveDirEncapsulator getDirectionsNG(@PathVariable("start") int start, @PathVariable("end") int end)
+    {
+        PathNG path=pathPlanningService.CalculatePathNG(start,end);
+        DriveDirEncapsulator dirs=pathPlanningService.createBotDriveDirsNG(path);
+        return dirs;
+    }
+
     /**
      * Calculates path with given start and stop ID
      * @param start Start Node/Vertex ID
@@ -135,7 +153,29 @@ public class MapController
     {
         return pathPlanningService.CalculatePath(start,stop);
     }
+    @RequestMapping(value = "{start}/pathNG/{stop}", method = RequestMethod.GET)
+    public PathNG PathPlanningNG(@PathVariable("start") int start, @PathVariable("stop") int stop)
+    {
+        return pathPlanningService.CalculatePathNG(start,stop);
+    }
 
+    @RequestMapping(value = "getnexthop/{start}/{current}/{end}", method = RequestMethod.GET)
+    public DriveDirEncapsulator getNextHop(@PathVariable("start") int start,@PathVariable("current") int current, @PathVariable("end") int end){
+        List<Vertex> vertices=(pathPlanningService.CalculatePath(start,end)).getPath();
+        Path path=new Path();
+        for (int i=0; i<vertices.size(); i++){
+           if(vertices.get(i).getId()==current){
+               path.addVertex(vertices.get(i));
+               path.addVertex(vertices.get(i+1));
+           }
+        }
+        List<DriveDirEnum> dirs=pathPlanningService.createBotDriveDirs(path);
+        DriveDirEncapsulator directions=new DriveDirEncapsulator();
+        for(int i =0; i<dirs.size(); i++){
+            directions.addDriveDir(new DriveDir(dirs.get(i)));
+        }
+        return directions;
+    }
     /**
      * Calculates Test path with given start and stop ID
      * TODO OH WHAT YOU DO TO ME
@@ -194,6 +234,7 @@ public class MapController
      */
     public void updateMap()
     {
+
         StringBuilder data = new StringBuilder();
         try {
 
@@ -205,6 +246,7 @@ public class MapController
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conn.getResponseCode());
+
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -257,5 +299,168 @@ public class MapController
             }
 
         }catch (JSONException e) { e.printStackTrace();}
+        ShitMap();
+    }
+    public void ShitMap(){
+
+        List<Point> points = new ArrayList<>();
+        List<LinkNG> links=new ArrayList<>();
+        //X1
+        Point p;
+        for(int i=0; i<2; i++) {
+            p=new Point((long) 110+i);
+            p.setRfid("04 36 8A 9A F6 1F 80");
+            p.setPointLock(0);
+            points.add(p);
+            pointControlService.save(p);
+        }
+        //X2
+        for(int i=0; i<8; i++) {
+            p=new Point((long) 120+i);
+            p.setRfid("04 84 88 8A C8 48 80");
+            p.setPointLock(0);
+            points.add(p);
+            pointControlService.save(p);
+        }
+        //X3
+        for(int i=0; i<2; i++) {
+            p=new Point((long) 130+i);
+            p.setRfid("04 18 25 9A 7F 22 80");
+            p.setPointLock(0);
+            points.add(p);
+            pointControlService.save(p);
+        }
+        //X1Links
+        LinkNG l = new LinkNG((long) 2111);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(2));
+        l.setStopPoint(points.get(0));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 1011);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(0));
+        l.setStopPoint(points.get(1));
+        l.setAngle(180);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        //X2Links
+        l = new LinkNG((long) 1121);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(1));
+        l.setStopPoint(points.get(3));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 2126);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(3));
+        l.setStopPoint(points.get(8));
+        l.setAngle(-90);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 2623);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(8));
+        l.setStopPoint(points.get(5));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 2324);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(5));
+        l.setStopPoint(points.get(6));
+        l.setAngle(90);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 2522);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(7));
+        l.setStopPoint(points.get(4));
+        l.setAngle(-90);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 2227);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(4));
+        l.setStopPoint(points.get(9));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 2720);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(9));
+        l.setStopPoint(points.get(2));
+        l.setAngle(90);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        //X3
+        l = new LinkNG((long) 2431);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(6));
+        l.setStopPoint(points.get(11));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 3130);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(11));
+        l.setStopPoint(points.get(10));
+        l.setAngle(180);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 3025);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(10));
+        l.setStopPoint(points.get(7));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        //XXLinks
+        l = new LinkNG((long) 11020);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(0));
+        l.setStopPoint(points.get(2));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 12010);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(2));
+        l.setStopPoint(points.get(0));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 13020);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(10));
+        l.setStopPoint(points.get(2));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
+        l = new LinkNG((long) 12030);
+        l.setLength((long) 1);
+        l.setStartPoint(points.get(2));
+        l.setStopPoint(points.get(10));
+        l.setAngle(0);
+        l.setWeight(1);
+        links.add(l);
+        linkNGControlService.save(l);
     }
 }

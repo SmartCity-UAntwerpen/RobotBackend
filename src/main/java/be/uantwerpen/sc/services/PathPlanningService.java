@@ -1,6 +1,7 @@
 package be.uantwerpen.sc.services;
 
 import be.uantwerpen.sc.models.Link;
+import be.uantwerpen.sc.models.LinkNG;
 import be.uantwerpen.sc.models.map.*;
 import be.uantwerpen.sc.models.map.Map;
 import be.uantwerpen.sc.tools.*;
@@ -104,8 +105,18 @@ public class PathPlanningService implements IPathplanning
         return dijkstra.getShortestPathTo(stop,vertexes);
     }
 
+    public PathNG CalculatePathNG(int start, int stop) {
+        List<VertexNG> vertexes = mapControlService.getVertexMapNG();
+        mapControlService.resetVertexNG();
+        dijkstra.computePathsNG(start,vertexes);
+        return dijkstra.getShortestPathToNG(stop,vertexes);
+    }
     @Override
     public double CalculatePathWeight(int start, int stop){
+        Path p=CalculatePath(start,stop);
+        return p.getWeight();
+    }
+    public double CalculatePathLength(int start, int stop){
         Path p=CalculatePath(start,stop);
         return p.getWeight();
     }
@@ -138,16 +149,17 @@ public class PathPlanningService implements IPathplanning
         return new Path(vertexList);
     }
 
-    public List<DriveDir> createBotDriveDirs(Path path){
-        List<DriveDir> commands=new ArrayList<>();
-        //First part is always driving forward.
-        commands.add(DriveDir.FOLLOW);
+    public List<DriveDirEnum> createBotDriveDirs(Path path){
+        List<DriveDirEnum> commands=new ArrayList<>();
         List<Vertex> vertices=path.getPath();
         Collections.reverse(vertices);
         List<Link> links=new LinkedList<>();
         for (Vertex v: vertices) {
-            if(v.getPrevious()==null)
+            if(v.getPrevious()==null) {
+                commands.add(DriveDirEnum.FOLLOW);
+                commands.add(DriveDirEnum.FORWARD);
                 break;
+            }
             for(Edge l:v.getPrevious().getAdjacencies()) {
                 if(Objects.equals(l.getTarget(), v.getId()))
                     links.add(l.getLinkEntity());
@@ -162,16 +174,61 @@ public class PathPlanningService implements IPathplanning
             }
             Direction stop=getDirection(l.getStartDirection());
             Direction start=rotate(getDirection(previous.getStopDirection()));
-            DriveDir relDir=getNextRelDir(start,stop);
+            DriveDirEnum relDir=getNextRelDir(start,stop);
             commands.add(relDir);
-            commands.add(DriveDir.FOLLOW);
+            commands.add(DriveDirEnum.FOLLOW);
+            previous=l;
+        }
+        return commands;
+    }
+    public DriveDirEncapsulator createBotDriveDirsNG(PathNG path){
+        DriveDirEncapsulator commands=new DriveDirEncapsulator();
+        List<VertexNG> vertices=path.getPath();
+        Collections.reverse(vertices);
+        List<LinkNG> links=new LinkedList<>();
+        for (VertexNG v: vertices) {
+            if(v.getPrevious()==null) {
+                commands.addDriveDir(new DriveDir(DriveDirEnum.FORWARD));
+                commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
+                break;
+            }
+            for(EdgeNG l:v.getPrevious().getAdjacencies()) {
+                if(Objects.equals(l.getTarget(), v.getId()))
+                    links.add(l.getLinkEntity());
+            }
+        }
+        Collections.reverse(links);
+        LinkNG previous=null;
+        for(LinkNG l: links) {
+            if(previous==null) {
+                previous=l;
+                continue;
+            }
+            if(l.getAngle()==0){
+                commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
+            }
+            else if(l.getAngle()<0) {
+                DriveDir d=new DriveDir(DriveDirEnum.LEFT);
+                d.setAngle(-l.getAngle());
+               commands.addDriveDir(d);
+            }
+            else if(l.getAngle()==180){
+                commands.addDriveDir(new DriveDir(DriveDirEnum.TURN));
+            }
+            else{
+                DriveDir d=new DriveDir(DriveDirEnum.RIGHT);
+                d.setAngle(l.getAngle());
+                commands.addDriveDir(d);
+            }
+
+            //commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
             previous=l;
         }
         return commands;
     }
     private Direction getDirection(String s){
         switch (s){
-            case "S":
+            case "Z":
                 return Direction.SOUTH;
             case "N":
                 return Direction.NORTH;
@@ -196,7 +253,7 @@ public class PathPlanningService implements IPathplanning
         }
         return null;
     }
-    private DriveDir getNextRelDir(Direction startDir, Direction stopDir){
+    private DriveDirEnum getNextRelDir(Direction startDir, Direction stopDir){
         //Calculate relative direction
         switch(startDir)
         {
@@ -206,16 +263,16 @@ public class PathPlanningService implements IPathplanning
                 {
                     //Go EAST
                     case EAST:
-                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
                     //Go SOUTH
                     case NORTH://SOUTH:
-                        return DriveDir.FORWARD;   //Go STRAIGHT
+                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
                     //Go WEST
                     case WEST:
-                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
                     //turn
                     case SOUTH:
-                        return DriveDir.TURN;
+                        return DriveDirEnum.TURN;
 
                 }
 
@@ -225,16 +282,16 @@ public class PathPlanningService implements IPathplanning
                 {
                     //Go NORTH
                     case NORTH:
-                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
                     //Go SOUTH
                     case SOUTH:
-                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
                     //Go WEST
                     case EAST://WEST:
-                        return DriveDir.FORWARD;   //Go STRAIGHT
+                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
                     //turn
                     case WEST:
-                        return DriveDir.TURN;
+                        return DriveDirEnum.TURN;
                 }
 
                 //From SOUTH
@@ -243,16 +300,16 @@ public class PathPlanningService implements IPathplanning
                 {
                     //Go NORTH
                     case SOUTH://NORTH:
-                        return DriveDir.FORWARD;   //Go STRAIGHT
+                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
                     //Go EAST
                     case EAST:
-                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
                     //Go WEST
                     case WEST:
-                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
                     //turn
                     case NORTH:
-                        return DriveDir.TURN;
+                        return DriveDirEnum.TURN;
 
                 }
 
@@ -262,16 +319,16 @@ public class PathPlanningService implements IPathplanning
                 {
                     //Go NORTH
                     case NORTH:
-                        return DriveDir.RIGHT;//LEFT);   //Turn LEFT
+                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
                     //Go EAST
                     case WEST://EAST:
-                        return DriveDir.FORWARD;   //Go STRAIGHT
+                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
                     //Go SOUTH
                     case SOUTH:
-                        return DriveDir.LEFT;//RIGHT);   //Turn RIGHT
+                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
                     //turn
                     case EAST:
-                        return DriveDir.TURN;
+                        return DriveDirEnum.TURN;
                 }
         }
         //Invalid direction

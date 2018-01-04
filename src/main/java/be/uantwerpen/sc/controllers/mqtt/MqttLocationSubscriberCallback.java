@@ -6,6 +6,10 @@ import be.uantwerpen.sc.models.BotState;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.lang.ref.SoftReference;
 
 /**
  * @author  Arthur on 9/05/2016.
@@ -21,6 +25,7 @@ public class MqttLocationSubscriberCallback implements MqttCallback
         this.botController = botController;
     }
 
+    //TODO logger
     /**
      * TODO Reconnect
      * @param cause
@@ -44,8 +49,7 @@ public class MqttLocationSubscriberCallback implements MqttCallback
         Long botID = Long.parseLong(botIDString);
 
         String payloadString = new String(mqttMessage.getPayload());
-        System.out.println(topic);
-        System.out.println("LOC :"+payloadString);
+        System.out.println(payloadString);
         System.out.println("ID :"+botID);
 
         if(!topic.endsWith("loc")){
@@ -59,7 +63,7 @@ public class MqttLocationSubscriberCallback implements MqttCallback
             String content=payloadString.split("\\{")[1];
             String temp = content.split("id:")[1];
             String id = temp.split("/")[0];
-            temp = temp.split("vertexid:")[1];
+            temp = temp.split("vertex:")[1];
             String vertexid = temp.split("/")[0];
             temp = temp.split("progress:")[1];
             String progress = temp.split("}")[0];
@@ -67,12 +71,11 @@ public class MqttLocationSubscriberCallback implements MqttCallback
             int VertexId = Integer.parseInt(vertexid);
             int Progress = Integer.parseInt(progress);
             botController.updateLocation((long) Id, (long) VertexId, Progress);
-            Bot b = botController.getBot((long) Id);
-            b.updateStatus(BotState.Alive.ordinal());
         }
         catch(Exception e)
         {
             System.err.println("Could not parse integer from payloadString: " + payloadString);
+            e.printStackTrace();
         }
     }
 
