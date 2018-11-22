@@ -98,7 +98,7 @@ public class TerminalService
                 terminal.printTerminal("Bot ID: "+id);
                 break;
             case "job":
-                if(commandString.split(" ", 3).length <= 2)
+                if(commandString.split(" ", 4).length <= 2)
                 {
                     terminal.printTerminalInfo("Missing arguments! 'job {jobId} {botId} {startId} {stopId}");
                 }
@@ -106,10 +106,11 @@ public class TerminalService
                 {
                     try
                     {
-                        long jobid = Long.parseLong(commandString.split(" ", 3)[1]);
-                        long botid = Long.parseLong(commandString.split(" ", 3)[2]);
-                        long start = Long.parseLong(commandString.split(" ", 3)[3]);
-                        long stop = Long.parseLong(commandString.split(" ", 3)[4]);
+                        String[] args = commandString.split(" ");
+                        long jobid = Long.parseLong(args[1]);
+                        long botid = Long.parseLong(args[2]);
+                        long start = Long.parseLong(args[3]);
+                        long stop = Long.parseLong(args[4]);
                         this.sendJob(jobid,botid,start,stop);
 
                     }
@@ -289,7 +290,7 @@ public class TerminalService
             terminal.printTerminalError("Could not find bot with id: " + botId + "!");
             return;
         }
-        if(jobService.sendJob(botId, jobId,start,stop))
+        if(jobService.sendJob(jobId, botId,start,stop))
             terminal.printTerminalInfo("Job send to bot with id: " + botId + ".");
         else
             terminal.printTerminalError("Could not send job to bot with id: " + botId + "!");
