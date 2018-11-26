@@ -7,6 +7,8 @@ import be.uantwerpen.sc.models.BotState;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.tools.Terminal;
 import org.eclipse.paho.client.mqttv3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -77,6 +79,9 @@ public class MqttSubscriber implements MqttCallback {
      * MQTT Client
      */
     private MqttClient mqttSubscribeClient;
+
+    Logger logger = LoggerFactory.getLogger(MqttSubscriber.class);
+
 
     @PostConstruct
     private void postConstruct()
@@ -152,14 +157,15 @@ public class MqttSubscriber implements MqttCallback {
             connOpts.setPassword(mqttPassword.toCharArray());
             mqttSubscribeClient.connect(connOpts);
 
-            System.out.println("Subscribing topics...");
+           logger.info("Subscribing to topics...");
+
             //Subscribe to traffic light control topic
             mqttSubscribeClient.subscribe("LIGHT/#");
             mqttSubscribeClient.subscribe("BOT/#");
         }
         catch(MqttException e)
         {
-            System.out.println(e);
+            logger.error(e.toString());
             throw new Exception("Could not subscribe to topics of MQTT service!");
         }
     }
@@ -187,17 +193,17 @@ public class MqttSubscriber implements MqttCallback {
             Long botID = Long.parseLong(botIDString);
 
             String payloadString = new String(mqttMessage.getPayload());
-            System.out.println(payloadString);
-            System.out.println("ID :"+botID);
+            logger.info("MQTT message for location received: "+payloadString);
+            logger.info("ID :"+botID);
 
             if(!topic.endsWith("loc")){
-                System.out.println("no location");
+                logger.warn("no location");
                 return;
             }
 
             try
             {
-                System.out.println("MQTT LOCATION ARRIVED");
+                logger.info("MQTT LOCATION ARRIVED");
                 String content=payloadString.split("\\{")[1];
                 String temp = content.split("id:")[1];
                 String id = temp.split("/")[0];
@@ -212,7 +218,7 @@ public class MqttSubscriber implements MqttCallback {
             }
             catch(Exception e)
             {
-                System.err.println("Could not parse integer from payloadString: " + payloadString);
+                logger.error("Could not parse integer from payloadString: " + payloadString);
                 e.printStackTrace();
             }
         }
@@ -221,12 +227,12 @@ public class MqttSubscriber implements MqttCallback {
         //Light TOPIC
         //Topic: LIGHT/{id}
         else if(topic.matches("(LIGHT\\/[0-9]+)")){
-            System.out.println("MQTT LIGHT ARRIVED");
+            logger.info("MQTT LIGHT ARRIVED");
             String lightIDString = topic.split("/")[1];
             Long lightID = Long.parseLong(lightIDString);
 
             String payloadString = new String(mqttMessage.getPayload());
-            System.out.println("LIGHT :"+payloadString);
+           logger.info("LIGHT :"+payloadString);
 
             if(!topic.endsWith("Heartbeat")){
                 return;
@@ -248,10 +254,10 @@ public class MqttSubscriber implements MqttCallback {
         //Alive TOPIC
         //Topic: BOT/alive
         else if(topic.matches("(BOT/alive)")) {
-            System.out.println("MQTT KeepAlive ARRIVED");
+            logger.info("MQTT KEEPALIVE MESSAGE ARRIVED");
 
             String payloadString = new String(mqttMessage.getPayload());
-            System.out.println("Bot :"+payloadString);
+            logger.info("Bot: " +payloadString +" is alive");
 
             String temp = payloadString.split("botid:")[1];
             Long id = Long.parseLong(temp.split("/")[0]);
