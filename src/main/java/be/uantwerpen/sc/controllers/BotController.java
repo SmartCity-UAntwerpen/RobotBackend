@@ -1,21 +1,19 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.*;
+
+import be.uantwerpen.sc.models.Bot;
+import be.uantwerpen.sc.models.BotState;
+import be.uantwerpen.sc.models.Location;
+import be.uantwerpen.sc.models.map.newMap.Link;
 import be.uantwerpen.sc.services.BotControlService;
-import be.uantwerpen.sc.services.LinkControlService;
-import be.uantwerpen.sc.services.PointControlService;
+import be.uantwerpen.sc.services.newMap.LinkControlService;
+import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import org.json.JSONObject;
@@ -252,7 +250,7 @@ public class BotController
      * @return Bot ID
      */
     public int getNewId(){
-        StringBuilder data = new StringBuilder();
+        /*StringBuilder data = new StringBuilder();
         try {
             URL url = new URL("http://"+backboneIP+":"+backbonePort+"//bot/newBot/robot");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -283,7 +281,8 @@ public class BotController
             e.printStackTrace();
         }
         System.out.println(data);
-        return Integer.parseInt(data.toString());
+        return Integer.parseInt(data.toString());*/
+        return 2;
     }
 
 }

@@ -1,9 +1,11 @@
 package be.uantwerpen.sc.services;
 
-import be.uantwerpen.sc.models.Link;
-import be.uantwerpen.sc.models.LinkNG;
-import be.uantwerpen.sc.models.map.*;
-import be.uantwerpen.sc.models.map.Map;
+
+import be.uantwerpen.sc.models.map.newMap.Map;
+import be.uantwerpen.sc.models.map.Path;
+import be.uantwerpen.sc.models.map.newMap.Link;
+import be.uantwerpen.sc.models.map.newMap.Node;
+import be.uantwerpen.sc.services.newMap.MapControlService;
 import be.uantwerpen.sc.tools.*;
 import be.uantwerpen.sc.tools.pathplanning.Dijkstra;
 import be.uantwerpen.sc.tools.pathplanning.IPathplanning;
@@ -48,7 +50,7 @@ public class PathPlanningService implements IPathplanning
      * @param stop
      * @return
      */
-    public Path CalculatePathNonInterface(int start,int stop){
+    public Path CalculatePathNonInterface(int start, int stop){
         Map map = mapControlService.getMap();
         List<Link> linkEntityList = new ArrayList<>();
         List<Vertex> vertexes = new ArrayList<>();
@@ -65,9 +67,9 @@ public class PathPlanningService implements IPathplanning
             edges = new ArrayList<>();
             for (Link neighbour : nj.getNeighbours()){
                 for (Vertex v : vertexes){
-                    if(Objects.equals(v.getId(), neighbour.getStopPoint().getId())){
+                    if(Objects.equals(v.getId(), neighbour.getEndPoint().getId())){
                         for(Link linkEntity: linkEntityList){
-                            if(Objects.equals(linkEntity.getStopPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), nj.getPointEntity().getId())){
+                            if(Objects.equals(linkEntity.getEndPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), nj.getPointEntity().getId())){
                                 System.out.println(linkEntity.toString() +" " + linkEntity);
                                 realLink = linkEntity;
                             }
@@ -84,7 +86,6 @@ public class PathPlanningService implements IPathplanning
         for (int j = 0; j < vertexes.size();j++){
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
-
 
         dijkstra.computePaths(start,vertexes); // run Dijkstra
         return dijkstra.getShortestPathTo(stop,vertexes);
@@ -105,12 +106,6 @@ public class PathPlanningService implements IPathplanning
         return dijkstra.getShortestPathTo(stop,vertexes);
     }
 
-    public PathNG CalculatePathNG(int start, int stop) {
-        List<VertexNG> vertexes = mapControlService.getVertexMapNG();
-        mapControlService.resetVertexNG();
-        dijkstra.computePathsNG(start,vertexes);
-        return dijkstra.getShortestPathToNG(stop,vertexes);
-    }
     @Override
     public double CalculatePathWeight(int start, int stop){
         Path p=CalculatePath(start,stop);
@@ -141,7 +136,7 @@ public class PathPlanningService implements IPathplanning
         }
         int i = currentVertex.getAdjacencies().size();
         int index = random.nextInt(i);
-        Vertex nextVertex = new Vertex(new Node(currentVertex.getAdjacencies().get(index).getLinkEntity().getStopPoint()));
+        Vertex nextVertex = new Vertex(new Node(currentVertex.getAdjacencies().get(index).getLinkEntity().getEndPoint()));
 
         List<Vertex> vertexList = new ArrayList<>();
         vertexList.add(currentVertex);
@@ -149,7 +144,7 @@ public class PathPlanningService implements IPathplanning
         return new Path(vertexList);
     }
 
-    public List<DriveDirEnum> createBotDriveDirs(Path path){
+    /*public List<DriveDirEnum> createBotDriveDirs(Path path){
         List<DriveDirEnum> commands=new ArrayList<>();
         List<Vertex> vertices=path.getPath();
         Collections.reverse(vertices);
@@ -180,31 +175,31 @@ public class PathPlanningService implements IPathplanning
             previous=l;
         }
         return commands;
-    }
-    public DriveDirEncapsulator createBotDriveDirsNG(PathNG path){
+    }*/
+    public DriveDirEncapsulator createBotDriveDirs(Path path){
         DriveDirEncapsulator commands=new DriveDirEncapsulator();
-        List<VertexNG> vertices=path.getPath();
+        List<Vertex> vertices=path.getPath();
         Collections.reverse(vertices);
-        List<LinkNG> links=new LinkedList<>();
-        for (VertexNG v: vertices) {
+        List<Link> links=new LinkedList<>();
+        for (Vertex v: vertices) {
             if(v.getPrevious()==null) {
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FORWARD));
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
                 break;
             }
-            for(EdgeNG l:v.getPrevious().getAdjacencies()) {
+            for(Edge l:v.getPrevious().getAdjacencies()) {
                 if(Objects.equals(l.getTarget(), v.getId()))
                     links.add(l.getLinkEntity());
             }
         }
         Collections.reverse(links);
-        LinkNG previous=null;
-        for(LinkNG l: links) {
+        Link previous=null;
+        for(Link l: links) {
             if(previous==null) {
                 previous=l;
                 continue;
             }
-            if(l.getAngle()==null){
+            if(l.getAngle()==-1.0){ //TODO: change follow command condition
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
             }
             else if(l.getAngle()==0){

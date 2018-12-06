@@ -1,7 +1,6 @@
 package be.uantwerpen.sc.tools;
 
-import be.uantwerpen.sc.models.Link;
-import be.uantwerpen.sc.models.LinkNG;
+import be.uantwerpen.sc.models.OLD.LinkNG;
 
 
 /**

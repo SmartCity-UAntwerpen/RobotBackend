@@ -3,6 +3,7 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.sc.models.Bot;
 import be.uantwerpen.sc.models.BotState;
 import be.uantwerpen.sc.services.*;
+import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -100,6 +101,7 @@ public class JobController
 
         return "HTTP status : 200";
     }
+
     /**
      *
      * @param robotId

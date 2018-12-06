@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.Point;
-import be.uantwerpen.sc.services.PointControlService;
+import be.uantwerpen.sc.models.map.newMap.Point;
+import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,18 +53,16 @@ public class PointController
             if(point == null)//Point not found
                 return false;
 
-            switch(point.getPointLock())
-            {
-                case 1: //Point already locked
-                    return false;
-                case 0: //Point not locked -> attempt lock
-                    point.setPointLock(1);
-                    pointService.save(point);
-                    return true;
+            if(point.getTileLock()) {
+                //Point already locked
+                return false;
+            } else {
+                //Point not locked -> attempt lock
+                point.setTileLock(true,null);
+                pointService.save(point);
+                return true;
             }
         }
-
-        return false;
     }
 
     /**
@@ -78,7 +76,7 @@ public class PointController
         Point point = pointService.getPoint(id);
 
         //Point not found
-        return point != null && (point.getPointLock() == 1 ? true : false);
+        return point != null && (point.getTileLock());
     }
 
     /**
@@ -89,7 +87,7 @@ public class PointController
      * @return
      */
     @RequestMapping(value = "setlock/{id}/{value}", method = RequestMethod.GET)
-    public boolean setPointStatus(@PathVariable("id") Long id, @PathVariable("value") int value)
+    public boolean setPointStatus(@PathVariable("id") Long id, @PathVariable("value") boolean value)
     {
         synchronized (this)
         {
@@ -97,7 +95,7 @@ public class PointController
             if(point == null)
                 return false;
 
-            point.setPointLock(value);
+            point.setTileLock(value,null);
             pointService.save(point);
             return true;
         }

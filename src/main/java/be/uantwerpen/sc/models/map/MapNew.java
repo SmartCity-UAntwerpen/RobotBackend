@@ -1,8 +1,8 @@
 package be.uantwerpen.sc.models.map;
 
-import be.uantwerpen.sc.models.Link;
+import be.uantwerpen.sc.models.OLD.Link;
 import be.uantwerpen.sc.tools.pathplanning.AbstractMap;
-import be.uantwerpen.sc.models.Point;
+import be.uantwerpen.sc.models.OLD.Point;
 
 import java.util.ArrayList;
 import java.util.List;

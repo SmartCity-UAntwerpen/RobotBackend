@@ -1,4 +1,4 @@
-package be.uantwerpen.sc.models;
+package be.uantwerpen.sc.models.OLD;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Point
  */
-@Entity
+
 @Table(name = "points", catalog = "\"robotDB\"")
 public class Point
 {

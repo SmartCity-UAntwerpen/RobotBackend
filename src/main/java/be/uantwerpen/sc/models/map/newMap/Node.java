@@ -1,7 +1,5 @@
-package be.uantwerpen.sc.models.map;
+package be.uantwerpen.sc.models.map.newMap;
 
-import be.uantwerpen.sc.models.OLD.Link;
-import be.uantwerpen.sc.models.OLD.Point;
 
 import java.util.List;
 

@@ -1,5 +1,8 @@
 package be.uantwerpen.sc.models;
 
+
+import be.uantwerpen.sc.models.map.newMap.Link;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -84,7 +87,7 @@ public class TrafficLight
 
 
     @OneToOne
-    @JoinColumn(name = "\"link\"", referencedColumnName = "idlink")
+    @JoinColumn(name = "\"link\"")
     public Link getLink()
     {
         return link;

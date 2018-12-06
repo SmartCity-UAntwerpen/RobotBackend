@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.Link;
-import be.uantwerpen.sc.services.LinkControlService;
+import be.uantwerpen.sc.models.map.newMap.Link;
+import be.uantwerpen.sc.services.newMap.LinkControlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,19 +55,18 @@ public class LinkController
             {
                 return false;
             }
-            switch(link.getLocked())
-            {
-                case 1: //Point already locked
-                    return false;
-                case 0: //Point not locked -> attempt lock
-                    link.setLocked(1);
-                    link.setTrafficWeight(link.getTrafficWeight()+10);
-                    linkControlService.save(link);
-                    return true;
+            if(link.getLock().getStatus()) {
+                return false;
+            } else{
+                //Point not locked -> attempt lock
+                link.lockLink(true,null);
+                link.setWeight(link.getWeight()+10);
+                linkControlService.save(link);
+                return true;
+
             }
         }
 
-        return false;
     }
 
     /**
@@ -87,18 +86,18 @@ public class LinkController
                 return false;
             }
 
-            switch(link.getLocked())
-            {
-                case 1: //Point already locked
-                    link.setLocked(0);
-                    link.setTrafficWeight(link.getTrafficWeight()-10);
-                    linkControlService.save(link);
-                    return true;
-                case 0: //Point not locked -> attempt lock
-                    return false;
+            if(link.getLock().getStatus()) {
+                //Point already locked
+                link.lockLink(false, null);
+                link.setWeight(link.getWeight() - 10);
+                linkControlService.save(link);
+                return true;
+            } else {
+                //Point not locked -> attempt lock
+                return false;
             }
         }
-        return false;
+
     }
 }
 

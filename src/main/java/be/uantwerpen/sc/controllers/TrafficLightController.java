@@ -2,8 +2,8 @@ package be.uantwerpen.sc.controllers;
 
 import be.uantwerpen.sc.models.TrafficLight;
 import be.uantwerpen.sc.repositories.TrafficLightRepository;
-import be.uantwerpen.sc.services.LinkControlService;
 import be.uantwerpen.sc.services.TrafficLightControlService;
+import be.uantwerpen.sc.services.newMap.LinkControlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

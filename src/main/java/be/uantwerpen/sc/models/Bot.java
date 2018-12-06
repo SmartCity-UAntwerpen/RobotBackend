@@ -1,5 +1,7 @@
 package be.uantwerpen.sc.models;
 
+import be.uantwerpen.sc.models.map.newMap.Link;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
@@ -9,7 +11,7 @@ import java.util.Random;
  * Bot Data Class
  */
 @Entity
-@Table(name = "robots",catalog = "\"robotDB\"")
+@Table(name = "robots",catalog = "\"robotDB_1\"")
 public class Bot
 {
     private Long idCore;
@@ -136,7 +138,7 @@ public class Bot
     }
 
     @OneToOne
-    @JoinColumn(name = "\"link\"", referencedColumnName = "idlink")
+    @JoinColumn(name = "\"link\"")
     public Link getLinkId()
     {
         return link;

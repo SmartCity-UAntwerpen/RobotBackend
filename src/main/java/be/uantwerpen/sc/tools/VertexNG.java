@@ -1,6 +1,5 @@
 package be.uantwerpen.sc.tools;
 
-import be.uantwerpen.sc.models.map.Node;
 import be.uantwerpen.sc.models.map.NodeNG;
 
 import java.util.ArrayList;

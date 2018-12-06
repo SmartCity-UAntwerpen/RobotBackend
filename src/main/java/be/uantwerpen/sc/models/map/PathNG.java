@@ -1,6 +1,5 @@
 package be.uantwerpen.sc.models.map;
 
-import be.uantwerpen.sc.tools.Vertex;
 import be.uantwerpen.sc.tools.VertexNG;
 
 import java.util.ArrayList;

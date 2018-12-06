@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.tools;
 
-import be.uantwerpen.sc.models.map.Node;
+import be.uantwerpen.sc.models.map.newMap.Node;
 
 import java.util.ArrayList;
 import java.util.List;
