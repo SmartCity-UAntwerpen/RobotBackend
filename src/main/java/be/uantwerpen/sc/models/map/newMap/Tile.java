@@ -5,7 +5,7 @@ import be.uantwerpen.sc.models.Bot;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "tiles", catalog = "\"robotDB_1\"")
+@Table(name = "tiles", catalog = "\"robotDB_new\"")
 public class Tile {
 
     @Id
@@ -13,7 +13,7 @@ public class Tile {
 
     private String rfid;
 
-    private boolean isLocked;
+    private Boolean isLocked;
 
     private String type;
 
@@ -21,7 +21,15 @@ public class Tile {
     @JoinColumn(name="lockedBy")
     private Bot lockedBy;
 
-    public Long getId() {
+    public Tile(){}
+
+    public Tile(Long id, String rfid, String type){
+        this.id = id;
+        this.rfid = rfid;
+        this.type = type;
+    }
+
+    public long getId() {
         return id;
     }
 
@@ -41,7 +49,7 @@ public class Tile {
         return isLocked;
     }
 
-    public void setLocked(boolean locked) {
+    public void setLocked(Boolean locked) {
         isLocked = locked;
     }
 

@@ -4,29 +4,30 @@ package be.uantwerpen.sc.models.map.newMap;
 import be.uantwerpen.sc.models.Bot;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
-@Table(name = "links", catalog = "\"robotDB_1\"")
+@Table(name = "links", catalog = "\"robotDB_new\"")
 public class Link {
 
     @Id
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="start")
     private Point startPoint;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="end")
     private Point endPoint;
-
     private int weight;
-
     private double angle;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="linkLockId")
     private LinkLock lock;
+
+    public Link(){}
 
     public Long getId() {
         return id;
@@ -36,6 +37,9 @@ public class Link {
         this.id = id;
     }
 
+
+    @OneToOne
+    @JoinColumn(name = "\"start\"")
     public Point getStartPoint() {
         return startPoint;
     }
@@ -44,6 +48,8 @@ public class Link {
         this.startPoint = startPoint;
     }
 
+    @OneToOne
+    @JoinColumn(name = "\"end\"")
     public Point getEndPoint() {
         return endPoint;
     }
@@ -83,5 +89,18 @@ public class Link {
 
     public Boolean getLockStatus(){
         return lock.getStatus();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if(this == o) return true;
+        if(o == null || getClass() != o.getClass()) return false;
+
+        Link that = (Link) o;
+
+        if(!Objects.equals(id, that.id)) return false;
+
+        return true;
     }
 }

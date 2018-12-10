@@ -104,10 +104,10 @@ public class BotController
      * Robot calls this GET
      * @return
      */
-    @RequestMapping(value = "newRobot", method = RequestMethod.GET)
-    public Long newRobot()
+    @RequestMapping(value = "newRobot/{id}", method = RequestMethod.GET)
+    public Long newRobot(@PathVariable("id") Long id)
     {
-        Bot bot = new Bot((long) getNewId());
+        Bot bot = new Bot(id);
         System.out.println(bot);
         //Save bot in database and get bot new rid
         botControlService.saveBot(bot);

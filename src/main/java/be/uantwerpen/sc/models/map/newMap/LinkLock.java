@@ -5,17 +5,19 @@ import be.uantwerpen.sc.models.Bot;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "link_locks", catalog = "\"robotDB_1\"")
+@Table(name = "link_locks", catalog = "\"robotDB_new\"")
 public class LinkLock {
 
     @Id
     private Long id;
 
-    private boolean status;
+    private Boolean status;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="lockedBy")
     private Bot lockedBy;
+
+    public LinkLock(){}
 
     public Long getId() {
         return id;
@@ -25,11 +27,11 @@ public class LinkLock {
         this.id = id;
     }
 
-    public boolean getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 

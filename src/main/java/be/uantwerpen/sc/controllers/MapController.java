@@ -5,14 +5,17 @@ import be.uantwerpen.sc.models.map.Path;
 import be.uantwerpen.sc.models.map.newMap.Link;
 import be.uantwerpen.sc.models.map.newMap.Point;
 import be.uantwerpen.sc.models.map.newMap.Map;
+import be.uantwerpen.sc.models.map.newMap.Tile;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
 import be.uantwerpen.sc.services.newMap.MapControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
+import be.uantwerpen.sc.services.newMap.TileControlService;
 import be.uantwerpen.sc.tools.DriveDir;
 import be.uantwerpen.sc.tools.DriveDirEncapsulator;
 import be.uantwerpen.sc.tools.DriveDirEnum;
 import be.uantwerpen.sc.tools.Vertex;
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,6 +63,9 @@ public class MapController
     private PointControlService pointControlService;
 
     @Autowired
+    private TileControlService tileControlService;
+
+    @Autowired
     private LinkControlService linkControlService;
 
     @Autowired
@@ -87,6 +93,20 @@ public class MapController
         return mapControlService.getMap();
     }
 
+    @RequestMapping(value = "getPoint/{id}", method = RequestMethod.GET)
+    public Point getPoint(@PathVariable("id") Long id)
+    {
+        Point p =  pointControlService.getPoint(id);
+        return p;
+    }
+
+    @RequestMapping(value = "getTile/{id}", method = RequestMethod.GET)
+    public Tile getTile(@PathVariable("id") Long id)
+    {
+        Tile t =  tileControlService.getTile(id);
+        return t;
+    }
+
     /*
     @RequestMapping(value = "getdirections/{start}/{end}", method = RequestMethod.GET)
     public DriveDirEncapsulator getDirections(@PathVariable("start") int start, @PathVariable("end") int end)
@@ -99,11 +119,12 @@ public class MapController
         }
         return directions;
     }*/
+
     /**
      * Calculates path with given start and stop ID, returning the drive commands for the robot
      * @return Generated Path
      */
-    @RequestMapping(value = "getdirectionsng/{start}/{end}", method = RequestMethod.GET)
+    @RequestMapping(value = "getdirections/{start}/{end}", method = RequestMethod.GET)
     public DriveDirEncapsulator getDirectionsNG(@PathVariable("start") int start, @PathVariable("end") int end)
     {
         Path path=pathPlanningService.CalculatePath(start,end);
@@ -120,7 +141,8 @@ public class MapController
     @RequestMapping(value = "{start}/path/{stop}", method = RequestMethod.GET)
     public Path PathPlanning(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        return pathPlanningService.CalculatePath(start,stop);
+        Path p = pathPlanningService.CalculatePath(start,stop);
+        return p;
     }
 
     @RequestMapping(value = "getnexthop/{start}/{current}/{end}", method = RequestMethod.GET)

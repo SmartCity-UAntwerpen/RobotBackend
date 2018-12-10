@@ -1,11 +1,8 @@
 package be.uantwerpen.sc.tools.pathplanning;
 
 import be.uantwerpen.sc.models.map.Path;
-import be.uantwerpen.sc.models.map.PathNG;
 import be.uantwerpen.sc.tools.Edge;
-import be.uantwerpen.sc.tools.EdgeNG;
 import be.uantwerpen.sc.tools.Vertex;
-import be.uantwerpen.sc.tools.VertexNG;
 
 import java.util.*;
 
@@ -50,6 +47,7 @@ public class Dijkstra
         }
     }
 
+    /*
     public void computePathsNG(int sourceId, List<VertexNG> vertexes)
     {
         VertexNG source=getVertexByIDNG(vertexes, sourceId);
@@ -79,7 +77,7 @@ public class Dijkstra
                 }
             }
         }
-    }
+    }*/
     /**
      * Calculates shortest path between given Vertex and list of available Vertices
      * Better alternative to arraylist possible?
@@ -96,6 +94,7 @@ public class Dijkstra
         Collections.reverse(path);
         return new Path(path);
     }
+    /*
     public PathNG getShortestPathToNG(int targetId, List<VertexNG> vertexes)
     {
         VertexNG target=getVertexByIDNG(vertexes, targetId);
@@ -104,7 +103,7 @@ public class Dijkstra
             path.add(vertex);
         Collections.reverse(path);
         return new PathNG(path);
-    }
+    }*/
 
     private Vertex getVertexByID(List<Vertex> list, int target){
         for(Vertex v : list){
@@ -113,11 +112,12 @@ public class Dijkstra
         }
         return null;
     }
+    /*
     private VertexNG getVertexByIDNG(List<VertexNG> list, int target){
         for(VertexNG v : list){
             if(v.getId()==target)
                 return v;
         }
         return null;
-    }
+    }*/
 }

@@ -5,16 +5,17 @@ import be.uantwerpen.sc.models.Bot;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "points", catalog = "\"robotDB_1\"")
+@Table(name = "points", catalog = "\"robotDB_new\"")
 public class Point {
 
     @Id
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="tileId")
     private Tile tile;
 
+    public Point(){}
 
     public Long getId() {
         return id;
@@ -31,7 +32,6 @@ public class Point {
     public Tile getTile() {
         return this.tile;
     }
-
 
     public void setTileLock(boolean status, Bot botId){
         tile.setLocked(status);
