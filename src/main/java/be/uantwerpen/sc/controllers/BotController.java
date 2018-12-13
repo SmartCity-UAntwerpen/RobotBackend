@@ -1,10 +1,10 @@
 package be.uantwerpen.sc.controllers;
 
 
-import be.uantwerpen.sc.models.Bot;
-import be.uantwerpen.sc.models.BotState;
-import be.uantwerpen.sc.models.Location;
-import be.uantwerpen.sc.models.map.newMap.Link;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.BotState;
+import be.uantwerpen.rc.models.Location;
+import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
@@ -44,16 +44,6 @@ public class BotController
     private PointControlService pointControlService;
 
     /**
-     * Get All Bots
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.GET)
-    public List<Bot> allBots()
-    {
-        return botControlService.getAllBots();
-    }
-
-    /**
      * BackBone IP
      */
     @Value("${backbone.ip:default}")
@@ -63,6 +53,16 @@ public class BotController
      */
     @Value("${backbone.port:default}")
     String backbonePort;
+
+    /**
+     * Get All Bots
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public List<Bot> allBots()
+    {
+        return botControlService.getAllBots();
+    }
 
     @RequestMapping(value = "{id}",method = RequestMethod.GET)
     public Bot getBot(@PathVariable("id") Long id)
@@ -82,24 +82,6 @@ public class BotController
         botControlService.saveBot(bot);
     }
 
-    @RequestMapping(value = "updateBotTest/{id}",method = RequestMethod.GET)
-    public void updateBotTest(@PathVariable("id") Long id)
-    {
-        Bot botEntity = new Bot(id);
-        botEntity.setWorkingMode("Updated");
-        botControlService.saveBot(botEntity);
-    }
-
-
-    @RequestMapping(value = "savetest",method = RequestMethod.GET)
-    public void saveBotTest()
-    {
-        Bot bot = new Bot((long) getNewId());
-        bot.setWorkingMode("test");
-        botControlService.saveBot(bot);
-    }
-
-
     /**
      * Robot calls this GET
      * @return
@@ -118,7 +100,7 @@ public class BotController
         return bot.getIdCore();
     }
 
-    @RequestMapping(value = "{id}/lid/{lid}", method = RequestMethod.GET)
+    @RequestMapping(value = "{id}/locationUpdate/{lid}", method = RequestMethod.GET)
     public void locationLink(@PathVariable("id") Long id, @PathVariable("lid") Long lid)
     {
         Bot bot = botControlService.getBot(id);
@@ -161,7 +143,7 @@ public class BotController
         botControlService.deleteBot(rid);
     }
 
-    @RequestMapping(value = "/deleteBots}",method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteBots",method = RequestMethod.GET)
     public void resetBots()
     {
         botControlService.deleteBots();
@@ -228,9 +210,9 @@ public class BotController
      * @param modus Type: Independent, partial or full server
      * @return
      */
-    @RequestMapping(value = "initiate/{modus}", method = RequestMethod.GET)
-    public long initiate(@PathVariable("modus") String modus){
-        Bot bot = new Bot((long) getNewId());
+    @RequestMapping(value = "initiate/{id}/{modus}", method = RequestMethod.GET)
+    public long initiate(@PathVariable("id") Long id, @PathVariable("modus") String modus){
+        Bot bot = new Bot(id);
         bot.setWorkingMode(modus);
         bot.setJobId((long) 0);
         bot.setLinkId(linkControlService.getLink((long) 1));
@@ -239,50 +221,7 @@ public class BotController
         bot.setIdStop((long) 1);
         bot.setBusy(0);
         bot.updateStatus(BotState.Alive.ordinal());
-        //id ook doorgeven naar robot zelf
         botControlService.saveBot(bot);
         return bot.getIdCore();
     }
-
-    /**
-     * Gets New Bot ID for running a job? Something something calcweight
-     * TODO: Timeout HTTP
-     * @return Bot ID
-     */
-    public int getNewId(){
-        /*StringBuilder data = new StringBuilder();
-        try {
-            URL url = new URL("http://"+backboneIP+":"+backbonePort+"//bot/newBot/robot");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                data.append(output);
-                System.out.println(output);
-            }
-
-            conn.disconnect();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        }
-        System.out.println(data);
-        return Integer.parseInt(data.toString());*/
-        return 2;
-    }
-
 }

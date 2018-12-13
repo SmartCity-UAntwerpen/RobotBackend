@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.repositories.newMap;
 
-import be.uantwerpen.sc.models.map.newMap.Link;
+import be.uantwerpen.rc.models.map.Link;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

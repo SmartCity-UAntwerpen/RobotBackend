@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
-import be.uantwerpen.sc.models.Job;
+import be.uantwerpen.rc.models.Job;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;

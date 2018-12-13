@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.Bot;
-import be.uantwerpen.sc.models.BotState;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.BotState;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,7 +142,6 @@ public class JobController
         } catch (IOException e) {
 
             e.printStackTrace();
-
         }
     }
 

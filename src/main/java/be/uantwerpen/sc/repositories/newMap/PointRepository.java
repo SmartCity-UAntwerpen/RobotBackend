@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.repositories.newMap;
 
-import be.uantwerpen.sc.models.map.newMap.Point;
+import be.uantwerpen.rc.models.map.Point;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

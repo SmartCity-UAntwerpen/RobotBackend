@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.repositories.newMap;
 
-import be.uantwerpen.sc.models.map.newMap.Tile;
+import be.uantwerpen.rc.models.map.Tile;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

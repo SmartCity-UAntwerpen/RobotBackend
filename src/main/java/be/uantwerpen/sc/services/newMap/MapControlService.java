@@ -1,14 +1,14 @@
 package be.uantwerpen.sc.services.newMap;
 
 
-import be.uantwerpen.sc.models.map.newMap.Link;
-import be.uantwerpen.sc.models.map.newMap.Map;
-import be.uantwerpen.sc.models.map.newMap.Node;
-import be.uantwerpen.sc.models.map.newMap.Point;
+import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.rc.models.map.Map;
+import be.uantwerpen.rc.models.map.Node;
+import be.uantwerpen.rc.models.map.Point;
+import be.uantwerpen.rc.tools.Edge;
+import be.uantwerpen.rc.tools.Vertex;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.TrafficLightControlService;
-import be.uantwerpen.sc.tools.Edge;
-import be.uantwerpen.sc.tools.Vertex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

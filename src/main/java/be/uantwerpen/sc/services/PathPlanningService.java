@@ -1,14 +1,14 @@
 package be.uantwerpen.sc.services;
 
 
-import be.uantwerpen.sc.models.map.newMap.Map;
-import be.uantwerpen.sc.models.map.Path;
-import be.uantwerpen.sc.models.map.newMap.Link;
-import be.uantwerpen.sc.models.map.newMap.Node;
+import be.uantwerpen.rc.models.map.Map;
+import be.uantwerpen.rc.models.map.Path;
+import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.rc.models.map.Node;
 import be.uantwerpen.sc.services.newMap.MapControlService;
-import be.uantwerpen.sc.tools.*;
-import be.uantwerpen.sc.tools.pathplanning.Dijkstra;
-import be.uantwerpen.sc.tools.pathplanning.IPathplanning;
+import be.uantwerpen.rc.tools.*;
+import be.uantwerpen.rc.tools.pathplanning.Dijkstra;
+import be.uantwerpen.rc.tools.pathplanning.IPathplanning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +19,7 @@ import java.util.*;
  * TODO: Shitty class, remake
  */
 @Service
-public class PathPlanningService implements IPathplanning
-{
+public class PathPlanningService implements IPathplanning {
 
     /**
      * Autowired map control service
@@ -38,23 +37,23 @@ public class PathPlanningService implements IPathplanning
      * Creates path planning service
      * TODO: hard coded dijkstra
      */
-    public PathPlanningService()
-    {
+    public PathPlanningService() {
         this.dijkstra = new Dijkstra();
     }
 
     /**
      * Calculates Path
      * TODO Not Sure
+     *
      * @param start
      * @param stop
      * @return
      */
-    public Path CalculatePathNonInterface(int start, int stop){
+    public Path CalculatePathNonInterface(int start, int stop) {
         Map map = mapControlService.getMap();
         List<Link> linkEntityList = new ArrayList<>();
         List<Vertex> vertexes = new ArrayList<>();
-        for (Node nj : map.getNodeList()){
+        for (Node nj : map.getNodeList()) {
             vertexes.add(new Vertex(nj));
             linkEntityList.addAll(nj.getNeighbours());
         }
@@ -63,19 +62,19 @@ public class PathPlanningService implements IPathplanning
         List<ArrayList<Edge>> edgeslistinlist = new ArrayList<>();
         Link realLink = new Link();
         int i = 0;
-        for (Node nj : map.getNodeList()){
+        for (Node nj : map.getNodeList()) {
             edges = new ArrayList<>();
-            for (Link neighbour : nj.getNeighbours()){
-                for (Vertex v : vertexes){
-                    if(Objects.equals(v.getId(), neighbour.getEndPoint().getId())){
-                        for(Link linkEntity: linkEntityList){
-                            if(Objects.equals(linkEntity.getEndPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), nj.getPointEntity().getId())){
-                                System.out.println(linkEntity.toString() +" " + linkEntity);
+            for (Link neighbour : nj.getNeighbours()) {
+                for (Vertex v : vertexes) {
+                    if (Objects.equals(v.getId(), neighbour.getEndPoint().getId())) {
+                        for (Link linkEntity : linkEntityList) {
+                            if (Objects.equals(linkEntity.getEndPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), nj.getPointEntity().getId())) {
+                                System.out.println(linkEntity.toString() + " " + linkEntity);
                                 realLink = linkEntity;
                             }
                         }
                         //edges.add(new Edge(v.getId(),neighbour.getWeight(),linkControlService.getLink(neighbour.getPointEntity().getPid())));
-                        edges.add(new Edge(v.getId(),neighbour.getWeight(),realLink));
+                        edges.add(new Edge(v.getId(), neighbour.getWeight(), realLink));
                     }
                 }
             }
@@ -83,41 +82,44 @@ public class PathPlanningService implements IPathplanning
             i++;
         }
 
-        for (int j = 0; j < vertexes.size();j++){
+        for (int j = 0; j < vertexes.size(); j++) {
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
 
-        dijkstra.computePaths(start,vertexes); // run Dijkstra
-        return dijkstra.getShortestPathTo(stop,vertexes);
+        dijkstra.computePaths(start, vertexes); // run Dijkstra
+        return dijkstra.getShortestPathTo(stop, vertexes);
     }
 
     /**
      * Calculates path following Dijkstra
      * TODO Hardcoded Dijkstra
+     *
      * @param start start int (?)
-     * @param stop stop int (?)
+     * @param stop  stop int (?)
      * @return List of Vertexes following the shortest path
      */
     @Override
     public Path CalculatePath(int start, int stop) {
         List<Vertex> vertexes = mapControlService.getVertexMap();
         mapControlService.resetVertex();
-        dijkstra.computePaths(start,vertexes);
-        return dijkstra.getShortestPathTo(stop,vertexes);
+        dijkstra.computePaths(start, vertexes);
+        return dijkstra.getShortestPathTo(stop, vertexes);
     }
 
     @Override
-    public double CalculatePathWeight(int start, int stop){
-        Path p=CalculatePath(start,stop);
+    public double CalculatePathWeight(int start, int stop) {
+        Path p = CalculatePath(start, stop);
         return p.getWeight();
     }
-    public double CalculatePathLength(int start, int stop){
-        Path p=CalculatePath(start,stop);
+
+    public double CalculatePathLength(int start, int stop) {
+        Path p = CalculatePath(start, stop);
         return p.getWeight();
     }
 
     /**
      * Gets a random next vertex from the start vertex and returns this as path
+     *
      * @param map
      * @param start
      * @return
@@ -129,8 +131,8 @@ public class PathPlanningService implements IPathplanning
 
         Random random = new Random();
         Vertex currentVertex = null;
-        for(Vertex v: vertexes){
-            if(v.getId()==start) {
+        for (Vertex v : vertexes) {
+            if (v.getId() == start) {
                 currentVertex = v;
             }
         }
@@ -144,199 +146,49 @@ public class PathPlanningService implements IPathplanning
         return new Path(vertexList);
     }
 
-    /*public List<DriveDirEnum> createBotDriveDirs(Path path){
-        List<DriveDirEnum> commands=new ArrayList<>();
-        List<Vertex> vertices=path.getPath();
+
+    public DriveDirEncapsulator createBotDriveDirs(Path path) {
+        DriveDirEncapsulator commands = new DriveDirEncapsulator();
+        List<Vertex> vertices = path.getPath();
         Collections.reverse(vertices);
-        List<Link> links=new LinkedList<>();
-        for (Vertex v: vertices) {
-            if(v.getPrevious()==null) {
-                commands.add(DriveDirEnum.FOLLOW);
-                commands.add(DriveDirEnum.FORWARD);
-                break;
-            }
-            for(Edge l:v.getPrevious().getAdjacencies()) {
-                if(Objects.equals(l.getTarget(), v.getId()))
-                    links.add(l.getLinkEntity());
-            }
-        }
-        Collections.reverse(links);
-        Link previous=null;
-        for(Link l: links) {
-            if(previous==null) {
-                previous=l;
-                continue;
-            }
-            Direction stop=getDirection(l.getStartDirection());
-            Direction start=rotate(getDirection(previous.getStopDirection()));
-            DriveDirEnum relDir=getNextRelDir(start,stop);
-            commands.add(relDir);
-            commands.add(DriveDirEnum.FOLLOW);
-            previous=l;
-        }
-        return commands;
-    }*/
-    public DriveDirEncapsulator createBotDriveDirs(Path path){
-        DriveDirEncapsulator commands=new DriveDirEncapsulator();
-        List<Vertex> vertices=path.getPath();
-        Collections.reverse(vertices);
-        List<Link> links=new LinkedList<>();
-        for (Vertex v: vertices) {
-            if(v.getPrevious()==null) {
+        List<Link> links = new LinkedList<>();
+        for (Vertex v : vertices) {
+            if (v.getPrevious() == null) {
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FORWARD));
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
                 break;
             }
-            for(Edge l:v.getPrevious().getAdjacencies()) {
-                if(Objects.equals(l.getTarget(), v.getId()))
+            for (Edge l : v.getPrevious().getAdjacencies()) {
+                if (Objects.equals(l.getTarget(), v.getId()))
                     links.add(l.getLinkEntity());
             }
         }
         Collections.reverse(links);
-        Link previous=null;
-        for(Link l: links) {
-            if(previous==null) {
-                previous=l;
+        Link previous = null;
+        for (Link l : links) {
+            if (previous == null) {
+                previous = l;
                 continue;
             }
-            if(l.getAngle()==-1.0){ //TODO: change follow command condition
+            if (l.getAngle() == -1.0) { //TODO: change follow command condition
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
-            }
-            else if(l.getAngle()==0){
+            } else if (l.getAngle() == 0) {
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FORWARD));
-            }
-            else if(l.getAngle()<0) {
-                DriveDir d=new DriveDir(DriveDirEnum.LEFT);
+            } else if (l.getAngle() < 0) {
+                DriveDir d = new DriveDir(DriveDirEnum.LEFT);
                 d.setAngle(-l.getAngle());
-               commands.addDriveDir(d);
-            }
-            else if(l.getAngle()==180){
+                commands.addDriveDir(d);
+            } else if (l.getAngle() == 180) {
                 commands.addDriveDir(new DriveDir(DriveDirEnum.TURN));
-            }
-            else{
-                DriveDir d=new DriveDir(DriveDirEnum.RIGHT);
+            } else {
+                DriveDir d = new DriveDir(DriveDirEnum.RIGHT);
                 d.setAngle(l.getAngle());
                 commands.addDriveDir(d);
             }
 
             //commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
-            previous=l;
+            previous = l;
         }
         return commands;
     }
-    private Direction getDirection(String s){
-        switch (s){
-            case "Z":
-                return Direction.SOUTH;
-            case "N":
-                return Direction.NORTH;
-            case "W":
-                return Direction.WEST;
-            case "E":
-                return Direction.EAST;
-        }
-        return null;
-    }
-
-    private Direction rotate(Direction direction){
-        switch (direction){
-            case NORTH:
-                return Direction.SOUTH;
-            case SOUTH:
-                return Direction.NORTH;
-            case EAST:
-                return Direction.WEST;
-            case WEST:
-                return Direction.EAST;
-        }
-        return null;
-    }
-    private DriveDirEnum getNextRelDir(Direction startDir, Direction stopDir){
-        //Calculate relative direction
-        switch(startDir)
-        {
-            //From NORTH
-            case NORTH:
-                switch(stopDir)
-                {
-                    //Go EAST
-                    case EAST:
-                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
-                    //Go SOUTH
-                    case NORTH://SOUTH:
-                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
-                    //Go WEST
-                    case WEST:
-                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
-                    //turn
-                    case SOUTH:
-                        return DriveDirEnum.TURN;
-
-                }
-
-                //From EAST
-            case EAST:
-                switch(stopDir)
-                {
-                    //Go NORTH
-                    case NORTH:
-                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
-                    //Go SOUTH
-                    case SOUTH:
-                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
-                    //Go WEST
-                    case EAST://WEST:
-                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
-                    //turn
-                    case WEST:
-                        return DriveDirEnum.TURN;
-                }
-
-                //From SOUTH
-            case SOUTH:
-                switch(stopDir)
-                {
-                    //Go NORTH
-                    case SOUTH://NORTH:
-                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
-                    //Go EAST
-                    case EAST:
-                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
-                    //Go WEST
-                    case WEST:
-                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
-                    //turn
-                    case NORTH:
-                        return DriveDirEnum.TURN;
-
-                }
-
-                //From WEST
-            case WEST:
-                switch(stopDir)
-                {
-                    //Go NORTH
-                    case NORTH:
-                        return DriveDirEnum.RIGHT;//LEFT);   //Turn LEFT
-                    //Go EAST
-                    case WEST://EAST:
-                        return DriveDirEnum.FORWARD;   //Go STRAIGHT
-                    //Go SOUTH
-                    case SOUTH:
-                        return DriveDirEnum.LEFT;//RIGHT);   //Turn RIGHT
-                    //turn
-                    case EAST:
-                        return DriveDirEnum.TURN;
-                }
-        }
-        //Invalid direction
-        return null;
-    }
-}
-
-enum Direction{
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST
 }

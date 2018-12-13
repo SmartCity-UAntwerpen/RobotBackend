@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.repositories.newMap;
 ;
-import be.uantwerpen.sc.models.map.newMap.LinkLock;
+import be.uantwerpen.rc.models.map.LinkLock;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

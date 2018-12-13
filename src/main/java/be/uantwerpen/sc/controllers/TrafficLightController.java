@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.TrafficLight;
+import be.uantwerpen.rc.models.TrafficLight;
 import be.uantwerpen.sc.repositories.TrafficLightRepository;
 import be.uantwerpen.sc.services.TrafficLightControlService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;

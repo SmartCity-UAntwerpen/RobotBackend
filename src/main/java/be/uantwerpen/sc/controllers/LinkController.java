@@ -1,6 +1,8 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.map.newMap.Link;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,13 +30,16 @@ public class LinkController
     @Autowired
     private LinkControlService linkControlService;
 
+    @Autowired
+    private BotControlService botService;
+
     /**
      * Get <- TODO
      * Get list of all available
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
-    public List<Link> allBots()
+    public List<Link> allLinks()
     {
         return linkControlService.getAllLinks();
     }
@@ -44,8 +49,8 @@ public class LinkController
      * @param id ID of link to lock
      * @return Success
      */
-    @RequestMapping(value = "requestlock/{id}", method = RequestMethod.GET)
-    public boolean requestLinkLock(@PathVariable("id") Long id)
+    @RequestMapping(value = "requestlock/{botId}/{id}", method = RequestMethod.GET)
+    public boolean requestLinkLock(@PathVariable("botId") Long botId,@PathVariable("id") Long id)
     {
         synchronized(this)
         {
@@ -59,7 +64,8 @@ public class LinkController
                 return false;
             } else{
                 //Point not locked -> attempt lock
-                link.lockLink(true,null);
+                Bot bot = botService.getBot(botId);
+                link.lockLink(true,bot);
                 link.setWeight(link.getWeight()+10);
                 linkControlService.save(link);
                 return true;
@@ -74,8 +80,8 @@ public class LinkController
      * @param id ID of link to lock
      * @return Success
      */
-    @RequestMapping(value = "unlock/{id}", method = RequestMethod.GET)
-    public boolean LinkUnLock(@PathVariable("id") Long id)
+    @RequestMapping(value = "unlock/{botId}/{id}", method = RequestMethod.GET)
+    public boolean LinkUnLock(@PathVariable("botId") Long botId, @PathVariable("id") Long id)
     {
         synchronized(this)
         {
@@ -86,14 +92,14 @@ public class LinkController
                 return false;
             }
 
-            if(link.getLock().getStatus()) {
+            //Check if bot asking the unlock is the one that locked the link
+            if(link.getLock().getLockedBy().getIdCore().equals(botId) && link.getLock().getStatus()) {
                 //Point already locked
                 link.lockLink(false, null);
                 link.setWeight(link.getWeight() - 10);
                 linkControlService.save(link);
                 return true;
             } else {
-                //Point not locked -> attempt lock
                 return false;
             }
         }

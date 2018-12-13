@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.services;
 
 import be.uantwerpen.sc.controllers.mqtt.MqttLightPublisher;
-import be.uantwerpen.sc.models.TrafficLight;
+import be.uantwerpen.rc.models.TrafficLight;
 import be.uantwerpen.sc.repositories.TrafficLightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

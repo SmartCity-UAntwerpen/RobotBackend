@@ -1,6 +1,8 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.map.newMap.Point;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.map.Point;
+import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +28,9 @@ public class PointController
     @Autowired
     private PointControlService pointService;
 
+    @Autowired
+    private BotControlService botService;
+
     /**
      * GET <- WHO
      * Get all Points
@@ -41,10 +46,11 @@ public class PointController
      * GET <-WHO
      * Request Locking of point
      * @param id Point ID
+     * @param botId Bot id (lockedBy)
      * @return
      */
-    @RequestMapping(value = "requestlock/{id}", method = RequestMethod.GET)
-    public boolean requestPointLock(@PathVariable("id") Long id)
+    @RequestMapping(value = "requestlock/{botId}/{id}", method = RequestMethod.GET)
+    public boolean requestPointLock(@PathVariable("botId") Long botId,@PathVariable("id") Long id)
     {
         synchronized(this)
         {
@@ -58,7 +64,8 @@ public class PointController
                 return false;
             } else {
                 //Point not locked -> attempt lock
-                point.setTileLock(true,null);
+                Bot bot = botService.getBot(botId);
+                point.setTileLock(true,bot);
                 pointService.save(point);
                 return true;
             }
@@ -80,24 +87,30 @@ public class PointController
     }
 
     /**
-     * Locks / unlocks point
-     * Done by who? TODO
-     * @param id
-     * @param value
-     * @return
+     * Unlocks a point
+     * @param id Point ID
+     * @param botId Bot ID has to match the lockedBy id from the database
+     * @return result
      */
-    @RequestMapping(value = "setlock/{id}/{value}", method = RequestMethod.GET)
-    public boolean setPointStatus(@PathVariable("id") Long id, @PathVariable("value") boolean value)
-    {
-        synchronized (this)
-        {
-            Point point = pointService.getPoint(id);
-            if(point == null)
-                return false;
+    @RequestMapping(value = "unlock/{botId}/{id}", method = RequestMethod.GET)
+    public boolean unlockPoint(@PathVariable("botId") Long botId, @PathVariable("id") Long id) {
+        Point point = pointService.getPoint(id);
 
-            point.setTileLock(value,null);
-            pointService.save(point);
-            return true;
+        if(point == null){
+            return false; //Point not found
+        }
+        try {
+            //Check if bot asking the unlock is the one that locked the point
+            if (point.getTile().getLockedBy().getIdCore().equals(botId) && point.getTileLock()) {
+                point.setTileLock(false, null);
+                pointService.save(point);
+                return true;
+            } else {
+                return false;
+            }
+        }catch(NullPointerException e){
+            System.err.println("Bot not found");
+            return false;
         }
     }
 }

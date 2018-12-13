@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.services;
 
 import be.uantwerpen.sc.controllers.BotController;
-import be.uantwerpen.sc.models.Bot;
+import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.sc.repositories.BotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

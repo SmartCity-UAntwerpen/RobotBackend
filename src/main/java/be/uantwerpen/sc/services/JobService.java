@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.services;
 
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
-import be.uantwerpen.sc.models.Job;
+import be.uantwerpen.rc.models.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

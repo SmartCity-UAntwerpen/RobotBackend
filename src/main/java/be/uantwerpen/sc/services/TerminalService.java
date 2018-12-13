@@ -3,8 +3,8 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.sc.controllers.BotController;
 import be.uantwerpen.sc.controllers.CostController;
 import be.uantwerpen.sc.controllers.JobController;
-import be.uantwerpen.sc.models.Bot;
-import be.uantwerpen.sc.models.map.newMap.Link;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import be.uantwerpen.sc.tools.Terminal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +95,7 @@ public class TerminalService
         switch(command)
         {
             case "generatebot":
-                long id=botController.initiate("INDEPENDENT");
+                long id=botController.initiate(9999L,"INDEPENDENT");
                 terminal.printTerminal("Bot ID: "+id);
                 break;
             case "job":

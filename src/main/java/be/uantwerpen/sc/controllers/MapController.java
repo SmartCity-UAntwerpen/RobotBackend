@@ -1,24 +1,18 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.Bot;
-import be.uantwerpen.sc.models.map.Path;
-import be.uantwerpen.sc.models.map.newMap.Link;
-import be.uantwerpen.sc.models.map.newMap.Point;
-import be.uantwerpen.sc.models.map.newMap.Map;
-import be.uantwerpen.sc.models.map.newMap.Tile;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.map.Path;
+import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.rc.models.map.Point;
+import be.uantwerpen.rc.models.map.Map;
+import be.uantwerpen.rc.models.map.Tile;
+import be.uantwerpen.rc.tools.DriveDirEncapsulator;
+import be.uantwerpen.rc.tools.Vertex;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
 import be.uantwerpen.sc.services.newMap.MapControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import be.uantwerpen.sc.services.newMap.TileControlService;
-import be.uantwerpen.sc.tools.DriveDir;
-import be.uantwerpen.sc.tools.DriveDirEncapsulator;
-import be.uantwerpen.sc.tools.DriveDirEnum;
-import be.uantwerpen.sc.tools.Vertex;
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,13 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -138,7 +125,7 @@ public class MapController
      * @param stop Stop Node/Vertex ID
      * @return Generated Path
      */
-    @RequestMapping(value = "{start}/path/{stop}", method = RequestMethod.GET)
+    @RequestMapping(value = "path/{start}/{stop}", method = RequestMethod.GET)
     public Path PathPlanning(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
         Path p = pathPlanningService.CalculatePath(start,stop);
