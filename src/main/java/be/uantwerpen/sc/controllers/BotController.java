@@ -5,11 +5,14 @@ import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.BotState;
 import be.uantwerpen.rc.models.Location;
 import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +56,8 @@ public class BotController
      */
     @Value("${backbone.port:default}")
     String backbonePort;
+
+    Logger logger = LoggerFactory.getLogger(BotController.class);
 
     /**
      * Get All Bots
@@ -100,37 +105,41 @@ public class BotController
         return bot.getIdCore();
     }
 
-    @RequestMapping(value = "{id}/locationUpdate/{lid}", method = RequestMethod.GET)
-    public void locationLink(@PathVariable("id") Long id, @PathVariable("lid") Long lid)
+    /**
+     * Bot location update
+     * @param id, the bot id
+     * @param pid, the location = a point id
+     */
+    @RequestMapping(value = "{id}/locationUpdate/{pid}", method = RequestMethod.GET)
+    public void locationLink(@PathVariable("id") Long id, @PathVariable("pid") Long pid)
     {
         Bot bot = botControlService.getBot(id);
-        Link link;
+        Point point;
 
         if(bot != null)
         {
-            link = linkControlService.getLink(lid);
-
-            if(link != null)
+            point = pointControlService.getPoint(pid);
+            logger.info("Bot with id: " +id+" updated its location: "+pid);
+            if(point != null)
             {
-                bot.setLinkId(link);
+                bot.setPoint(point);
                 botControlService.saveBot(bot);
                 System.out.println(bot.getIdCore());
             }
             else
-                System.out.println("Link with id: " + lid + " not found!");
+                System.out.println("Point with id: " + pid + " not found!");
         }
         else
             System.out.println("Bot with id:" + id + " not found!");
     }
 
-    public void updateLocation(Long id, Long idvertex, int progress)
+    public void updateLocation(Long id, Long pointId, int progress)
     {
         Bot bot = botControlService.getBot(id);
 
         if(bot != null)
         {
-            //System.out.println(.getLink(idvertex));
-            //bot.setLinkId(pointControlService.getPoint(idvertex));
+            bot.setPoint(pointControlService.getPoint(pointId));
             bot.setPercentageCompleted(progress);
             bot.updateStatus(BotState.Alive.ordinal());
             botControlService.saveBot(bot);
@@ -140,6 +149,7 @@ public class BotController
     @RequestMapping(value = "delete/{rid}",method = RequestMethod.GET)
     public void deleteBot(@PathVariable("rid") Long rid)
     {
+        logger.info("Removing bot with id: "+rid);
         botControlService.deleteBot(rid);
     }
 
@@ -161,11 +171,11 @@ public class BotController
             Location loc = new Location();
             loc.setVehicleID(b.getIdCore());
 
-            if (b.getBusy()==1){
+            if (b.getBusy()){
                 loc.setStartID(b.getIdStart());
                 loc.setStopID(b.getIdStop());
                 loc.setPercentage((long) b.getPercentageCompleted());
-            }else if(b.getBusy()==0){
+            }else{
                 loc.setStartID(b.getLinkId().getStartPoint().getId());
                 loc.setStopID(b.getLinkId().getStartPoint().getId());
                 loc.setPercentage( (long)100);
@@ -219,7 +229,7 @@ public class BotController
         bot.setPercentageCompleted(100);
         bot.setIdStart((long) 1);
         bot.setIdStop((long) 1);
-        bot.setBusy(0);
+        bot.setBusy(false);
         bot.updateStatus(BotState.Alive.ordinal());
         botControlService.saveBot(bot);
         return bot.getIdCore();

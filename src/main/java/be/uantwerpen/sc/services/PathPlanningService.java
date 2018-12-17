@@ -86,8 +86,8 @@ public class PathPlanningService implements IPathplanning {
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
 
-        dijkstra.computePaths(start, vertexes); // run Dijkstra
-        return dijkstra.getShortestPathTo(stop, vertexes);
+        dijkstra.computePaths((long)start, vertexes); // run Dijkstra
+        return dijkstra.getShortestPathTo((long)stop, vertexes);
     }
 
     /**
@@ -102,8 +102,8 @@ public class PathPlanningService implements IPathplanning {
     public Path CalculatePath(int start, int stop) {
         List<Vertex> vertexes = mapControlService.getVertexMap();
         mapControlService.resetVertex();
-        dijkstra.computePaths(start, vertexes);
-        return dijkstra.getShortestPathTo(stop, vertexes);
+        dijkstra.computePaths((long)start, vertexes);
+        return dijkstra.getShortestPathTo((long)stop, vertexes);
     }
 
     @Override

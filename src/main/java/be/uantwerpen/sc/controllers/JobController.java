@@ -62,55 +62,28 @@ public class JobController
      * HTTP RECEIVE from MAAS
      * Uses COREID
      * @param idJob
-     * @param idVehicle
      * @param idstart
      * @param idstop
      * @return
      */
-    @RequestMapping(value = "executeJob/{idJob}/{idVehicle}/{idStart}/{idStop}",method = RequestMethod.GET)
-    public String executeJob(@PathVariable("idJob") long idJob, @PathVariable("idVehicle") long idVehicle, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
+    @RequestMapping(value = "{idStart}/{idStop}/{idJob}",method = RequestMethod.GET)
+    public String executeJob(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
     {
-        Bot b;
-        try {
-            b = botControlService.getBot( idVehicle);
-        }catch(Exception e){
-            return "HTTP status : 404";
+        if(!jobService.queueJob(idJob,idstart,idstop)){
+            return "HTTP status : 400";
         }
-        if (b.getBusy()==1){
-            return "HTTP status : 403";
-        }
-        try {
-            pointControlService.getPoint( idstart);
-        }catch (Exception e){
-            return "HTTP status : 404";
-        }
-        try {
-            pointControlService.getPoint( idstop);
-        }catch (Exception e){
-            return "HTTP status : 404";
-        }
-
-        b.setJobId( idJob);
-        b.setBusy(1);
-        b.setIdStart(idstart);
-        b.setIdStop(idstop);
-        b.updateStatus(BotState.Busy.ordinal());
-        botControlService.saveBot(b);
-
-        jobService.sendJob(idJob, idVehicle, idstart, idstop);
-
         return "HTTP status : 200";
     }
 
     /**
-     *
+     *  Finished -> Robot sends to this end-point to notify it finished the job
      * @param robotId
      */
     @RequestMapping(value = "finished/{robotId}",method = RequestMethod.GET)
     public void finished(@PathVariable("robotId") long robotId)
     {
         Bot bot = botControlService.getBot( robotId);
-        bot.setBusy(0);
+        bot.setBusy(false);
         bot.setStatus(BotState.Alive.ordinal());
         botControlService.saveBot(bot);
         completeJob(bot.getJobId());

@@ -208,13 +208,13 @@ public class MqttSubscriber implements MqttCallback {
                 String temp = content.split("id:")[1];
                 String id = temp.split("/")[0];
                 temp = temp.split("vertex:")[1];
-                String vertexid = temp.split("/")[0];
+                String point = temp.split("/")[0];
                 temp = temp.split("progress:")[1];
                 String progress = temp.split("}")[0];
                 int Id = Integer.parseInt(id);
-                int VertexId = Integer.parseInt(vertexid);
+                int pointId = Integer.parseInt(point);
                 int Progress = Integer.parseInt(progress);
-                botController.updateLocation((long) Id, (long) VertexId, Progress);
+                botController.updateLocation((long) Id, (long) pointId, Progress);
             }
             catch(Exception e)
             {

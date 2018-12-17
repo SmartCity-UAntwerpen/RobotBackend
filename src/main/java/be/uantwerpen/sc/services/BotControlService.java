@@ -73,23 +73,6 @@ public class BotControlService
         if(this.getBot(bid) == null)
             return false;
         botRepository.delete(bid);
-        try {
-            String u = "http://"+backboneIP+":"+backbonePort+"/bot/delete/"+bid;
-            URL url = new URL(u);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
-            }
-            conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return true;
     }
 
@@ -100,5 +83,9 @@ public class BotControlService
     public void deleteBots()
     {
         botRepository.deleteAll();
+    }
+
+    public List<Bot> getAllAvialableBots(){
+        return botRepository.findAllByBusyFalse();
     }
 }

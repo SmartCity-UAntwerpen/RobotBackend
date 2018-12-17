@@ -112,7 +112,7 @@ public class TerminalService
                         long botid = Long.parseLong(args[2]);
                         long start = Long.parseLong(args[3]);
                         long stop = Long.parseLong(args[4]);
-                        this.sendJob(jobid,botid,start,stop);
+                        this.sendJob(jobid,start,stop);
 
                     }
                     catch(Exception e)
@@ -181,7 +181,7 @@ public class TerminalService
                     try
                     {
                         String[] ints= (commandString.split(" ", 3));
-                        System.out.println(costController.calcWeight(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
+                        System.out.println(costController.calcCost(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
                     }
                     catch(Exception e)
                     {
@@ -281,19 +281,13 @@ public class TerminalService
     }
 
     /**
-     * Sends Job to defined bot
-     * @param botId ID of bot
+     * Adds a job to the job queue
      */
-    private void sendJob(Long jobId,Long botId, long start, long stop)
+    private void sendJob(Long jobId, long start, long stop)
     {
-        if(botControlService.getBot(botId) == null)
-        {
-            terminal.printTerminalError("Could not find bot with id: " + botId + "!");
-            return;
-        }
-        if(jobService.sendJob(jobId, botId,start,stop))
-            terminal.printTerminalInfo("Job send to bot with id: " + botId + ".");
+        if(jobService.queueJob(jobId,start,stop))
+            terminal.printTerminalInfo("Job placed in queue!");
         else
-            terminal.printTerminalError("Could not send job to bot with id: " + botId + "!");
+            terminal.printTerminalError("Could not queue job!");
     }
 }
