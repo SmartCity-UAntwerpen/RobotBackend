@@ -19,5 +19,5 @@ public interface BotRepository extends CrudRepository<Bot, Long>
      */
     List<Bot> findAll();
 
-    List<Bot> findAllByBusyFalse();
+    List<Bot> findAllByBusyFalseAndPointNotNull();
 }

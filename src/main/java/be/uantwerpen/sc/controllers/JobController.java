@@ -66,10 +66,25 @@ public class JobController
      * @param idstop
      * @return
      */
-    @RequestMapping(value = "{idStart}/{idStop}/{idJob}",method = RequestMethod.GET)
+    @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.GET)
     public String executeJob(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
     {
         if(!jobService.queueJob(idJob,idstart,idstop)){
+            return "HTTP status : 400";
+        }
+        return "HTTP status : 200";
+    }
+
+    /**
+     * HTTP RECEIVE from MAAS
+     * Uses COREID
+     * @param pid, The target point id
+     * @return
+     */
+    @RequestMapping(value = "gotopoint/{pid}",method = RequestMethod.GET)
+    public String goToPoint(@PathVariable("pid") long pid)
+    {
+        if(!jobService.queueJob(null,-1L,pid)){
             return "HTTP status : 400";
         }
         return "HTTP status : 200";
@@ -95,7 +110,8 @@ public class JobController
      * @param id
      */
     public void completeJob(long id){
-        try {
+        //TODO send to backbone job is done
+        /*try {
             String u = "http://"+maasIp+":"+maasPort+"/completeJob/" + id;
             URL url = new URL(u);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -115,7 +131,7 @@ public class JobController
         } catch (IOException e) {
 
             e.printStackTrace();
-        }
+        }*/
     }
 
 }

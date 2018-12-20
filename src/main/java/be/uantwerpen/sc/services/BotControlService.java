@@ -86,6 +86,6 @@ public class BotControlService
     }
 
     public List<Bot> getAllAvialableBots(){
-        return botRepository.findAllByBusyFalse();
+        return botRepository.findAllByBusyFalseAndPointNotNull();
     }
 }

@@ -1,5 +1,6 @@
 package be.uantwerpen.sc.services;
 
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.controllers.BotController;
 import be.uantwerpen.sc.controllers.CostController;
 import be.uantwerpen.sc.controllers.JobController;
@@ -234,18 +235,17 @@ public class TerminalService
             terminal.printTerminalInfo("There are no bots available to list.");
         else
         {
-            terminal.printTerminal("Bot-id\t\tLink-id\t\tStatus");
+            terminal.printTerminal("Bot-id\t\tPoint-Id\t\tStatus");
             terminal.printTerminal("------------------------------");
 
             for(Bot bot : bots)
             {
-                Long linkId = -1L;
-                Link link = bot.getLinkId();
+                Point point = bot.getPoint();
 
-                if(link != null)
-                    linkId = link.getId();
+                if(point == null)
+                    terminal.printTerminal("Bot "+bot.getIdCore()+" has no current location");
 
-                terminal.printTerminal("\t" + bot.getIdCore() + "\t\t" + linkId + "\t\t\t" + bot.getStatus());
+                terminal.printTerminal("\t" + bot.getIdCore() + "\t\t" + point.getId() + "\t\t\t" + bot.getStatus());
             }
         }
     }

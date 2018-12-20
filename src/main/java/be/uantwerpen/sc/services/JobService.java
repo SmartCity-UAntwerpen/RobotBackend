@@ -4,6 +4,8 @@ import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
 import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.sc.services.newMap.PointControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +28,6 @@ public class JobService implements Runnable
     @Autowired
     MqttJobPublisher mqttJobPublisher;
 
-
     /**
      * Autowired Botcontrol Service
      */
@@ -45,7 +46,10 @@ public class JobService implements Runnable
     @Autowired
     private PointControlService pointControlService;
 
+    //TODO: make blocking fifo queue
     private BlockingQueue<Job> jobQueue = null;
+
+    Logger logger = LoggerFactory.getLogger(JobService.class);
 
     @PostConstruct
     public void init() {
@@ -92,14 +96,18 @@ public class JobService implements Runnable
         }
 
         //Create new job and add to queue
+        if(jobId == null){
+            jobId = 9999L;
+        }
         Job job = new Job(jobId);
         job.setIdStart(idStart);
         job.setIdEnd(idStop);
         try{
             boolean tmp = jobQueue.add(job);
+            logger.info("New job queued!\tId: "+job.getJobId()+"\tStart: "+job.getIdStart()+"\tEnd: "+job.getIdEnd());
             return true;
         }catch(IllegalStateException e){
-            System.err.println("Error adding job to job queue!");
+            logger.error("Error adding job to job queue!");
             return false;
         }
     }
@@ -110,7 +118,7 @@ public class JobService implements Runnable
             return;
         }
 
-        System.out.println("Starting Job Service...");
+        logger.info("Starting Job Service...");
 
         while(true){
             //Process that checks the queue and seeks a bot that can execute the job
@@ -121,17 +129,31 @@ public class JobService implements Runnable
                     List<Bot> bots = botControlService.getAllAvialableBots();
                     TreeMap<Integer,Bot> sortedBots = new TreeMap<>();
                     for (Bot b: bots) {
-                        sortedBots.put((int)pathPlanningService.CalculatePathWeight(b.getPoint().getId().intValue(),job.getIdStart().intValue()),b);
+                        int targetId = -1;
+                        //Depending on the type of job, calculate how far the bot is
+                        if(job.getIdStart() == -1L){
+                            //Go to point job ==> which bot is closest to end
+                            targetId = job.getIdEnd().intValue();
+                        }else{
+                            //Normal job ==> which bot is closest to start point
+                            targetId = job.getIdStart().intValue();
+                        }
+                        sortedBots.put((int)pathPlanningService.CalculatePathWeight(b.getPoint().getId().intValue(),targetId),b);
                     }
 
                     //Get closest bot == first entry and assign job
                     Bot bot = sortedBots.firstEntry().getValue();
+                    //If the start point is -1L than this is a goToPoint job ==> set start point to current location of the bot
+                    if(job.getIdStart() == -1L){
+                        job.setIdStart(bot.getPoint().getId());
+                    }
                     bot.setBusy(true);
                     bot.setIdStart(job.getIdStart());
                     bot.setIdStop(job.getIdEnd());
                     bot.setJobId(job.getJobId());
                     job.setIdVehicle(bot.getIdCore());
                     botControlService.saveBot(bot);
+
                     //Send MQTT message to bot
                     this.sendJob(job.getJobId(),bot.getIdCore(),job.getIdStart(),job.getIdEnd());
                 }else{
@@ -139,7 +161,7 @@ public class JobService implements Runnable
                     jobQueue.put(job);
                 }
             }catch(Exception e){
-                System.err.println("Error taking job from queue: " +e.getMessage());
+                logger.error("Error taking job from queue: " +e.getMessage());
             }
 
         }

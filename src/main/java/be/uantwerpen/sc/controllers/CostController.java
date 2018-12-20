@@ -23,7 +23,7 @@ import java.util.List;
  * Cost Controller
  */
 @RestController
-@RequestMapping("/cost/")
+@RequestMapping("/")
 public class CostController {
 
     /**
@@ -124,7 +124,7 @@ public class CostController {
      * @param stop
      * @return
      */
-    @RequestMapping(value = "calcpathweight/{start}/{stop}",method = RequestMethod.GET)
+    @RequestMapping(value = "cost/calcpathweight/{start}/{stop}",method = RequestMethod.GET)
     public double calcPathWeight(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
         return pathPlanningService.CalculatePathWeight(start, stop);

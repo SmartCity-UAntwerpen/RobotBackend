@@ -42,9 +42,7 @@ public class PathPlanningService implements IPathplanning {
     }
 
     /**
-     * Calculates Path
-     * TODO Not Sure
-     *
+     * Calculates Path     *
      * @param start
      * @param stop
      * @return
@@ -127,7 +125,6 @@ public class PathPlanningService implements IPathplanning {
     @Override
     public Path nextRandomPath(Map map, int start) {
         List<Vertex> vertexes = mapControlService.getVertexMap();
-
 
         Random random = new Random();
         Vertex currentVertex = null;
