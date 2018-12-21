@@ -58,7 +58,11 @@ public class CostController {
     @RequestMapping(value = "{start}/{stop}",method = RequestMethod.GET)
     public int calcCost(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        return (int) pathPlanningService.CalculatePathWeight(start, stop);
+        int cost = (int) pathPlanningService.CalculatePathWeight(start, stop);
+        if(botControlService.getAllAvialableBots().isEmpty()){
+            cost = cost +10;
+        }
+        return cost;
     }
 
     /*

@@ -2,8 +2,12 @@ package be.uantwerpen.sc.controllers;
 
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.BotState;
+import be.uantwerpen.rc.models.Job;
+import be.uantwerpen.sc.repositories.newMap.JobRepository;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.services.newMap.PointControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -41,6 +44,12 @@ public class JobController
     private JobService jobService;
 
     /**
+     * Job Repository
+     */
+    @Autowired
+    private JobRepository jobs;
+
+    /**
      * Autowired Point Control Service
      */
     @Autowired
@@ -49,14 +58,16 @@ public class JobController
     /**
      * Maas IP
      */
-    @Value("${maas.ip:default}")
-    private String maasIp;
+    @Value("${backbone.ip:default}")
+    private String backbone;
 
     /**
      * Maas Port
      */
-    @Value("${maas.port:default}")
-    private String maasPort;
+    @Value("${backbone.ip.port:default}")
+    private String backbonePort;
+
+    Logger logger = LoggerFactory.getLogger(JobController.class);
 
     /**
      * HTTP RECEIVE from MAAS
@@ -98,21 +109,41 @@ public class JobController
     public void finished(@PathVariable("robotId") long robotId)
     {
         Bot bot = botControlService.getBot( robotId);
+        Job job = jobs.findOne(bot.getJobId());
         bot.setBusy(false);
         bot.setStatus(BotState.Alive.ordinal());
         botControlService.saveBot(bot);
         completeJob(bot.getJobId());
+
+        logger.info("Job with id: "+job.getJobId() +" is done! Bot with id: "+bot.getIdCore() +" is available again!");
+        jobs.delete(job.getJobId());
     }
 
     /**
-     * HTTP GET -> MAAS
-     * Notifies that job is completed
-     * @param id
+     * Get the progress of a job
+     * @param jobid jobid
      */
-    public void completeJob(long id){
-        //TODO send to backbone job is done
-        /*try {
-            String u = "http://"+maasIp+":"+maasPort+"/completeJob/" + id;
+    @RequestMapping(value = "getprogress/{jobid}",method = RequestMethod.GET)
+    public int getProgress(@PathVariable("jobid") long jobid)
+    {
+        Job job = jobs.findOne(jobid);
+        logger.info("Progress of job "+jobid+" requested");
+        if(job == null){
+            //If job not found return 100%
+            return 100;
+        }
+        return 0; //TODO return actual progress
+    }
+
+    /**
+     * Send vehicle close by to backbone
+     * @param jobid
+     */
+    @RequestMapping(value = "closeBy/{jobid}", method = RequestMethod.GET)
+    public void sendCloseBy(@PathVariable("jobid") long jobid){
+        logger.info("Sending close by message for job "+jobid);
+        try {
+            String u = "http://"+backbone+":"+backbonePort+"/jobs/vehiclecloseby/" + jobid;
             URL url = new URL(u);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -124,14 +155,33 @@ public class JobController
             }
             conn.disconnect();
 
-        } catch (MalformedURLException e) {
-
-            e.printStackTrace();
-
         } catch (IOException e) {
-
-            e.printStackTrace();
-        }*/
+            logger.warn("Backbone not available! Job "+jobid+" cannot send closeby command to backbone.");
+        }
     }
 
+    /**
+     * HTTP GET -> MAAS
+     * Notifies that job is completed
+     * @param id
+     */
+    private void completeJob(long id){
+        logger.info("Sending complete message for job "+id);
+        try {
+            String u = "http://"+backbone+":"+backbonePort+"/jobs/complete/" + id;
+            URL url = new URL(u);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }
+            conn.disconnect();
+
+        } catch (IOException e) {
+            logger.warn("Backbone not available! Job "+id+" cannot send complete command to backbone.");
+        }
+    }
 }

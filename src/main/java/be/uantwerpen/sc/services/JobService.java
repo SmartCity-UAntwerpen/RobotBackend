@@ -3,6 +3,7 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
 import be.uantwerpen.rc.models.Job;
+import be.uantwerpen.sc.repositories.newMap.JobRepository;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -22,6 +24,12 @@ import java.util.concurrent.BlockingQueue;
 @Service
 public class JobService implements Runnable
 {
+    /**
+     * Autowired Job repository
+     */
+    @Autowired
+     JobRepository jobs;
+
     /**
      * Autowired MQTT Publisher
      */
@@ -46,33 +54,35 @@ public class JobService implements Runnable
     @Autowired
     private PointControlService pointControlService;
 
-    //TODO: make blocking fifo queue
+    //TODO: remove blocking queue ==> use database
     private BlockingQueue<Job> jobQueue = null;
 
     Logger logger = LoggerFactory.getLogger(JobService.class);
 
     @PostConstruct
     public void init() {
+        //Initialize job queue and add all jobs from database
         jobQueue = new ArrayBlockingQueue<Job>(100);
+        List<Job> allJobs = jobs.findAll();
+        jobQueue.addAll(allJobs);
     }
 
 
     /**
      * Send job over MQTT
-     * @param botId ID of bot for job
+     * @param bot The bot that executes the job
      * @param jobId ID of job for bot
      * @param idStart ID start Point
      * @param idStop ID stop Point
      * @return Success
      */
-    private boolean sendJob(Long jobId, Long botId, long idStart, long idStop)
+    private boolean sendJob(Long jobId, Bot bot, long idStart, long idStop)
     {
         Job job = new Job(jobId);
         job.setIdStart(idStart);
         job.setIdEnd(idStop);
-        job.setIdVehicle(botId);
-
-        return mqttJobPublisher.publishJob(job, botId);
+        job.setBot(bot);
+        return mqttJobPublisher.publishJob(job, bot.getIdCore());
     }
 
     /**
@@ -104,6 +114,7 @@ public class JobService implements Runnable
         job.setIdEnd(idStop);
         try{
             boolean tmp = jobQueue.add(job);
+            jobs.save(job);
             logger.info("New job queued!\tId: "+job.getJobId()+"\tStart: "+job.getIdStart()+"\tEnd: "+job.getIdEnd());
             return true;
         }catch(IllegalStateException e){
@@ -151,11 +162,11 @@ public class JobService implements Runnable
                     bot.setIdStart(job.getIdStart());
                     bot.setIdStop(job.getIdEnd());
                     bot.setJobId(job.getJobId());
-                    job.setIdVehicle(bot.getIdCore());
+                    job.setBot(bot);
                     botControlService.saveBot(bot);
-
+                    jobs.save(job);
                     //Send MQTT message to bot
-                    this.sendJob(job.getJobId(),bot.getIdCore(),job.getIdStart(),job.getIdEnd());
+                    this.sendJob(job.getJobId(),bot,job.getIdStart(),job.getIdEnd());
                 }else{
                     //Place job back in queue TODO: optimize this (remove this else)
                     jobQueue.put(job);

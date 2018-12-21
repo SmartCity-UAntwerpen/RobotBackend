@@ -232,6 +232,7 @@ public class BotController
         bot.setBusy(false);
         bot.updateStatus(BotState.Alive.ordinal());
         botControlService.saveBot(bot);
+        logger.info("Bot with id "+bot.getIdCore()+" entered the network!");
         return bot.getIdCore();
     }
 }

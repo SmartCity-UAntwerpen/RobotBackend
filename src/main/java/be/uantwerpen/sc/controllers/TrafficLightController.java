@@ -98,21 +98,15 @@ public class TrafficLightController
     /**
      * GET <- WHO
      * Create Trafficlight with given parameters
-     * @param id Link ID
-     * @param progress Link Progress
-     * @param direction Trafficlight Direction
      * @param state Trafficlight State
      * @return ID of traffic Light
      */
-    @RequestMapping(value = "initiate/{id}/{progress}/{direction}/{state}", method = RequestMethod.GET)
-    public long initiate(@PathVariable("id") int linkID, @PathVariable("progress") int progress, @PathVariable("direction") String direction, @PathVariable("state") String state){
+    @RequestMapping(value = "initiate/{id}/{localId}/{state}", method = RequestMethod.GET)
+    public long initiate(@PathVariable("id") int localId, @PathVariable("state") String state){
         TrafficLight trafficLight = new TrafficLight();
         List<TrafficLight> tlights = trafficLightRepository.findAll();
         long id = (long) (tlights.size()+1);
         trafficLight.setId(id);
-        trafficLight.setLink(linkControlService.getLink((long) linkID));
-        trafficLight.setPlaceLink(progress);
-        trafficLight.setDirection(direction);
         trafficLight.setState(state);
         trafficLightControlService.saveTl(trafficLight);
         return id;
