@@ -1,5 +1,6 @@
 package be.uantwerpen.sc.services.newMap;
 
+import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Tile;
 import be.uantwerpen.sc.repositories.newMap.TileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,15 @@ public class TileControlService {
     public void save(Tile tile)
     {
         tiles.save(tile);
+    }
+
+    public void removeAllLocksFromBot(Bot bot){
+        List<Tile> ts = tiles.findAllBylockedBy(bot);
+        for(Tile t : ts){
+            t.setLocked(false);
+            t.setLockedBy(null);
+            tiles.save(t);
+        }
     }
 
 }

@@ -96,7 +96,7 @@ public class LinkController
                 if(link.getLock().getLockedBy().getIdCore().equals(botId) && link.getLock().getStatus()) {
                     //Point already locked
                     link.lockLink(false, null);
-                    link.setWeight(link.getWeight() - 10);
+                    link.setWeight(1);
                     linkControlService.save(link);
                 return true;
                 } else {

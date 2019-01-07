@@ -2,10 +2,13 @@ package be.uantwerpen.sc.services.newMap;
 
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.rc.models.map.LinkLock;
+import be.uantwerpen.sc.repositories.newMap.LinkLockRepository;
 import be.uantwerpen.sc.repositories.newMap.LinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -13,6 +16,9 @@ public class LinkControlService {
 
     @Autowired
     private LinkRepository links;
+
+    @Autowired
+    private LinkLockRepository locks;
 
     /**
      * Encapsulator for finding all available links
@@ -60,4 +66,12 @@ public class LinkControlService {
         return this.getLink(id).getLockStatus();
     }
 
+    public void removeAllLocksFromBot(Bot bot){
+        List<LinkLock> l = locks.findAllBylockedBy(bot);
+        for(LinkLock lo : l){
+            lo.setStatus(false);
+            lo.setLockedBy(null);
+            locks.save(lo);
+        }
+    }
 }

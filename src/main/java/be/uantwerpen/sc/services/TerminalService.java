@@ -125,14 +125,10 @@ public class TerminalService
             case "showbots":
                 this.printAllBots();
                 break;
-            case "clearbots":
-                this.deleteBots();
-                break;
             case "clearlocks":
                 this.clearPointLocks();
                 break;
             case "clearall":
-                this.deleteBots();
                 this.clearPointLocks();
                 break;
             case "delete":
@@ -260,15 +256,6 @@ public class TerminalService
             terminal.printTerminalInfo("Bot deleted with id: " + botID + ".");
         else
             terminal.printTerminalError("Could not delete bot with id: " + botID + "!");
-    }
-
-    /**
-     * Resets available bots, used as command
-     */
-    private void deleteBots()
-    {
-        botControlService.deleteBots();
-        terminal.printTerminalInfo("All bot entries cleared from database.");
     }
 
     /**

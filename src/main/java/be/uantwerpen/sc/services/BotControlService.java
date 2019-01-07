@@ -72,17 +72,10 @@ public class BotControlService
     {
         if(this.getBot(bid) == null)
             return false;
+
+
         botRepository.delete(bid);
         return true;
-    }
-
-    /**
-     * Deletes all available bots
-     * @return
-     */
-    public void deleteBots()
-    {
-        botRepository.deleteAll();
     }
 
     public List<Bot> getAllAvialableBots(){

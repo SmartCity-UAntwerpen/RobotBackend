@@ -4,11 +4,11 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.BotState;
 import be.uantwerpen.rc.models.Location;
-import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
+import be.uantwerpen.sc.services.newMap.TileControlService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -47,6 +47,12 @@ public class BotController
     private PointControlService pointControlService;
 
     /**
+     * Autowired Tile Control Service
+     */
+    @Autowired
+    private TileControlService tileControlService;
+
+    /**
      * BackBone IP
      */
     @Value("${backbone.ip:default}")
@@ -58,6 +64,7 @@ public class BotController
     String backbonePort;
 
     Logger logger = LoggerFactory.getLogger(BotController.class);
+
 
     /**
      * Get All Bots
@@ -150,13 +157,16 @@ public class BotController
     public void deleteBot(@PathVariable("rid") Long rid)
     {
         logger.info("Removing bot with id: "+rid);
-        botControlService.deleteBot(rid);
-    }
+        Bot bot = botControlService.getBot(rid);
+        //Remove all references to the bot
+        linkControlService.removeAllLocksFromBot(bot);
+        tileControlService.removeAllLocksFromBot(bot);
 
-    @RequestMapping(value = "/deleteBots",method = RequestMethod.GET)
-    public void resetBots()
-    {
-        botControlService.deleteBots();
+        //Remove the job the bot was executing
+
+
+        //Remove the bot itself
+        botControlService.deleteBot(rid);
     }
 
     /**
@@ -208,7 +218,7 @@ public class BotController
             }
             else{
                 if(new Date().getTime()-b.getLastUpdated().getTime()>1000*60*5) {
-                    botControlService.deleteBot(b.getIdCore());
+                    this.deleteBot(b.getIdCore());
                 }
             }
         }

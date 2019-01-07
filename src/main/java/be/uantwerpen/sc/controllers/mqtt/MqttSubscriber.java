@@ -232,7 +232,7 @@ public class MqttSubscriber implements MqttCallback {
             Long lightID = Long.parseLong(lightIDString);
 
             String payloadString = new String(mqttMessage.getPayload());
-           logger.info("LIGHT :"+payloadString);
+            logger.info("LIGHT :"+payloadString);
 
             if(!topic.endsWith("Heartbeat")){
                 return;
