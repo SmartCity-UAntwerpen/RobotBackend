@@ -108,15 +108,18 @@ public class JobController
     @RequestMapping(value = "finished/{robotId}",method = RequestMethod.GET)
     public void finished(@PathVariable("robotId") long robotId)
     {
-        Bot bot = botControlService.getBot( robotId);
-        Job job = jobs.findOne(bot.getJobId());
-        bot.setBusy(false);
-        bot.setStatus(BotState.Alive.ordinal());
-        botControlService.saveBot(bot);
-        completeJob(bot.getJobId());
-
-        logger.info("Job with id: "+job.getJobId() +" is done! Bot with id: "+bot.getIdCore() +" is available again!");
-        jobs.delete(job.getJobId());
+        try{
+            Bot bot = botControlService.getBot( robotId);
+            Job job = jobs.findOne(bot.getJobId());
+            bot.setBusy(false);
+            bot.setStatus(BotState.Alive.ordinal());
+            botControlService.saveBot(bot);
+            completeJob(bot.getJobId());
+            logger.info("Job with id: "+job.getJobId() +" is done! Bot with id: "+bot.getIdCore() +" is available again!");
+            jobs.delete(job.getJobId());
+        }catch(NullPointerException e){
+            logger.warn("Robot "+robotId +" has no job assigned! Nothing to complete!");
+        }
     }
 
     /**

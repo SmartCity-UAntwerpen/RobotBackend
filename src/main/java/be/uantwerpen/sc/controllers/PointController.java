@@ -59,7 +59,7 @@ public class PointController
             if(point == null)//Point not found
                 return false;
 
-            if(point.getTileLock()) {
+            if(point.getTileLock() && !point.getTile().getLockedBy().getIdCore().equals(botId)){
                 //Point already locked
                 return false;
             } else {

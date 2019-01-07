@@ -1,8 +1,6 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Path;
-import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Tile;

@@ -60,7 +60,7 @@ public class LinkController
             {
                 return false;
             }
-            if(link.getLock().getStatus()) {
+            if(link.getLock().getStatus() && !link.getLock().getLockedBy().getIdCore().equals(botId)) {
                 return false;
             } else{
                 //Point not locked -> attempt lock
@@ -69,7 +69,6 @@ public class LinkController
                 link.setWeight(link.getWeight()+10);
                 linkControlService.save(link);
                 return true;
-
             }
         }
 
@@ -92,18 +91,22 @@ public class LinkController
                 return false;
             }
 
-            //Check if bot asking the unlock is the one that locked the link
-            if(link.getLock().getLockedBy().getIdCore().equals(botId) && link.getLock().getStatus()) {
-                //Point already locked
-                link.lockLink(false, null);
-                link.setWeight(link.getWeight() - 10);
-                linkControlService.save(link);
+            try{
+                //Check if bot asking the unlock is the one that locked the link
+                if(link.getLock().getLockedBy().getIdCore().equals(botId) && link.getLock().getStatus()) {
+                    //Point already locked
+                    link.lockLink(false, null);
+                    link.setWeight(link.getWeight() - 10);
+                    linkControlService.save(link);
                 return true;
-            } else {
+                } else {
+                    return false;
+                }
+            } catch(NullPointerException e){
+                System.err.println("Bot not found");
                 return false;
             }
         }
-
     }
 }
 
