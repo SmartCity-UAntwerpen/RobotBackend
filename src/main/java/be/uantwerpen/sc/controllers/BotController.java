@@ -166,7 +166,12 @@ public class BotController
         //TODO: remove jobs the bot was executing
 
         //Remove the bot itself
-        botControlService.deleteBot(rid);
+        try{
+            botControlService.deleteBot(rid);
+        }catch(Exception e){
+            logger.error("Bot with ID: "+rid +"could not be deleted!");
+        }
+
     }
 
     /**

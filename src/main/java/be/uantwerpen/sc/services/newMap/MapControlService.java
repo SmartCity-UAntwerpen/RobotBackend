@@ -50,9 +50,17 @@ public class MapControlService
     private Map map=null;
     private List<Vertex> vertexMap=null;
     public Map getMap() {
-        if (map==null)
+        //if (map==null)
             map=buildMap();
         return map;
+    }
+
+    /**
+     * Update map
+     *  Update the map
+     */
+    public void updateMap(){
+          map = buildMap();
     }
 
     public List<Vertex> getVertexMap(){

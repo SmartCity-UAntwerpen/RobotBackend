@@ -80,13 +80,25 @@ public class TrafficLightController
     /**
      * Get state of specific ID light
      * GET <- WHO
-     * @param id Traffic Light ID
+     * @param point Traffic Light location
      * @return String State
      */
-    @RequestMapping(value = "getState/{idtlight}", method = RequestMethod.GET)
-    public String getState(@PathVariable("idtlight") int id){
-        return  trafficLightControlService.getTrafficLight(id).getState();
+    @RequestMapping(value = "getState/{point}", method = RequestMethod.GET)
+    public String getState(@PathVariable("point") Long point){
+        Point p = pointControlService.getPoint(point);
+        return  trafficLightControlService.findTrafficLightByPoint(p).get(0).getState();
     }
+
+    /**
+     * Get state of specific ID light
+     * GET <- WHO
+     * @return JSON of trafficlights State
+     */
+    @RequestMapping(value = "getAll", method = RequestMethod.GET)
+    public List<TrafficLight> getAll(){
+        return  trafficLightControlService.getAllTrafficLights();
+    }
+
 
     /**
      * GET <- WHO
@@ -98,8 +110,15 @@ public class TrafficLightController
     @RequestMapping(value = "initiate/{point}/{state}", method = RequestMethod.GET)
     public long initiate(@PathVariable("point") Long point, @PathVariable("state") String state){
         Point p = pointControlService.getPoint(point);
-        TrafficLight tlight = trafficLightControlService.findTrafficLightByPoint(p);
-        if(tlight == null){
+        try{
+            TrafficLight tlight = trafficLightControlService.findTrafficLightByPoint(p).get(0);
+            tlight.setState(state);
+            trafficLightControlService.saveTl(tlight);
+            //The trafficlight already exists return its id
+            logger.info("TrafficLight already in database (UNGRACEFUL SHUTDOWN?) on location "+point + " with ID: "+tlight.getId());
+            return tlight.getId();
+        }catch(Exception e){
+            // Trafficlight doesnt exist already => create new
             TrafficLight trafficLight = new TrafficLight();
             List<TrafficLight> tlights = trafficLightRepository.findAll();
             long id = (long) (tlights.size()+1);
@@ -109,11 +128,6 @@ public class TrafficLightController
             trafficLightControlService.saveTl(trafficLight);
             logger.info("New TrafficLight on location "+point + " with new ID: "+id);
             return id;
-        }else{
-            //The trafficlight already exists return its id
-            logger.info("TrafficLight already in database (UNGRACEFUL SHUTDOWN?) on location "+point + " with new ID: "+tlight.getId());
-            return tlight.getId();
-
         }
     }
 

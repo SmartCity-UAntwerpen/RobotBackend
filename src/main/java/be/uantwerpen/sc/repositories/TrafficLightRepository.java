@@ -19,5 +19,5 @@ public interface TrafficLightRepository extends CrudRepository<TrafficLight, Lon
      * @return List of TrafficLights
      */
     List<TrafficLight> findAll();
-    TrafficLight findByPoint(Point point);
+    List<TrafficLight> findByPoint(Point point);
 }

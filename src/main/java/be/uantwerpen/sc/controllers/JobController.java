@@ -89,6 +89,23 @@ public class JobController
     /**
      * HTTP RECEIVE from MAAS
      * Uses COREID
+     * @param idJob
+     * @param idstart
+     * @param idstop
+     * @return
+     */
+    @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.POST)
+    public String executeJobPOST(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
+    {
+        if(!jobService.queueJob(idJob,idstart,idstop)){
+            return "HTTP status : 400";
+        }
+        return "HTTP status : 200";
+    }
+
+    /**
+     * HTTP RECEIVE from MAAS
+     * Uses COREID
      * @param pid, The target point id
      * @return
      */

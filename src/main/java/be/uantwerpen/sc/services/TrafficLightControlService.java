@@ -96,7 +96,7 @@ public class TrafficLightControlService
      * @param point, the point to check
      * @return trafficlight, the trafficlight entity on that point
      */
-    public TrafficLight findTrafficLightByPoint(Point point){
+    public List<TrafficLight> findTrafficLightByPoint(Point point){
         return trafficLightRepository.findByPoint(point);
     }
 }
