@@ -236,12 +236,12 @@ public class TerminalService
 
             for(Bot bot : bots)
             {
-                Point point = bot.getPoint();
+                Long point = bot.getPoint();
 
                 if(point == null)
                     terminal.printTerminal("Bot "+bot.getIdCore()+" has no current location");
 
-                terminal.printTerminal("\t" + bot.getIdCore() + "\t\t" + point.getId() + "\t\t\t" + bot.getStatus());
+                terminal.printTerminal("\t" + bot.getIdCore() + "\t\t" + point + "\t\t\t" + bot.getStatus());
             }
         }
     }

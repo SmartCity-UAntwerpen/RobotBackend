@@ -129,7 +129,7 @@ public class BotController
             logger.info("Bot with id: " +id+" updated its location: "+pid);
             if(point != null)
             {
-                bot.setPoint(point);
+                bot.setPoint(pid);
                 botControlService.saveBot(bot);
                 System.out.println(bot.getIdCore());
             }
@@ -146,7 +146,7 @@ public class BotController
 
         if(bot != null)
         {
-            bot.setPoint(pointControlService.getPoint(pointId));
+            bot.setPoint(pointId);
             bot.setPercentageCompleted(progress);
             bot.updateStatus(BotState.Alive.ordinal());
             botControlService.saveBot(bot);
@@ -163,7 +163,7 @@ public class BotController
         tileControlService.removeAllLocksFromBot(bot);
 
         //Remove the job the bot was executing
-
+        //TODO: remove jobs the bot was executing
 
         //Remove the bot itself
         botControlService.deleteBot(rid);
@@ -186,8 +186,8 @@ public class BotController
                 loc.setStopID(b.getIdStop());
                 loc.setPercentage((long) b.getPercentageCompleted());
             }else{
-                loc.setStartID(b.getLinkId().getStartPoint().getId());
-                loc.setStopID(b.getLinkId().getStartPoint().getId());
+                loc.setStartID(b.getLinkId());
+                loc.setStopID(b.getLinkId());
                 loc.setPercentage( (long)100);
             }
 
@@ -235,7 +235,7 @@ public class BotController
         Bot bot = new Bot(id);
         bot.setWorkingMode(modus);
         bot.setJobId((long) 0);
-        bot.setLinkId(linkControlService.getLink((long) 1));
+        bot.setLinkId(1L); //Set location to link 1
         bot.setPercentageCompleted(100);
         bot.setIdStart((long) 1);
         bot.setIdStop((long) 1);

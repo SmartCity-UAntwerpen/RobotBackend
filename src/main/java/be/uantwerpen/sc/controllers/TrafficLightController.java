@@ -1,9 +1,13 @@
 package be.uantwerpen.sc.controllers;
 
 import be.uantwerpen.rc.models.TrafficLight;
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.repositories.TrafficLightRepository;
 import be.uantwerpen.sc.services.TrafficLightControlService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
+import be.uantwerpen.sc.services.newMap.PointControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,10 +37,12 @@ public class TrafficLightController
     private TrafficLightRepository trafficLightRepository;
 
     /**
-     * Autowired Link Control Service
+     * Autowired Point Control Service
      */
     @Autowired
-    private LinkControlService linkControlService;
+    private PointControlService pointControlService;
+
+    Logger logger = LoggerFactory.getLogger(TrafficLightController.class);
 
     /**
      * GET <- WHO
@@ -59,19 +65,6 @@ public class TrafficLightController
     public TrafficLight getTrafficLight(@PathVariable("id") Long id)
     {
         return trafficLightControlService.getTrafficLight(id);
-    }
-
-    /**
-     * GET <- WHO
-     * Save new trafficlight with state "Test"
-     * TODO probably test function
-     */
-    @RequestMapping(value = "savetest",method = RequestMethod.GET)
-    public void saveTlTest()
-    {
-        TrafficLight tl = new TrafficLight();
-        tl.setState("Test");
-        trafficLightControlService.saveTl(tl);
     }
 
     /**
@@ -98,18 +91,41 @@ public class TrafficLightController
     /**
      * GET <- WHO
      * Create Trafficlight with given parameters
+     * @param point the tl location
      * @param state Trafficlight State
-     * @return ID of traffic Light
+     * @return id, the new ID of the TL
      */
-    @RequestMapping(value = "initiate/{id}/{localId}/{state}", method = RequestMethod.GET)
-    public long initiate(@PathVariable("id") int localId, @PathVariable("state") String state){
-        TrafficLight trafficLight = new TrafficLight();
-        List<TrafficLight> tlights = trafficLightRepository.findAll();
-        long id = (long) (tlights.size()+1);
-        trafficLight.setId(id);
-        trafficLight.setState(state);
-        trafficLightControlService.saveTl(trafficLight);
-        return id;
+    @RequestMapping(value = "initiate/{point}/{state}", method = RequestMethod.GET)
+    public long initiate(@PathVariable("point") Long point, @PathVariable("state") String state){
+        Point p = pointControlService.getPoint(point);
+        TrafficLight tlight = trafficLightControlService.findTrafficLightByPoint(p);
+        if(tlight == null){
+            TrafficLight trafficLight = new TrafficLight();
+            List<TrafficLight> tlights = trafficLightRepository.findAll();
+            long id = (long) (tlights.size()+1);
+            trafficLight.setId(id);
+            trafficLight.setState(state);
+            trafficLight.setPoint(p);
+            trafficLightControlService.saveTl(trafficLight);
+            logger.info("New TrafficLight on location "+point + " with new ID: "+id);
+            return id;
+        }else{
+            //The trafficlight already exists return its id
+            logger.info("TrafficLight already in database (UNGRACEFUL SHUTDOWN?) on location "+point + " with new ID: "+tlight.getId());
+            return tlight.getId();
+
+        }
+    }
+
+    /**
+     * GET <- WHO
+     * Delete a traffic light
+     * @param id the tl id
+     */
+    @RequestMapping(value = "delete/{id}", method = RequestMethod.GET)
+    public void delete(@PathVariable("id") Long id){
+        trafficLightControlService.deleteTl(id);
+        logger.info("Deleting TrafficLight "+id);
     }
 
 

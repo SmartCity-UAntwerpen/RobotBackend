@@ -56,13 +56,20 @@ public class CostController {
      * @return
      */
     @RequestMapping(value = "{start}/{stop}",method = RequestMethod.GET)
-    public int calcCost(@PathVariable("start") int start, @PathVariable("stop") int stop)
+    public String calcCost(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
         int cost = (int) pathPlanningService.CalculatePathWeight(start, stop);
         if(botControlService.getAllAvialableBots().isEmpty()){
             cost = cost +10;
         }
-        return cost;
+        /*
+        if(start == 9 && stop == 16 || start == 16 && stop == 9){
+            return 1000;
+        }
+        if(start == 10 && stop == 16 || start == 16 && stop == 10){
+            return 1000;
+        }*/
+        return "{\"cost\":" +cost+"}";
     }
 
     /*

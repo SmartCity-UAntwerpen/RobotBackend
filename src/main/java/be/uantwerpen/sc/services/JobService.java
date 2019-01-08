@@ -149,14 +149,14 @@ public class JobService implements Runnable
                             //Normal job ==> which bot is closest to start point
                             targetId = job.getIdStart().intValue();
                         }
-                        sortedBots.put((int)pathPlanningService.CalculatePathWeight(b.getPoint().getId().intValue(),targetId),b);
+                        sortedBots.put((int)pathPlanningService.CalculatePathWeight(b.getPoint().intValue(),targetId),b);
                     }
 
                     //Get closest bot == first entry and assign job
                     Bot bot = sortedBots.firstEntry().getValue();
                     //If the start point is -1L than this is a goToPoint job ==> set start point to current location of the bot
                     if(job.getIdStart() == -1L){
-                        job.setIdStart(bot.getPoint().getId());
+                        job.setIdStart(bot.getPoint());
                     }
                     bot.setBusy(true);
                     bot.setIdStart(job.getIdStart());

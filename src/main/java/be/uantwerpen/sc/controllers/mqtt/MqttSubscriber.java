@@ -223,7 +223,6 @@ public class MqttSubscriber implements MqttCallback {
             }
         }
 
-
         //Light TOPIC
         //Topic: LIGHT/{id}
         else if(topic.matches("(LIGHT\\/[0-9]+)")){
@@ -233,10 +232,6 @@ public class MqttSubscriber implements MqttCallback {
 
             String payloadString = new String(mqttMessage.getPayload());
             logger.info("LIGHT :"+payloadString);
-
-            if(!topic.endsWith("Heartbeat")){
-                return;
-            }
 
             String temp = payloadString.split("id:")[1];
             String id = temp.split("/")[0];
@@ -249,7 +244,6 @@ public class MqttSubscriber implements MqttCallback {
             }
             trafficLightController.updateState(Integer.parseInt(id), state);
         }
-
 
         //Alive TOPIC
         //Topic: BOT/alive
