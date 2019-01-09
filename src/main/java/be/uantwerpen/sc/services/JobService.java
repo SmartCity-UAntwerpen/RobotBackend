@@ -3,7 +3,7 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
 import be.uantwerpen.rc.models.Job;
-import be.uantwerpen.sc.repositories.newMap.JobRepository;
+import be.uantwerpen.sc.repositories.JobRepository;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.awt.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;

@@ -2,7 +2,7 @@ package be.uantwerpen.sc.services.newMap;
 
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Tile;
-import be.uantwerpen.sc.repositories.newMap.TileRepository;
+import be.uantwerpen.sc.repositories.TileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

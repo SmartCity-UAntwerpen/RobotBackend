@@ -161,7 +161,7 @@ public class TerminalService
                     try
                     {
                         String[] ints= (commandString.split(" ", 3));
-                        System.out.println(costController.calcPathWeight(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
+                        System.out.println(costController.calcCost(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
 
                     }
                     catch(Exception e)

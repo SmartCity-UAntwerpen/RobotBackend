@@ -15,9 +15,15 @@ import java.util.List;
 public interface TrafficLightRepository extends CrudRepository<TrafficLight, Long>
 {
     /**
-     * Retrieve list of all available traffic lights
+     * Returns a List of all available traffic lights
      * @return List of TrafficLights
      */
     List<TrafficLight> findAll();
+
+    /**
+     * Returns a List of TrafficLights on a specific point (should only be one)
+     * @param point, the point
+     * @return List of TrafficLights (should only contain one item)
+     */
     List<TrafficLight> findByPoint(Point point);
 }

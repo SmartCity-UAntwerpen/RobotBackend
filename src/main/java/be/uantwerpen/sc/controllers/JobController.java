@@ -3,7 +3,7 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.BotState;
 import be.uantwerpen.rc.models.Job;
-import be.uantwerpen.sc.repositories.newMap.JobRepository;
+import be.uantwerpen.sc.repositories.JobRepository;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import org.slf4j.Logger;

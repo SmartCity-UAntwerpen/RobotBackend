@@ -1,4 +1,4 @@
-package be.uantwerpen.sc.repositories.newMap;
+package be.uantwerpen.sc.repositories;
 
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Link;
@@ -9,6 +9,7 @@ import java.util.List;
 
 @Repository
 public interface LinkRepository extends CrudRepository<Link, Long> {
+
     /**
      * Return list of all available Links
      * @return List of Links

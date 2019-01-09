@@ -3,12 +3,11 @@ package be.uantwerpen.sc.services.newMap;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.rc.models.map.LinkLock;
-import be.uantwerpen.sc.repositories.newMap.LinkLockRepository;
-import be.uantwerpen.sc.repositories.newMap.LinkRepository;
+import be.uantwerpen.sc.repositories.LinkLockRepository;
+import be.uantwerpen.sc.repositories.LinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
