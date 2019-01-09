@@ -36,6 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 
                 return;
             }
+            http.csrf().disable();
         }
     }
 }

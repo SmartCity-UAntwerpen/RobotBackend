@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.services;
 
 import be.uantwerpen.sc.controllers.BotController;
-import be.uantwerpen.sc.models.Bot;
+import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.sc.repositories.BotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,33 +72,13 @@ public class BotControlService
     {
         if(this.getBot(bid) == null)
             return false;
-        botRepository.delete(bid);
-        try {
-            String u = "http://"+backboneIP+":"+backbonePort+"/bot/delete/"+bid;
-            URL url = new URL(u);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
 
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
-            }
-            conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        botRepository.delete(bid);
         return true;
     }
 
-    /**
-     * Deletes all available bots
-     * @return
-     */
-    public void deleteBots()
-    {
-        botRepository.deleteAll();
+    public List<Bot> getAllAvialableBots(){
+        return botRepository.findAllByBusyFalseAndPointNotNull();
     }
 }

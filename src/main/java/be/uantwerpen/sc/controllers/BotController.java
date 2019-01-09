@@ -1,21 +1,24 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.*;
+
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.BotState;
+import be.uantwerpen.rc.models.Job;
+import be.uantwerpen.rc.models.Location;
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
-import be.uantwerpen.sc.services.LinkControlService;
-import be.uantwerpen.sc.services.PointControlService;
+import be.uantwerpen.sc.services.JobService;
+import be.uantwerpen.sc.services.newMap.LinkControlService;
+import be.uantwerpen.sc.services.newMap.PointControlService;
+import be.uantwerpen.sc.services.newMap.TileControlService;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import org.json.JSONObject;
@@ -46,14 +49,16 @@ public class BotController
     private PointControlService pointControlService;
 
     /**
-     * Get All Bots
-     * @return
+     * Autowired Tile Control Service
      */
-    @RequestMapping(method = RequestMethod.GET)
-    public List<Bot> allBots()
-    {
-        return botControlService.getAllBots();
-    }
+    @Autowired
+    private TileControlService tileControlService;
+
+    /**
+     * Autowired Job Service
+     */
+    @Autowired
+    private JobService jobService;
 
     /**
      * BackBone IP
@@ -65,6 +70,19 @@ public class BotController
      */
     @Value("${backbone.port:default}")
     String backbonePort;
+
+    Logger logger = LoggerFactory.getLogger(BotController.class);
+
+
+    /**
+     * Get All Bots
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public List<Bot> allBots()
+    {
+        return botControlService.getAllBots();
+    }
 
     @RequestMapping(value = "{id}",method = RequestMethod.GET)
     public Bot getBot(@PathVariable("id") Long id)
@@ -84,32 +102,14 @@ public class BotController
         botControlService.saveBot(bot);
     }
 
-    @RequestMapping(value = "updateBotTest/{id}",method = RequestMethod.GET)
-    public void updateBotTest(@PathVariable("id") Long id)
-    {
-        Bot botEntity = new Bot(id);
-        botEntity.setWorkingMode("Updated");
-        botControlService.saveBot(botEntity);
-    }
-
-
-    @RequestMapping(value = "savetest",method = RequestMethod.GET)
-    public void saveBotTest()
-    {
-        Bot bot = new Bot((long) getNewId());
-        bot.setWorkingMode("test");
-        botControlService.saveBot(bot);
-    }
-
-
     /**
      * Robot calls this GET
      * @return
      */
-    @RequestMapping(value = "newRobot", method = RequestMethod.GET)
-    public Long newRobot()
+    @RequestMapping(value = "newRobot/{id}", method = RequestMethod.GET)
+    public Long newRobot(@PathVariable("id") Long id)
     {
-        Bot bot = new Bot((long) getNewId());
+        Bot bot = new Bot(id);
         System.out.println(bot);
         //Save bot in database and get bot new rid
         botControlService.saveBot(bot);
@@ -120,37 +120,41 @@ public class BotController
         return bot.getIdCore();
     }
 
-    @RequestMapping(value = "{id}/lid/{lid}", method = RequestMethod.GET)
-    public void locationLink(@PathVariable("id") Long id, @PathVariable("lid") Long lid)
+    /**
+     * Bot location update
+     * @param id, the bot id
+     * @param pid, the location = a point id
+     */
+    @RequestMapping(value = "{id}/locationUpdate/{pid}", method = RequestMethod.GET)
+    public void locationLink(@PathVariable("id") Long id, @PathVariable("pid") Long pid)
     {
         Bot bot = botControlService.getBot(id);
-        Link link;
+        Point point;
 
         if(bot != null)
         {
-            link = linkControlService.getLink(lid);
-
-            if(link != null)
+            point = pointControlService.getPoint(pid);
+            logger.info("Bot with id: " +id+" updated its location: "+pid);
+            if(point != null)
             {
-                bot.setLinkId(link);
+                bot.setPoint(pid);
                 botControlService.saveBot(bot);
                 System.out.println(bot.getIdCore());
             }
             else
-                System.out.println("Link with id: " + lid + " not found!");
+                System.out.println("Point with id: " + pid + " not found!");
         }
         else
             System.out.println("Bot with id:" + id + " not found!");
     }
 
-    public void updateLocation(Long id, Long idvertex, int progress)
+    public void updateLocation(Long id, Long pointId, int progress)
     {
         Bot bot = botControlService.getBot(id);
 
         if(bot != null)
         {
-            //System.out.println(.getLink(idvertex));
-            //bot.setLinkId(pointControlService.getPoint(idvertex));
+            bot.setPoint(pointId);
             bot.setPercentageCompleted(progress);
             bot.updateStatus(BotState.Alive.ordinal());
             botControlService.saveBot(bot);
@@ -160,13 +164,31 @@ public class BotController
     @RequestMapping(value = "delete/{rid}",method = RequestMethod.GET)
     public void deleteBot(@PathVariable("rid") Long rid)
     {
-        botControlService.deleteBot(rid);
-    }
+        logger.info("Removing bot with id: "+rid);
+        Bot bot = botControlService.getBot(rid);
+        //Remove all references to the bot
+        linkControlService.removeAllLocksFromBot(bot);
+        tileControlService.removeAllLocksFromBot(bot);
 
-    @RequestMapping(value = "/deleteBots}",method = RequestMethod.GET)
-    public void resetBots()
-    {
-        botControlService.deleteBots();
+        //Remove the job the bot was executing
+        //TODO: remove jobs the bot was executing
+        List<Job> jobs = jobService.getExecutingJob(bot);
+        for(Job j: jobs){
+            //Remove the bot from executing it and set starting point to the bots last location
+            j.setIdStart(bot.getPoint());
+            j.setBot(null);
+            jobService.saveJob(j);
+            //Also queue job again so it will be executed again
+            jobService.queueJob(j.getJobId(),j.getIdStart(),j.getIdEnd());
+        }
+
+        //Remove the bot itself
+        try{
+            botControlService.deleteBot(rid);
+        }catch(Exception e){
+            logger.error("Bot with ID: "+rid +"could not be deleted!");
+        }
+
     }
 
     /**
@@ -181,13 +203,13 @@ public class BotController
             Location loc = new Location();
             loc.setVehicleID(b.getIdCore());
 
-            if (b.getBusy()==1){
+            if (b.getBusy()){
                 loc.setStartID(b.getIdStart());
                 loc.setStopID(b.getIdStop());
                 loc.setPercentage((long) b.getPercentageCompleted());
-            }else if(b.getBusy()==0){
-                loc.setStartID(b.getLinkId().getStartPoint().getId());
-                loc.setStopID(b.getLinkId().getStartPoint().getId());
+            }else{
+                loc.setStartID(b.getLinkId());
+                loc.setStopID(b.getLinkId());
                 loc.setPercentage( (long)100);
             }
 
@@ -218,7 +240,7 @@ public class BotController
             }
             else{
                 if(new Date().getTime()-b.getLastUpdated().getTime()>1000*60*5) {
-                    botControlService.deleteBot(b.getIdCore());
+                    this.deleteBot(b.getIdCore());
                 }
             }
         }
@@ -230,60 +252,19 @@ public class BotController
      * @param modus Type: Independent, partial or full server
      * @return
      */
-    @RequestMapping(value = "initiate/{modus}", method = RequestMethod.GET)
-    public long initiate(@PathVariable("modus") String modus){
-        Bot bot = new Bot((long) getNewId());
+    @RequestMapping(value = "initiate/{id}/{modus}", method = RequestMethod.GET)
+    public long initiate(@PathVariable("id") Long id, @PathVariable("modus") String modus){
+        Bot bot = new Bot(id);
         bot.setWorkingMode(modus);
         bot.setJobId((long) 0);
-        bot.setLinkId(linkControlService.getLink((long) 1));
+        bot.setLinkId(1L); //Set location to link 1
         bot.setPercentageCompleted(100);
         bot.setIdStart((long) 1);
         bot.setIdStop((long) 1);
-        bot.setBusy(0);
+        bot.setBusy(false);
         bot.updateStatus(BotState.Alive.ordinal());
-        //id ook doorgeven naar robot zelf
         botControlService.saveBot(bot);
+        logger.info("Bot with id "+bot.getIdCore()+" entered the network!");
         return bot.getIdCore();
     }
-
-    /**
-     * Gets New Bot ID for running a job? Something something calcweight
-     * TODO: Timeout HTTP
-     * @return Bot ID
-     */
-    public int getNewId(){
-        StringBuilder data = new StringBuilder();
-        try {
-            URL url = new URL("http://"+backboneIP+":"+backbonePort+"//bot/newBot/robot");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                data.append(output);
-                System.out.println(output);
-            }
-
-            conn.disconnect();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        }
-        System.out.println(data);
-        return Integer.parseInt(data.toString());
-    }
-
 }

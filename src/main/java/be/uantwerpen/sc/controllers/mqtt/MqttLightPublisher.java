@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
-import be.uantwerpen.sc.models.TrafficLight;
+import be.uantwerpen.rc.models.TrafficLight;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;

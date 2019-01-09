@@ -1,5 +1,6 @@
 package be.uantwerpen.sc.configurations;
 
+import be.uantwerpen.sc.services.JobService;
 import be.uantwerpen.sc.services.TerminalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -17,6 +18,11 @@ public class SystemLoader implements ApplicationRunner
      */
     @Autowired
     private TerminalService terminalService;
+    /**
+     * Auto Wired jobService
+     */
+    @Autowired
+    private JobService jobService;
 
     //Run after Spring context initialization
     public void run(ApplicationArguments args)
@@ -43,6 +49,9 @@ public class SystemLoader implements ApplicationRunner
             }
 
             terminalService.systemReady();
+
+            //Start jobService
+            new Thread(jobService).start();
         }
     }
 }

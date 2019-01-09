@@ -1,7 +1,9 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.Link;
-import be.uantwerpen.sc.services.LinkControlService;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.sc.services.BotControlService;
+import be.uantwerpen.sc.services.newMap.LinkControlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,13 +30,16 @@ public class LinkController
     @Autowired
     private LinkControlService linkControlService;
 
+    @Autowired
+    private BotControlService botService;
+
     /**
      * Get <- TODO
      * Get list of all available
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
-    public List<Link> allBots()
+    public List<Link> allLinks()
     {
         return linkControlService.getAllLinks();
     }
@@ -44,8 +49,8 @@ public class LinkController
      * @param id ID of link to lock
      * @return Success
      */
-    @RequestMapping(value = "requestlock/{id}", method = RequestMethod.GET)
-    public boolean requestLinkLock(@PathVariable("id") Long id)
+    @RequestMapping(value = "requestlock/{botId}/{id}", method = RequestMethod.GET)
+    public boolean requestLinkLock(@PathVariable("botId") Long botId,@PathVariable("id") Long id)
     {
         synchronized(this)
         {
@@ -55,19 +60,18 @@ public class LinkController
             {
                 return false;
             }
-            switch(link.getLocked())
-            {
-                case 1: //Point already locked
-                    return false;
-                case 0: //Point not locked -> attempt lock
-                    link.setLocked(1);
-                    link.setTrafficWeight(link.getTrafficWeight()+10);
-                    linkControlService.save(link);
-                    return true;
+            if(link.getLock().getStatus() && !link.getLock().getLockedBy().getIdCore().equals(botId)) {
+                return false;
+            } else{
+                //Point not locked -> attempt lock
+                Bot bot = botService.getBot(botId);
+                link.lockLink(true,bot);
+                link.setWeight(link.getWeight()+10);
+                linkControlService.save(link);
+                return true;
             }
         }
 
-        return false;
     }
 
     /**
@@ -75,8 +79,8 @@ public class LinkController
      * @param id ID of link to lock
      * @return Success
      */
-    @RequestMapping(value = "unlock/{id}", method = RequestMethod.GET)
-    public boolean LinkUnLock(@PathVariable("id") Long id)
+    @RequestMapping(value = "unlock/{botId}/{id}", method = RequestMethod.GET)
+    public boolean LinkUnLock(@PathVariable("botId") Long botId, @PathVariable("id") Long id)
     {
         synchronized(this)
         {
@@ -87,18 +91,22 @@ public class LinkController
                 return false;
             }
 
-            switch(link.getLocked())
-            {
-                case 1: //Point already locked
-                    link.setLocked(0);
-                    link.setTrafficWeight(link.getTrafficWeight()-10);
+            try{
+                //Check if bot asking the unlock is the one that locked the link
+                if(link.getLock().getLockedBy().getIdCore().equals(botId) && link.getLock().getStatus()) {
+                    //Point already locked
+                    link.lockLink(false, null);
+                    link.setWeight(1);
                     linkControlService.save(link);
-                    return true;
-                case 0: //Point not locked -> attempt lock
+                return true;
+                } else {
                     return false;
+                }
+            } catch(NullPointerException e){
+                System.err.println("Bot not found");
+                return false;
             }
         }
-        return false;
     }
 }
 

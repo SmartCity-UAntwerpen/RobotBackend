@@ -1,10 +1,12 @@
 package be.uantwerpen.sc.services;
 
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.controllers.BotController;
 import be.uantwerpen.sc.controllers.CostController;
 import be.uantwerpen.sc.controllers.JobController;
-import be.uantwerpen.sc.models.Bot;
-import be.uantwerpen.sc.models.Link;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.map.Link;
+import be.uantwerpen.sc.services.newMap.PointControlService;
 import be.uantwerpen.sc.tools.Terminal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,11 +96,11 @@ public class TerminalService
         switch(command)
         {
             case "generatebot":
-                long id=botController.initiate("INDEPENDENT");
+                long id=botController.initiate(9999L,"INDEPENDENT");
                 terminal.printTerminal("Bot ID: "+id);
                 break;
             case "job":
-                if(commandString.split(" ", 3).length <= 2)
+                if(commandString.split(" ", 4).length <= 2)
                 {
                     terminal.printTerminalInfo("Missing arguments! 'job {jobId} {botId} {startId} {stopId}");
                 }
@@ -106,11 +108,12 @@ public class TerminalService
                 {
                     try
                     {
-                        long jobid = Long.parseLong(commandString.split(" ", 3)[1]);
-                        long botid = Long.parseLong(commandString.split(" ", 3)[2]);
-                        long start = Long.parseLong(commandString.split(" ", 3)[3]);
-                        long stop = Long.parseLong(commandString.split(" ", 3)[4]);
-                        this.sendJob(jobid,botid,start,stop);
+                        String[] args = commandString.split(" ");
+                        long jobid = Long.parseLong(args[1]);
+                        long botid = Long.parseLong(args[2]);
+                        long start = Long.parseLong(args[3]);
+                        long stop = Long.parseLong(args[4]);
+                        this.sendJob(jobid,start,stop);
 
                     }
                     catch(Exception e)
@@ -122,14 +125,10 @@ public class TerminalService
             case "showbots":
                 this.printAllBots();
                 break;
-            case "clearbots":
-                this.deleteBots();
-                break;
             case "clearlocks":
                 this.clearPointLocks();
                 break;
             case "clearall":
-                this.deleteBots();
                 this.clearPointLocks();
                 break;
             case "delete":
@@ -179,7 +178,7 @@ public class TerminalService
                     try
                     {
                         String[] ints= (commandString.split(" ", 3));
-                        System.out.println(costController.calcWeight(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
+                        System.out.println(costController.calcCost(Integer.parseInt(ints[1]), Integer.parseInt(ints[2])));
                     }
                     catch(Exception e)
                     {
@@ -232,18 +231,17 @@ public class TerminalService
             terminal.printTerminalInfo("There are no bots available to list.");
         else
         {
-            terminal.printTerminal("Bot-id\t\tLink-id\t\tStatus");
+            terminal.printTerminal("Bot-id\t\tPoint-Id\t\tStatus");
             terminal.printTerminal("------------------------------");
 
             for(Bot bot : bots)
             {
-                Long linkId = -1L;
-                Link link = bot.getLinkId();
+                Long point = bot.getPoint();
 
-                if(link != null)
-                    linkId = link.getId();
+                if(point == null)
+                    terminal.printTerminal("Bot "+bot.getIdCore()+" has no current location");
 
-                terminal.printTerminal("\t" + bot.getIdCore() + "\t\t" + linkId + "\t\t\t" + bot.getStatus());
+                terminal.printTerminal("\t" + bot.getIdCore() + "\t\t" + point + "\t\t\t" + bot.getStatus());
             }
         }
     }
@@ -261,15 +259,6 @@ public class TerminalService
     }
 
     /**
-     * Resets available bots, used as command
-     */
-    private void deleteBots()
-    {
-        botControlService.deleteBots();
-        terminal.printTerminalInfo("All bot entries cleared from database.");
-    }
-
-    /**
      * Clears all point locks, used as command
      */
     private void clearPointLocks()
@@ -279,19 +268,13 @@ public class TerminalService
     }
 
     /**
-     * Sends Job to defined bot
-     * @param botId ID of bot
+     * Adds a job to the job queue
      */
-    private void sendJob(Long jobId,Long botId, long start, long stop)
+    private void sendJob(Long jobId, long start, long stop)
     {
-        if(botControlService.getBot(botId) == null)
-        {
-            terminal.printTerminalError("Could not find bot with id: " + botId + "!");
-            return;
-        }
-        if(jobService.sendJob(botId, jobId,start,stop))
-            terminal.printTerminalInfo("Job send to bot with id: " + botId + ".");
+        if(jobService.queueJob(jobId,start,stop))
+            terminal.printTerminalInfo("Job placed in queue!");
         else
-            terminal.printTerminalError("Could not send job to bot with id: " + botId + "!");
+            terminal.printTerminalError("Could not queue job!");
     }
 }

@@ -1,7 +1,8 @@
 package be.uantwerpen.sc.services;
 
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.controllers.mqtt.MqttLightPublisher;
-import be.uantwerpen.sc.models.TrafficLight;
+import be.uantwerpen.rc.models.TrafficLight;
 import be.uantwerpen.sc.repositories.TrafficLightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,5 +81,22 @@ public class TrafficLightControlService
         trafficLight.setId(tlId);
         trafficLight.setState(state);
         return mqttLightPublisher.publishLight(trafficLight, tlId);
+    }
+
+    /**
+     * Delete a tl from the db
+     * @param id the tl id
+     */
+    public void deleteTl(Long id){
+        trafficLightRepository.delete(id);
+    }
+
+    /**
+     * Find a traffic light on a point
+     * @param point, the point to check
+     * @return trafficlight, the trafficlight entity on that point
+     */
+    public List<TrafficLight> findTrafficLightByPoint(Point point){
+        return trafficLightRepository.findByPoint(point);
     }
 }

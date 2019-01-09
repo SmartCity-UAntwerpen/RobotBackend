@@ -1,7 +1,7 @@
 package be.uantwerpen.sc.controllers;
 
-import be.uantwerpen.sc.models.Bot;
-import be.uantwerpen.sc.models.Cost;
+import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.Cost;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.PathPlanningService;
 import org.json.JSONArray;
@@ -23,7 +23,7 @@ import java.util.List;
  * Cost Controller
  */
 @RestController
-@RequestMapping("/cost/")
+@RequestMapping("/")
 public class CostController {
 
     /**
@@ -50,13 +50,36 @@ public class CostController {
     String backbonePort;
 
     /**
+     *
+     * @param start
+     * @param stop
+     * @return
+     */
+    @RequestMapping(value = "{start}/{stop}",method = RequestMethod.GET)
+    public String calcCost(@PathVariable("start") int start, @PathVariable("stop") int stop)
+    {
+        int cost = (int) pathPlanningService.CalculatePathWeight(start, stop);
+        if(botControlService.getAllAvialableBots().isEmpty()){
+            cost = cost +10;
+        }
+        /*
+        if(start == 9 && stop == 16 || start == 16 && stop == 9){
+            return 1000;
+        }
+        if(start == 10 && stop == 16 || start == 16 && stop == 10){
+            return 1000;
+        }*/
+        return "{\"cost\":" +cost+"}";
+    }
+
+    /*
+    /**
      * HTTP function
      * Used by MAAS
      * Returns list of all bots with the weight to their start point and the weight from start to end
      * @param start
      * @param stop
      * @return
-     */
     @RequestMapping(value = "calcWeight/{start}/{stop}",method = RequestMethod.GET)
     public String calcWeight(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
@@ -81,7 +104,28 @@ public class CostController {
         }
         return array.toString();
     }
+        List<Bot> bots = botControlService.getAllBots();
+        JSONArray array = new JSONArray();
+        for (Bot b : bots) {
+            JSONObject obj = new JSONObject();
+            Cost c = new Cost();
+            c.setIdVehicle(b.getIdCore());
 
+            c.setWeight(pathPlanningService.CalculatePathWeight(start, stop));
+            int pid = Math.toIntExact((b.getLinkId().getStartPoint().getId()));//TODO Can crash due to Link=null
+            c.setWeightToStart(pathPlanningService.CalculatePathWeight(pid, start));
+
+            try{
+                obj.put("status", c.getStatus());
+                obj.put("weightToStart", c.getWeightToStart());
+                obj.put("weight", c.getWeight());
+                obj.put("idVehicle", c.getIdVehicle());
+            }catch (JSONException e) { e.printStackTrace();}
+            array.put(obj);
+        }
+        return array.toString();
+    }
+*/
 
     /**
      * HTTP function
@@ -91,7 +135,7 @@ public class CostController {
      * @param stop
      * @return
      */
-    @RequestMapping(value = "calcpathweight/{start}/{stop}",method = RequestMethod.GET)
+    @RequestMapping(value = "cost/calcpathweight/{start}/{stop}",method = RequestMethod.GET)
     public double calcPathWeight(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
         return pathPlanningService.CalculatePathWeight(start, stop);

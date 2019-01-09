@@ -1,6 +1,6 @@
 package be.uantwerpen.sc.repositories;
 
-import be.uantwerpen.sc.models.Bot;
+import be.uantwerpen.rc.models.Bot;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,4 +18,6 @@ public interface BotRepository extends CrudRepository<Bot, Long>
      * @return List of Bots
      */
     List<Bot> findAll();
+
+    List<Bot> findAllByBusyFalseAndPointNotNull();
 }
