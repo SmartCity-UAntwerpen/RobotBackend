@@ -132,8 +132,7 @@ public class TrafficLightController
     }
 
     /**
-     * GET <- WHO
-     * Delete a traffic light
+     * Delete a traffic light, called by the trafficlight cores
      * @param id the tl id
      */
     @RequestMapping(value = "delete/{id}", method = RequestMethod.GET)

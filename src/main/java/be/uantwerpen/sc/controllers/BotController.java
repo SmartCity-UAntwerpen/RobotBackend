@@ -3,9 +3,11 @@ package be.uantwerpen.sc.controllers;
 
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.BotState;
+import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.rc.models.Location;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
+import be.uantwerpen.sc.services.JobService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import be.uantwerpen.sc.services.newMap.TileControlService;
@@ -51,6 +53,12 @@ public class BotController
      */
     @Autowired
     private TileControlService tileControlService;
+
+    /**
+     * Autowired Job Service
+     */
+    @Autowired
+    private JobService jobService;
 
     /**
      * BackBone IP
@@ -164,6 +172,15 @@ public class BotController
 
         //Remove the job the bot was executing
         //TODO: remove jobs the bot was executing
+        List<Job> jobs = jobService.getExecutingJob(bot);
+        for(Job j: jobs){
+            //Remove the bot from executing it and set starting point to the bots last location
+            j.setIdStart(bot.getPoint());
+            j.setBot(null);
+            jobService.saveJob(j);
+            //Also queue job again so it will be executed again
+            jobService.queueJob(j.getJobId(),j.getIdStart(),j.getIdEnd());
+        }
 
         //Remove the bot itself
         try{

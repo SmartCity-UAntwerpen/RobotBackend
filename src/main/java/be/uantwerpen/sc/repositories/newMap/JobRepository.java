@@ -12,5 +12,7 @@ public interface JobRepository extends CrudRepository<Job, Long> {
     @Override
     List<Job> findAll();
     List<Job> findAllByBot(Bot bot);
+    List<Job> findAllByBotNull();
+
     void deleteAllByBot(Bot bot);
 }

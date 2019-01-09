@@ -64,7 +64,9 @@ public class MapControlService
     }
 
     public List<Vertex> getVertexMap(){
-        if(vertexMap==null)
+        //Always update the map
+        this.buildMap();
+        //if(vertexMap==null)
             vertexMap=mapToVertexes();
         return vertexMap;
     }

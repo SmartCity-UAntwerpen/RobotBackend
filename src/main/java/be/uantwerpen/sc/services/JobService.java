@@ -63,7 +63,7 @@ public class JobService implements Runnable
     public void init() {
         //Initialize job queue and add all jobs from database
         jobQueue = new ArrayBlockingQueue<Job>(100);
-        List<Job> allJobs = jobs.findAll();
+        List<Job> allJobs = jobs.findAllByBotNull();
         jobQueue.addAll(allJobs);
     }
 
@@ -83,6 +83,23 @@ public class JobService implements Runnable
         job.setIdEnd(idStop);
         job.setBot(bot);
         return mqttJobPublisher.publishJob(job, bot.getIdCore());
+    }
+
+    /**
+     * Update a job in database
+     * @param job, the job
+     */
+    public void saveJob(Job job){
+        jobs.save(job);
+    }
+
+    /**
+     * Get the jobs the bot is executing
+     * @param bot, the bot
+     * @return list of all jobs the bot is executing (this list should only contain one item)
+     */
+    public List<Job> getExecutingJob(Bot bot){
+        return jobs.findAllByBot(bot);
     }
 
     /**

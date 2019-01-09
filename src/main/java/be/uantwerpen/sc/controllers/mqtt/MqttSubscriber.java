@@ -160,8 +160,9 @@ public class MqttSubscriber implements MqttCallback {
            logger.info("Subscribing to topics...");
 
             //Subscribe to traffic light control topic
-            mqttSubscribeClient.subscribe("LIGHT/#");
+
             mqttSubscribeClient.subscribe("BOT/#");
+            mqttSubscribeClient.subscribe("LIGHT/#");
         }
         catch(MqttException e)
         {
@@ -177,7 +178,7 @@ public class MqttSubscriber implements MqttCallback {
     }
 
     /**
-     * Message arrived: Heartbeat
+     * Message arrived
      *
      * @param topic,       String of the topic received
      * @param mqttMessage, the message contents
