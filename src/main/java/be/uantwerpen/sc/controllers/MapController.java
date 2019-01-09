@@ -11,6 +11,8 @@ import be.uantwerpen.sc.services.newMap.LinkControlService;
 import be.uantwerpen.sc.services.newMap.MapControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
 import be.uantwerpen.sc.services.newMap.TileControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +25,9 @@ import java.util.List;
 /**
  * @author  Niels on 3/04/2016.
  * @author Reinout
+ * @author Dieter 2018-2019
+ *
+ *
  * Map Controller
  */
 @RestController
@@ -47,12 +52,21 @@ public class MapController
     @Autowired
     private PointControlService pointControlService;
 
+    /**
+     * Autowired Tile Control Service
+     */
     @Autowired
     private TileControlService tileControlService;
 
+    /**
+     * Autowirded Link Control Service
+     */
     @Autowired
     private LinkControlService linkControlService;
 
+    /**
+     * Autowired Bot Control Service
+     */
     @Autowired
     private BotControlService botControlService;
     /**
@@ -66,6 +80,8 @@ public class MapController
     @Value("${backbone.port:default}")
     String backbonePort;
 
+    private Logger logger = LoggerFactory.getLogger(MapController.class);
+
     /**
      * Get Map
      * Updates and returns map
@@ -75,9 +91,15 @@ public class MapController
     public Map getMap()
     {
         updateMap();
+        logger.info("Map requested!");
         return mapControlService.getMap();
     }
 
+    /**
+     * Get point (test function)
+     * @param id, point id
+     * @return point
+     */
     @RequestMapping(value = "getPoint/{id}", method = RequestMethod.GET)
     public Point getPoint(@PathVariable("id") Long id)
     {
@@ -85,25 +107,17 @@ public class MapController
         return p;
     }
 
+    /**
+     * Get tile (test function)
+     * @param id, tile id
+     * @return tile
+     */
     @RequestMapping(value = "getTile/{id}", method = RequestMethod.GET)
     public Tile getTile(@PathVariable("id") Long id)
     {
         Tile t =  tileControlService.getTile(id);
         return t;
     }
-
-    /*
-    @RequestMapping(value = "getdirections/{start}/{end}", method = RequestMethod.GET)
-    public DriveDirEncapsulator getDirections(@PathVariable("start") int start, @PathVariable("end") int end)
-    {
-        Path path=pathPlanningService.CalculatePath(start,end);
-        List<DriveDir> dirs=pathPlanningService.createBotDriveDirs(path);
-        DriveDirEncapsulator directions=new DriveDirEncapsulator();
-        for(int i =0; i<dirs.size(); i++){
-            directions.addDriveDir(new DriveDir(dirs.get(i)));
-        }
-        return directions;
-    }*/
 
     /**
      * Calculates path with given start and stop ID, returning the drive commands for the robot
@@ -130,6 +144,13 @@ public class MapController
         return p;
     }
 
+    /**
+     * TODO: update to new map (used for full server navigation)
+     * @param start, start point
+     * @param current, current location point
+     * @param end, end points
+     * @return path
+     */
     @RequestMapping(value = "getnexthop/{start}/{current}/{end}", method = RequestMethod.GET)
     public DriveDirEncapsulator getNextHop(@PathVariable("start") int start,@PathVariable("current") int current, @PathVariable("end") int end){
         List<Vertex> vertices=(pathPlanningService.CalculatePath(start,end)).getPath();
@@ -142,44 +163,6 @@ public class MapController
         }
         DriveDirEncapsulator dirs=pathPlanningService.createBotDriveDirs(path);
         return dirs;
-    }
-    /**
-     * Calculates Test path with given start and stop ID
-     * TODO OH WHAT YOU DO TO ME
-     * NO ONE KNOWS
-     * NA NANANA NA NANANA BADUM TSS
-     * @param start Start Node/Vertex ID
-     * @param stop Stop Node/Vertex ID
-     * @return Generated Path
-     */
-    @RequestMapping(value = "testpath/{start}/path/{stop}", method = RequestMethod.GET)
-    public Path PathPlanning2(@PathVariable("start") int start, @PathVariable("stop") int stop)
-    {
-        return pathPlanningService.CalculatePathNonInterface(start,stop);
-    }
-
-    /**
-     * Returns Map as String
-     * GET<- TODO WHO
-     * For what purpose? Map exists
-     * @return
-     */
-    @RequestMapping(value = "stringmap", method = RequestMethod.GET)
-    public String mapString()
-    {
-        return mapControlService.getMap().toString();
-    }
-
-    /**
-     * Generates random path with given start point
-     * GET <- TODO WHO
-     * @param start Start Vertex ID
-     * @return Generated Path
-     */
-    @RequestMapping(value = "random/{start}", method = RequestMethod.GET)
-    public Path randomPath(@PathVariable("start") int start)
-    {
-        return pathPlanningService.nextRandomPath(null,start);
     }
 
     /**

@@ -22,10 +22,9 @@ import java.net.URL;
 /**
  * @author  Niels on 4/05/2016.
  * @author Reinout
+ * @author Dieter 2018-2019
  *
  * Job Controller
- * TODO Use, comments?
- * HTTP Interface
  */
 @RestController
 @RequestMapping("/job/")
@@ -67,15 +66,14 @@ public class JobController
     @Value("${backbone.ip.port:default}")
     private String backbonePort;
 
-    Logger logger = LoggerFactory.getLogger(JobController.class);
+    private Logger logger = LoggerFactory.getLogger(JobController.class);
 
     /**
-     * HTTP RECEIVE from MAAS
-     * Uses COREID
-     * @param idJob
-     * @param idstart
-     * @param idstop
-     * @return
+     * Queues a job in the job queue for the job service
+     * @param idJob, job id from backbone
+     * @param idstart, start point
+     * @param idstop, end point
+     * @return http status
      */
     @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.GET)
     public String executeJob(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
@@ -87,12 +85,11 @@ public class JobController
     }
 
     /**
-     * HTTP RECEIVE from MAAS
-     * Uses COREID
-     * @param idJob
-     * @param idstart
-     * @param idstop
-     * @return
+     * Queues a job in the job queue for the job service
+     * @param idJob, job id from backbone
+     * @param idstart, start point
+     * @param idstop, end point
+     * @return http status
      */
     @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.POST)
     public String executeJobPOST(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
@@ -104,10 +101,9 @@ public class JobController
     }
 
     /**
-     * HTTP RECEIVE from MAAS
-     * Uses COREID
+     * Go to point command from backbone
      * @param pid, The target point id
-     * @return
+     * @return http status
      */
     @RequestMapping(value = "gotopoint/{pid}",method = RequestMethod.GET)
     public String goToPoint(@PathVariable("pid") long pid)
@@ -181,9 +177,8 @@ public class JobController
     }
 
     /**
-     * HTTP GET -> MAAS
-     * Notifies that job is completed
-     * @param id
+     * Notifies backbone that job is completed
+     * @param id, the job id
      */
     private void completeJob(long id){
         logger.info("Sending complete message for job "+id);

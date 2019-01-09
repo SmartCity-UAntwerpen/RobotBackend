@@ -4,6 +4,8 @@ import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.newMap.LinkControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +17,7 @@ import java.util.List;
 /**
  * @author  Niels on 30/03/2016.
  * @author Reinout
- * HTTP INTERFACE
+ * @author Dieter 2018-2019
  *
  * Link Controller
  *
@@ -33,10 +35,12 @@ public class LinkController
     @Autowired
     private BotControlService botService;
 
+    private Logger logger = LoggerFactory.getLogger(LinkController.class);
+
+
     /**
-     * Get <- TODO
      * Get list of all available
-     * @return
+     * @return list of links
      */
     @RequestMapping(method = RequestMethod.GET)
     public List<Link> allLinks()
@@ -61,6 +65,7 @@ public class LinkController
                 return false;
             }
             if(link.getLock().getStatus() && !link.getLock().getLockedBy().getIdCore().equals(botId)) {
+                logger.info("Bot "+botId+" was denied lock for link: "+id);
                 return false;
             } else{
                 //Point not locked -> attempt lock
@@ -68,6 +73,7 @@ public class LinkController
                 link.lockLink(true,bot);
                 link.setWeight(link.getWeight()+10);
                 linkControlService.save(link);
+                logger.info("Bot "+botId+" locked link: "+link.getId());
                 return true;
             }
         }
@@ -98,12 +104,13 @@ public class LinkController
                     link.lockLink(false, null);
                     link.setWeight(1);
                     linkControlService.save(link);
+                    logger.info("Bot "+botId+" unlocked link: "+id);
                 return true;
                 } else {
                     return false;
                 }
             } catch(NullPointerException e){
-                System.err.println("Bot not found");
+                logger.error("Bot not found for unlocking link!");
                 return false;
             }
         }

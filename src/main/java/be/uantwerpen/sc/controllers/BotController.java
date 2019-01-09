@@ -21,15 +21,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+
 import org.json.JSONObject;
 
 /**
+ * @author Dieter 2018-2019
  * Bot Controller
  */
 @RestController
 @RequestMapping("/bot/")
-public class BotController
-{
+public class BotController {
     /**
      * Autowired Botcontrol Service
      */
@@ -71,89 +72,88 @@ public class BotController
     @Value("${backbone.port:default}")
     String backbonePort;
 
-    Logger logger = LoggerFactory.getLogger(BotController.class);
+    private Logger logger = LoggerFactory.getLogger(BotController.class);
 
 
     /**
      * Get All Bots
+     *
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
-    public List<Bot> allBots()
-    {
+    public List<Bot> allBots() {
         return botControlService.getAllBots();
     }
 
-    @RequestMapping(value = "{id}",method = RequestMethod.GET)
-    public Bot getBot(@PathVariable("id") Long id)
-    {
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public Bot getBot(@PathVariable("id") Long id) {
         return botControlService.getBot(id);
     }
 
-    @RequestMapping(value = "{id}",method = RequestMethod.POST)
-    public void saveBot(@PathVariable("id") Long id, @RequestBody Bot bot)
-    {
+    @RequestMapping(value = "{id}", method = RequestMethod.POST)
+    public void saveBot(@PathVariable("id") Long id, @RequestBody Bot bot) {
         botControlService.saveBot(bot);
     }
 
-    @RequestMapping(value = "{id}",method = RequestMethod.PUT)
-    public void updateBot(@PathVariable("id") Long id, @RequestBody Bot bot)
-    {
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    public void updateBot(@PathVariable("id") Long id, @RequestBody Bot bot) {
         botControlService.saveBot(bot);
     }
 
     /**
-     * Robot calls this GET
-     * @return
+     * Robot calls this
+     *
+     * @return id
      */
+    @Deprecated
     @RequestMapping(value = "newRobot/{id}", method = RequestMethod.GET)
-    public Long newRobot(@PathVariable("id") Long id)
-    {
+    public Long newRobot(@PathVariable("id") Long id) {
         Bot bot = new Bot(id);
         System.out.println(bot);
         //Save bot in database and get bot new rid
         botControlService.saveBot(bot);
 
         Date date = new Date();
-        System.out.println("New robot created!! - " + date.toString());
+        logger.info("New robot created!! - " + date.toString());
 
         return bot.getIdCore();
     }
 
     /**
      * Bot location update
-     * @param id, the bot id
+     *
+     * @param id,  the bot id
      * @param pid, the location = a point id
      */
     @RequestMapping(value = "{id}/locationUpdate/{pid}", method = RequestMethod.GET)
-    public void locationLink(@PathVariable("id") Long id, @PathVariable("pid") Long pid)
-    {
+    public void locationLink(@PathVariable("id") Long id, @PathVariable("pid") Long pid) {
         Bot bot = botControlService.getBot(id);
         Point point;
 
-        if(bot != null)
-        {
+        if (bot != null) {
             point = pointControlService.getPoint(pid);
-            logger.info("Bot with id: " +id+" updated its location: "+pid);
-            if(point != null)
-            {
+            logger.info("Bot with id: " + id + " updated its location: " + pid);
+            if (point != null) {
                 bot.setPoint(pid);
                 botControlService.saveBot(bot);
                 System.out.println(bot.getIdCore());
-            }
-            else
+            } else
                 System.out.println("Point with id: " + pid + " not found!");
-        }
-        else
+        } else
             System.out.println("Bot with id:" + id + " not found!");
     }
 
-    public void updateLocation(Long id, Long pointId, int progress)
-    {
+    /**
+     * Updated a bots location
+     *
+     * @param id        the bot id
+     * @param pointId,  point location
+     * @param progress, the bots progress on the link
+     */
+    public void updateLocation(Long id, Long pointId, int progress) {
         Bot bot = botControlService.getBot(id);
 
-        if(bot != null)
-        {
+        if (bot != null) {
             bot.setPoint(pointId);
             bot.setPercentageCompleted(progress);
             bot.updateStatus(BotState.Alive.ordinal());
@@ -161,85 +161,96 @@ public class BotController
         }
     }
 
-    @RequestMapping(value = "delete/{rid}",method = RequestMethod.GET)
-    public void deleteBot(@PathVariable("rid") Long rid)
-    {
-        logger.info("Removing bot with id: "+rid);
+    /**
+     * Delete a bot from database
+     * First all the references to the bot are removed (foreign key constraints)
+     *
+     * @param rid, bot id
+     */
+    @RequestMapping(value = "delete/{rid}", method = RequestMethod.GET)
+    public void deleteBot(@PathVariable("rid") Long rid) {
+        logger.info("Removing bot with id: " + rid);
         Bot bot = botControlService.getBot(rid);
         //Remove all references to the bot
         linkControlService.removeAllLocksFromBot(bot);
         tileControlService.removeAllLocksFromBot(bot);
 
         //Remove the job the bot was executing
-        //TODO: remove jobs the bot was executing
         List<Job> jobs = jobService.getExecutingJob(bot);
-        for(Job j: jobs){
+        for (Job j : jobs) {
             //Remove the bot from executing it and set starting point to the bots last location
             j.setIdStart(bot.getPoint());
             j.setBot(null);
             jobService.saveJob(j);
             //Also queue job again so it will be executed again
-            jobService.queueJob(j.getJobId(),j.getIdStart(),j.getIdEnd());
+            jobService.queueJob(j.getJobId(), j.getIdStart(), j.getIdEnd());
         }
 
         //Remove the bot itself
-        try{
+        try {
             botControlService.deleteBot(rid);
-        }catch(Exception e){
-            logger.error("Bot with ID: "+rid +"could not be deleted!");
+            logger.info("Bot " + rid + " has been removed!");
+        } catch (Exception e) {
+            logger.error("Bot with ID: " + rid + "could not be deleted!");
         }
 
     }
 
     /**
      * Get all bot positions
+     *
      * @return
      */
     @RequestMapping(value = "posAll", method = RequestMethod.GET)
-    public String posAll(){
+    public String posAll() {
         List<Bot> bots = botControlService.getAllBots();
         JSONArray array = new JSONArray();
-        for(Bot b : bots){
+        for (Bot b : bots) {
             Location loc = new Location();
             loc.setVehicleID(b.getIdCore());
 
-            if (b.getBusy()){
+            if (b.getBusy()) {
                 loc.setStartID(b.getIdStart());
                 loc.setStopID(b.getIdStop());
                 loc.setPercentage((long) b.getPercentageCompleted());
-            }else{
+            } else {
                 loc.setStartID(b.getLinkId());
                 loc.setStopID(b.getLinkId());
-                loc.setPercentage( (long)100);
+                loc.setPercentage((long) 100);
             }
 
             JSONObject obj = new JSONObject();
-            try{
+            try {
                 obj.put("idVehicle", loc.getVehicleID());
                 obj.put("idStart", loc.getStartID());
                 obj.put("idEnd", loc.getStopID());
                 obj.put("percentage", loc.getPercentage());
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            catch (JSONException e) {e.printStackTrace(); }
             array.put(obj);
         }
         return array.toString();
     }
 
+
+    /**
+     * Check if the bots are alive
+     * if not remove them
+     */
     @RequestMapping(value = "checkTimer", method = RequestMethod.GET)
-    public void checkTimer(){
+    public void checkTimer() {
         System.out.println("Checking Alive Bots");
         List<Bot> bots = botControlService.getAllBots();
-        long currentDate=new Date().getTime();
-        for(Bot b : bots){
-            if(b.getStatus()!=BotState.Unknown.ordinal()){
-                if(currentDate-b.getLastUpdated().getTime()>1000*60*5) {
+        long currentDate = new Date().getTime();
+        for (Bot b : bots) {
+            if (b.getStatus() != BotState.Unknown.ordinal()) {
+                if (currentDate - b.getLastUpdated().getTime() > 1000 * 60 * 5) {
                     b.updateStatus(BotState.Unknown.ordinal());
                     botControlService.saveBot(b);
                 }
-            }
-            else{
-                if(new Date().getTime()-b.getLastUpdated().getTime()>1000*60*5) {
+            } else {
+                if (new Date().getTime() - b.getLastUpdated().getTime() > 1000 * 60 * 5) {
                     this.deleteBot(b.getIdCore());
                 }
             }
@@ -249,11 +260,12 @@ public class BotController
     /**
      * 1st Function at Bot Boot
      * Creates Bot, initiates entry for database, and returns its ID
-     * @param modus Type: Independent, partial or full server
-     * @return
+     *
+     * @param modus Type: Independent, partial or full server (Currently only independent implemented)
+     * @return the id
      */
     @RequestMapping(value = "initiate/{id}/{modus}", method = RequestMethod.GET)
-    public long initiate(@PathVariable("id") Long id, @PathVariable("modus") String modus){
+    public long initiate(@PathVariable("id") Long id, @PathVariable("modus") String modus) {
         Bot bot = new Bot(id);
         bot.setWorkingMode(modus);
         bot.setJobId((long) 0);
@@ -264,7 +276,7 @@ public class BotController
         bot.setBusy(false);
         bot.updateStatus(BotState.Alive.ordinal());
         botControlService.saveBot(bot);
-        logger.info("Bot with id "+bot.getIdCore()+" entered the network!");
+        logger.info("Bot with id " + bot.getIdCore() + " entered the network!");
         return bot.getIdCore();
     }
 }

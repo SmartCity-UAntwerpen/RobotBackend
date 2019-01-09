@@ -4,6 +4,8 @@ import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.newMap.PointControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +17,7 @@ import java.util.List;
 /**
  * @author  Niels on 23/03/2016.
  * @author Reinout
- * HTTP INTERFACE
+ * @author Dieter 2018-2019
  *
  */
 @RestController
@@ -30,6 +32,8 @@ public class PointController
 
     @Autowired
     private BotControlService botService;
+
+    private Logger logger = LoggerFactory.getLogger(PointController.class);
 
     /**
      * GET <- WHO
@@ -47,7 +51,7 @@ public class PointController
      * Request Locking of point
      * @param id Point ID
      * @param botId Bot id (lockedBy)
-     * @return
+     * @return success
      */
     @RequestMapping(value = "requestlock/{botId}/{id}", method = RequestMethod.GET)
     public boolean requestPointLock(@PathVariable("botId") Long botId,@PathVariable("id") Long id)
@@ -61,12 +65,14 @@ public class PointController
 
             if(point.getTileLock() && !point.getTile().getLockedBy().getIdCore().equals(botId)){
                 //Point already locked
+                logger.info("Bot "+botId+" was denied lock for point: "+id);
                 return false;
             } else {
                 //Point not locked -> attempt lock
                 Bot bot = botService.getBot(botId);
                 point.setTileLock(true,bot);
                 pointService.save(point);
+                logger.info("Bot "+botId+" locked point: "+id);
                 return true;
             }
         }
@@ -104,12 +110,13 @@ public class PointController
             if (point.getTile().getLockedBy().getIdCore().equals(botId) && point.getTileLock()) {
                 point.setTileLock(false, null);
                 pointService.save(point);
+                logger.info("Bot "+botId+" unlocked point: "+id);
                 return true;
             } else {
                 return false;
             }
         }catch(NullPointerException e){
-            System.err.println("Bot not found");
+            logger.error("Bot not found for unlocking point");
             return false;
         }
     }

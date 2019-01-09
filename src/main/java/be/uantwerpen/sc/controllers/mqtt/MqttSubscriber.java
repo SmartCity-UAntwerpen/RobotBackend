@@ -80,7 +80,7 @@ public class MqttSubscriber implements MqttCallback {
      */
     private MqttClient mqttSubscribeClient;
 
-    Logger logger = LoggerFactory.getLogger(MqttSubscriber.class);
+    private Logger logger = LoggerFactory.getLogger(MqttSubscriber.class);
 
 
     @PostConstruct
@@ -178,8 +178,7 @@ public class MqttSubscriber implements MqttCallback {
     }
 
     /**
-     * Message arrived
-     *
+     * Message arrived, parse it and handle accordingly
      * @param topic,       String of the topic received
      * @param mqttMessage, the message contents
      */
