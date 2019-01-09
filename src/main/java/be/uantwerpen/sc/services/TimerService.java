@@ -24,6 +24,7 @@ public class TimerService implements Runnable {
      */
     @Value("${server.port:default}")
     String port;
+
     @Override
     public void run() {
 
@@ -31,7 +32,7 @@ public class TimerService implements Runnable {
             long startTime = System.currentTimeMillis();
             long elapsedTime = 0L;
             //Wait 1 minute
-            while (elapsedTime < 60*1000) {
+            while (elapsedTime < 60 * 1000) {
                 elapsedTime = (new Date()).getTime() - startTime;
             }
             botController.checkTimer();

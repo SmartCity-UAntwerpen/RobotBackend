@@ -11,6 +11,12 @@ import java.util.List;
 public interface LinkLockRepository extends CrudRepository<LinkLock, Long> {
 
     /**
+     * Return a List of all LinkLocks
+     * @return List of LinkLocks
+     */
+    List<LinkLock> findAll();
+
+    /**
      * Returns a List of all LinkLocks that are locked by a specific bot
      * @param bot, the bot
      * @return List of LinkLocks

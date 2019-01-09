@@ -5,7 +5,7 @@ import be.uantwerpen.rc.models.BotState;
 import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.sc.repositories.JobRepository;
 import be.uantwerpen.sc.services.*;
-import be.uantwerpen.sc.services.newMap.PointControlService;
+import be.uantwerpen.sc.services.PointControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class JobController
      * Autowired Job Service
      */
     @Autowired
-    private JobService jobService;
+    private JobControlService jobControlService;
 
     /**
      * Job Repository
@@ -78,7 +78,7 @@ public class JobController
     @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.GET)
     public String executeJob(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
     {
-        if(!jobService.queueJob(idJob,idstart,idstop)){
+        if(!jobControlService.queueJob(idJob,idstart,idstop)){
             return "HTTP status : 400";
         }
         return "HTTP status : 200";
@@ -94,7 +94,7 @@ public class JobController
     @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.POST)
     public String executeJobPOST(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
     {
-        if(!jobService.queueJob(idJob,idstart,idstop)){
+        if(!jobControlService.queueJob(idJob,idstart,idstop)){
             return "HTTP status : 400";
         }
         return "HTTP status : 200";
@@ -108,7 +108,7 @@ public class JobController
     @RequestMapping(value = "gotopoint/{pid}",method = RequestMethod.GET)
     public String goToPoint(@PathVariable("pid") long pid)
     {
-        if(!jobService.queueJob(null,-1L,pid)){
+        if(!jobControlService.queueJob(null,-1L,pid)){
             return "HTTP status : 400";
         }
         return "HTTP status : 200";

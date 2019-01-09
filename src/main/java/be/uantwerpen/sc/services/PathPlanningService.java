@@ -5,7 +5,6 @@ import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Path;
 import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.rc.models.map.Node;
-import be.uantwerpen.sc.services.newMap.MapControlService;
 import be.uantwerpen.rc.tools.*;
 import be.uantwerpen.rc.tools.pathplanning.Dijkstra;
 import be.uantwerpen.rc.tools.pathplanning.IPathplanning;
@@ -16,7 +15,7 @@ import java.util.*;
 
 /**
  * Service for path planning
- * TODO: Shitty class, remake
+ * TODO: implement other path planning algorithms and other navigations modes for the bots
  */
 @Service
 public class PathPlanningService implements IPathplanning {
@@ -42,10 +41,11 @@ public class PathPlanningService implements IPathplanning {
     }
 
     /**
-     * Calculates Path     *
-     * @param start
-     * @param stop
-     * @return
+     * Calculates Path
+     *
+     * @param start, start point
+     * @param stop,  stop point
+     * @return shortest path
      */
     public Path CalculatePathNonInterface(int start, int stop) {
         Map map = mapControlService.getMap();
@@ -84,8 +84,8 @@ public class PathPlanningService implements IPathplanning {
             vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
         }
 
-        dijkstra.computePaths((long)start, vertexes); // run Dijkstra
-        return dijkstra.getShortestPathTo((long)stop, vertexes);
+        dijkstra.computePaths((long) start, vertexes); // run Dijkstra
+        return dijkstra.getShortestPathTo((long) stop, vertexes);
     }
 
     /**
@@ -100,8 +100,8 @@ public class PathPlanningService implements IPathplanning {
     public Path CalculatePath(int start, int stop) {
         List<Vertex> vertexes = mapControlService.getVertexMap();
         mapControlService.resetVertex();
-        dijkstra.computePaths((long)start, vertexes);
-        return dijkstra.getShortestPathTo((long)stop, vertexes);
+        dijkstra.computePaths((long) start, vertexes);
+        return dijkstra.getShortestPathTo((long) stop, vertexes);
     }
 
     @Override
@@ -122,6 +122,7 @@ public class PathPlanningService implements IPathplanning {
      * @param start
      * @return
      */
+    @Deprecated
     @Override
     public Path nextRandomPath(Map map, int start) {
         List<Vertex> vertexes = mapControlService.getVertexMap();
@@ -143,7 +144,14 @@ public class PathPlanningService implements IPathplanning {
         return new Path(vertexList);
     }
 
-
+    /**
+     * Method used in old full server navigation
+     * TODO update
+     *
+     * @param path
+     * @return
+     */
+    @Deprecated
     public DriveDirEncapsulator createBotDriveDirs(Path path) {
         DriveDirEncapsulator commands = new DriveDirEncapsulator();
         List<Vertex> vertices = path.getPath();

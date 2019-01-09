@@ -6,6 +6,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +43,8 @@ public class MqttJobPublisher
     @Value("${mqtt.password:default}")
     private String mqttPassword;
 
+    private Logger logger = LoggerFactory.getLogger(MqttJobPublisher.class);
+
     /**
      * Publish Job over MQTT
      * @param job Job to publish
@@ -49,9 +53,9 @@ public class MqttJobPublisher
      */
     public boolean publishJob(Job job, long botID)
     {
-        System.out.println("Publishing Job");
+        logger.info("Publishing Job");
         String content  = "Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getBot().getIdCore().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString()+"}";
-        System.out.println(content);
+        logger.info(content);
         int qos         = 2;
         String topic    = "BOT/" + botID + "/Job";
         String broker   = "tcp://" + mqttIP + ":" + mqttPort;
@@ -74,12 +78,12 @@ public class MqttJobPublisher
         }
         catch(MqttException e)
         {
-            System.err.println("Could not publish topic: " + topic + " to mqtt service!");
-            System.err.println("Reason: " + e.getReasonCode());
-            System.err.println("Message: " + e.getMessage());
-            System.err.println(e.getLocalizedMessage());
-            System.err.println("Cause: " + e.getCause());
-            System.err.println("Exception: " + e);
+            logger.error("Could not publish topic: " + topic + " to mqtt service!");
+            logger.error("Reason: " + e.getReasonCode());
+            logger.error("Message: " + e.getMessage());
+            logger.error(e.getLocalizedMessage());
+            logger.error("Cause: " + e.getCause());
+            logger.error("Exception: " + e);
 
             return false;
         }

@@ -7,10 +7,10 @@ import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.rc.models.Location;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
-import be.uantwerpen.sc.services.JobService;
-import be.uantwerpen.sc.services.newMap.LinkControlService;
-import be.uantwerpen.sc.services.newMap.PointControlService;
-import be.uantwerpen.sc.services.newMap.TileControlService;
+import be.uantwerpen.sc.services.JobControlService;
+import be.uantwerpen.sc.services.LinkControlService;
+import be.uantwerpen.sc.services.PointControlService;
+import be.uantwerpen.sc.services.TileControlService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class BotController {
      * Autowired Job Service
      */
     @Autowired
-    private JobService jobService;
+    private JobControlService jobControlService;
 
     /**
      * BackBone IP
@@ -176,14 +176,14 @@ public class BotController {
         tileControlService.removeAllLocksFromBot(bot);
 
         //Remove the job the bot was executing
-        List<Job> jobs = jobService.getExecutingJob(bot);
+        List<Job> jobs = jobControlService.getExecutingJob(bot);
         for (Job j : jobs) {
             //Remove the bot from executing it and set starting point to the bots last location
             j.setIdStart(bot.getPoint());
             j.setBot(null);
-            jobService.saveJob(j);
+            jobControlService.saveJob(j);
             //Also queue job again so it will be executed again
-            jobService.queueJob(j.getJobId(), j.getIdStart(), j.getIdEnd());
+            jobControlService.queueJob(j.getJobId(), j.getIdStart(), j.getIdEnd());
         }
 
         //Remove the bot itself

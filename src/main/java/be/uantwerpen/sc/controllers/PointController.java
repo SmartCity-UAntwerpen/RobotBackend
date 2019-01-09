@@ -3,7 +3,7 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
-import be.uantwerpen.sc.services.newMap.PointControlService;
+import be.uantwerpen.sc.services.PointControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

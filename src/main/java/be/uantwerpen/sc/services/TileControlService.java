@@ -1,4 +1,4 @@
-package be.uantwerpen.sc.services.newMap;
+package be.uantwerpen.sc.services;
 
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Tile;
@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author Dieter 2018-2019
+ * <p>
+ * Tile Control Service
+ */
 @Service
 public class TileControlService {
 
@@ -16,35 +21,40 @@ public class TileControlService {
 
     /**
      * Encapsulator for getting all available points
+     *
      * @return List of Points
      */
-    public List<Tile> getAllTiles()
-    {
+    public List<Tile> getAllTiles() {
         return tiles.findAll();
     }
 
     /**
      * Encapsulator for getting Point by ID
+     *
      * @param id ID of point
      * @return Point of interest
      */
-    public Tile getTile(Long id)
-    {
+    public Tile getTile(Long id) {
         return tiles.findOne(id);
     }
 
     /**
      * Saves Point into Database
+     *
      * @param tile Point to save
      */
-    public void save(Tile tile)
-    {
+    public void save(Tile tile) {
         tiles.save(tile);
     }
 
-    public void removeAllLocksFromBot(Bot bot){
+    /**
+     * Remove all tile locks from a specific bot
+     *
+     * @param bot, the bot
+     */
+    public void removeAllLocksFromBot(Bot bot) {
         List<Tile> ts = tiles.findAllBylockedBy(bot);
-        for(Tile t : ts){
+        for (Tile t : ts) {
             t.setLocked(false);
             t.setLockedBy(null);
             tiles.save(t);

@@ -3,7 +3,7 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.sc.services.BotControlService;
-import be.uantwerpen.sc.services.newMap.LinkControlService;
+import be.uantwerpen.sc.services.LinkControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
