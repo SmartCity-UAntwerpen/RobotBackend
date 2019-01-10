@@ -65,7 +65,7 @@ public class TerminalService {
             System.out.println("Timer not started");
         }
 
-        terminal.printTerminal("\nSmartCity Backend [Version " + getClass().getPackage().getImplementationVersion() + "]\n(c) 2015-2017 University of Antwerp. All rights reserved.");
+        terminal.printTerminal("\nSmartCity Backend [Version " + getClass().getPackage().getImplementationVersion() + "]\n(c) 2018-2019 University of Antwerp. All rights reserved.");
         terminal.printTerminal("Type 'help' to display the possible commands.");
         terminal.activateTerminal();
     }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -206,7 +207,7 @@ public class JobController
             }
             conn.disconnect();
 
-        } catch (IOException e) {
+        } catch (IOException | HTTPException e) {
             logger.warn("Backbone not available! Job "+id+" cannot send complete command to backbone.");
         }
     }
