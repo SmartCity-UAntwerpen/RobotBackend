@@ -26,13 +26,13 @@ public class JobControlService implements Runnable {
      * Autowired Job repository
      */
     @Autowired
-    JobRepository jobs;
+    private JobRepository jobs;
 
     /**
      * Autowired MQTT Publisher
      */
     @Autowired
-    MqttJobPublisher mqttJobPublisher;
+    private MqttJobPublisher mqttJobPublisher;
 
     /**
      * Autowired Botcontrol Service
@@ -65,6 +65,15 @@ public class JobControlService implements Runnable {
         List<Job> allJobs = jobs.findAllByBotNull();
         jobQueue.addAll(allJobs);
         logger.info(allJobs.size() + " jobs added to the job queue! Init done!");
+    }
+
+    /**
+     * Delete all jobs from database
+     */
+    public void deleteAllJobs(){
+        List<Job> jobs = this.jobs.findAll();
+        jobQueue = new ArrayBlockingQueue<Job>(100); //Reinitialize the jobQueue
+        this.jobs.delete(jobs);
     }
 
 

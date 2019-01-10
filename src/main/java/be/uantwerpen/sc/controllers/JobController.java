@@ -135,6 +135,17 @@ public class JobController
         }
     }
 
+
+    /**
+     *  Remove all jobs
+     */
+    @RequestMapping(value = "deleteAll",method = RequestMethod.POST)
+    public void removeAll()
+    {
+        logger.info("Deleting all jobs...");
+        jobControlService.deleteAllJobs();
+    }
+
     /**
      * Get the progress of a job
      * @param jobid jobid

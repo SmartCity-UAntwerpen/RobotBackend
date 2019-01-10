@@ -227,6 +227,11 @@ public class MqttSubscriber implements MqttCallback {
             Long id = Long.parseLong(temp.split("/")[0]);
 
             Bot bot = botControlService.getBot(id);
+            if(bot == null) {
+                logger.warn("Bot with id: "+id+" not found!");
+                return;
+            }
+
             bot.updateStatus(BotState.Alive.ordinal());
             botControlService.saveBot(bot);
         }
