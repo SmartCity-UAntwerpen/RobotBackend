@@ -63,6 +63,9 @@ public class TrafficLightControlService {
      */
     public void updateState(long id, String state) {
         TrafficLight tl = getTrafficLight(id);
+        if(tl == null){
+            return; //TrafficLight not found
+        }
         tl.setState(state);
         trafficLightRepository.save(tl);
     }
