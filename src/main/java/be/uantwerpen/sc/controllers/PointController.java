@@ -116,7 +116,7 @@ public class PointController
                 return false;
             }
         }catch(NullPointerException e){
-            logger.error("Bot not found for unlocking point");
+            logger.error("Bot "+botId+" not found for unlocking point: "+id);
             return false;
         }
     }

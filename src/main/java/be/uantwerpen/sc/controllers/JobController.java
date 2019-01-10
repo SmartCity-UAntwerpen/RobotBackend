@@ -63,7 +63,7 @@ public class JobController
     /**
      * Maas Port
      */
-    @Value("${backbone.ip.port:default}")
+    @Value("${backbone.port:default}")
     private String backbonePort;
 
     private Logger logger = LoggerFactory.getLogger(JobController.class);
@@ -162,7 +162,7 @@ public class JobController
             String u = "http://"+backbone+":"+backbonePort+"/jobs/vehiclecloseby/" + jobid;
             URL url = new URL(u);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept", "application/json");
 
             if (conn.getResponseCode() != 200) {
@@ -186,8 +186,8 @@ public class JobController
             String u = "http://"+backbone+":"+backbonePort+"/jobs/complete/" + id;
             URL url = new URL(u);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestMethod("POST");
+            //conn.setRequestProperty("Accept", "application/json");
 
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "

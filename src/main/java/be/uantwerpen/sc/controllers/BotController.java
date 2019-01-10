@@ -240,7 +240,7 @@ public class BotController {
      */
     @RequestMapping(value = "checkTimer", method = RequestMethod.GET)
     public void checkTimer() {
-        System.out.println("Checking Alive Bots");
+        logger.info("Checking Alive Bots");
         List<Bot> bots = botControlService.getAllBots();
         long currentDate = new Date().getTime();
         for (Bot b : bots) {

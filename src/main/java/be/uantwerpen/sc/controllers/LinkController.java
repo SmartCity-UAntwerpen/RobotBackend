@@ -110,7 +110,7 @@ public class LinkController
                     return false;
                 }
             } catch(NullPointerException e){
-                logger.error("Bot not found for unlocking link!");
+                logger.error("Bot "+botId+" not found for unlocking link: "+id);
                 return false;
             }
         }
