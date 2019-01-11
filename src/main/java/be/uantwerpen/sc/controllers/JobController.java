@@ -152,16 +152,21 @@ public class JobController
      * @param jobid jobid
      */
     @RequestMapping(value = "getprogress/{jobid}",method = RequestMethod.GET)
-    public int getProgress(@PathVariable("jobid") long jobid)
+    public String getProgress(@PathVariable("jobid") long jobid)
     {
         Job job = jobs.findOne(jobid);
-        Bot bot = job.getBot();
-        if(job == null || bot == null){
+
+        if(job == null) {
             //If job not found return 100%
-            return 100;
+            return "{\"progress\":" +100+"}";
+        }
+        Bot bot = job.getBot();
+        if(bot == null) {
+            //If job not found return 0%
+            return "{\"progress\":" +0+"}";
         }
         logger.info("Progress of job "+jobid+" requested: bot "+bot.getIdCore()+" is executing, progress: "+bot.getPercentageCompleted());
-        return bot.getPercentageCompleted();
+        return "{\"progress\":" +bot.getPercentageCompleted()+"}";
     }
 
     /**
