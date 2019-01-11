@@ -155,12 +155,13 @@ public class JobController
     public int getProgress(@PathVariable("jobid") long jobid)
     {
         Job job = jobs.findOne(jobid);
-        logger.info("Progress of job "+jobid+" requested");
-        if(job == null){
+        Bot bot = job.getBot();
+        if(job == null || bot == null){
             //If job not found return 100%
             return 100;
         }
-        return 0; //TODO return actual progress
+        logger.info("Progress of job "+jobid+" requested: bot "+bot.getIdCore()+" is executing, progress: "+bot.getPercentageCompleted());
+        return bot.getPercentageCompleted();
     }
 
     /**
@@ -207,7 +208,7 @@ public class JobController
             }
             conn.disconnect();
 
-        } catch (IOException | HTTPException e) {
+        } catch (IOException | RuntimeException e) {
             logger.warn("Backbone not available! Job "+id+" cannot send complete command to backbone.");
         }
     }
