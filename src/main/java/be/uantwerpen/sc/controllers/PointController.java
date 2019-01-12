@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Null;
 import java.util.List;
 
 /**
@@ -62,19 +63,24 @@ public class PointController
 
             if(point == null)//Point not found
                 return false;
-
-            if(point.getTileLock() && !point.getTile().getLockedBy().getIdCore().equals(botId)){
-                //Point already locked
-                logger.info("Bot "+botId+" was denied lock for point: "+id);
+            try{
+                if(point.getTileLock() && !point.getTile().getLockedBy().getIdCore().equals(botId)){
+                    //Point already locked
+                    logger.info("Bot "+botId+" was denied lock for point: "+id);
+                    return false;
+                } else {
+                    //Point not locked -> attempt lock
+                    Bot bot = botService.getBot(botId);
+                    point.setTileLock(true,bot);
+                    pointService.save(point);
+                    logger.info("Bot "+botId+" locked point: "+id);
+                    return true;
+                }
+            }catch (NullPointerException e){
+                logger.error("Error locking point: "+id);
                 return false;
-            } else {
-                //Point not locked -> attempt lock
-                Bot bot = botService.getBot(botId);
-                point.setTileLock(true,bot);
-                pointService.save(point);
-                logger.info("Bot "+botId+" locked point: "+id);
-                return true;
             }
+
         }
     }
 

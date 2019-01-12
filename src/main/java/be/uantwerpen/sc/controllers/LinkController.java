@@ -64,18 +64,24 @@ public class LinkController
             {
                 return false;
             }
-            if(link.getLock().getStatus() && !link.getLock().getLockedBy().getIdCore().equals(botId)) {
-                logger.info("Bot "+botId+" was denied lock for link: "+id);
+            try{
+                if(link.getLock().getStatus() && !link.getLock().getLockedBy().getIdCore().equals(botId)) {
+                    logger.info("Bot "+botId+" was denied lock for link: "+id);
+                    return false;
+                } else{
+                    //Point not locked -> attempt lock
+                    Bot bot = botService.getBot(botId);
+                    link.lockLink(true,bot);
+                    link.setWeight(link.getWeight()+10);
+                    linkControlService.save(link);
+                    logger.info("Bot "+botId+" locked link: "+link.getId());
+                    return true;
+                }
+            } catch(NullPointerException e){
+                logger.error("Error locking link: "+id);
                 return false;
-            } else{
-                //Point not locked -> attempt lock
-                Bot bot = botService.getBot(botId);
-                link.lockLink(true,bot);
-                link.setWeight(link.getWeight()+10);
-                linkControlService.save(link);
-                logger.info("Bot "+botId+" locked link: "+link.getId());
-                return true;
             }
+
         }
 
     }
