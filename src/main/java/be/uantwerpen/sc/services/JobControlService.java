@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Dieter 2018-2019
@@ -163,8 +164,8 @@ public class JobControlService implements Runnable {
         while (true) {
             //Process that checks the queue and seeks a bot that can execute the job
             try {
-                Job job = jobQueue.take();
                 if (!botControlService.getAllAvialableBots().isEmpty()) {
+                    Job job = jobQueue.take();
                     //Find closest bot
                     List<Bot> bots = botControlService.getAllAvialableBots();
                     TreeMap<Integer, Bot> sortedBots = new TreeMap<>();
@@ -198,7 +199,8 @@ public class JobControlService implements Runnable {
                     this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
                 } else {
                     //Place job back in queue TODO: optimize this (remove this else)
-                    jobQueue.put(job);
+                    //jobQueue.put(job);
+                    TimeUnit.SECONDS.sleep(2);
                 }
             } catch (Exception e) {
                 logger.error("Error taking job from queue: " + e.getMessage());
