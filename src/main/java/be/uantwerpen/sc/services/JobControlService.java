@@ -198,8 +198,7 @@ public class JobControlService implements Runnable {
                     //Send MQTT message to bot
                     this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
                 } else {
-                    //Place job back in queue TODO: optimize this (remove this else)
-                    //jobQueue.put(job);
+                    //Sleep seconds
                     TimeUnit.SECONDS.sleep(2);
                 }
             } catch (Exception e) {
