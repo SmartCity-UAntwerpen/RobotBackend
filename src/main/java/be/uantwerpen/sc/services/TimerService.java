@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Runnable Timer Service
@@ -28,14 +31,12 @@ public class TimerService implements Runnable {
     @Override
     public void run() {
 
-        while (true) {
-            long startTime = System.currentTimeMillis();
-            long elapsedTime = 0L;
-            //Wait 1 minute
-            while (elapsedTime < 60 * 1000) {
-                elapsedTime = (new Date()).getTime() - startTime;
+        final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                botController.checkTimer();
             }
-            botController.checkTimer();
-        }
+        }, 0, 60, TimeUnit.SECONDS);
     }
 }
