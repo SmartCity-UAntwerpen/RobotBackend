@@ -179,7 +179,7 @@ public class BotController {
         List<Job> jobs = jobControlService.getExecutingJob(bot);
         for (Job j : jobs) {
             //Remove the bot from executing it and set starting point to the bots last location
-            j.setIdStart(bot.getPoint());
+            //j.setIdStart(bot.getPoint());
             j.setBot(null);
             jobControlService.saveJob(j);
             //Also queue job again so it will be executed again

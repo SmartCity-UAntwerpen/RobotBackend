@@ -136,6 +136,16 @@ public class JobController
         }
     }
 
+    /**
+     *  Path not found -> Robot sends to this end-point to notify it finished the job, no path was possible
+     * @param robotId, the robot id
+     */
+    @RequestMapping(value = "pathError/{robotId}",method = RequestMethod.GET)
+    public void pathError(@PathVariable("robotId") long robotId)
+    {
+        logger.info("Robot "+robotId+" could not found a path! Finishing job...");
+        this.finished(robotId);
+    }
 
     /**
      *  Remove all jobs
