@@ -99,7 +99,6 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>be.uantwerpen.rc</groupId>
 			<artifactId>RobotCommon</artifactId>

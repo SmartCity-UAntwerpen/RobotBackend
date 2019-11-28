@@ -1,6 +1,5 @@
 package be.uantwerpen.sc.services;
 
-
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Path;
 import be.uantwerpen.rc.models.map.Link;
@@ -28,13 +27,13 @@ public class PathPlanningService implements IPathplanning {
 
     /**
      * Dijkstra Path Finder
-     * Todo Why hard coded?
+     * Todo Why hardcoded?
      */
     private Dijkstra dijkstra;
 
     /**
      * Creates path planning service
-     * TODO: hard coded dijkstra
+     * TODO: hardcoded dijkstra
      */
     public PathPlanningService() {
         this.dijkstra = new Dijkstra();
