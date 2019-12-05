@@ -78,7 +78,7 @@ public class BotControlService {
      *
      * @return List of Bots
      */
-    public List<Bot> getAllAvialableBots() {
+    public List<Bot> getAllAvailableBots() {
         return botRepository.findAllByBusyFalseAndPointNotNull();
     }
 }

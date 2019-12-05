@@ -58,7 +58,7 @@ public class CostController {
     public String calcCost(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
         int cost = (int) pathPlanningService.CalculatePathWeight(start, stop);
-        if(botControlService.getAllAvialableBots().isEmpty()){
+        if(botControlService.getAllAvailableBots().isEmpty()){
             cost = cost +10;
         }
         /*

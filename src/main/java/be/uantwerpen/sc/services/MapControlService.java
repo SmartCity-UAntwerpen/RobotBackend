@@ -10,6 +10,10 @@ import be.uantwerpen.rc.tools.Vertex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -61,6 +65,31 @@ public class MapControlService {
      */
     public void updateMap() {
         map = buildMap();
+    }
+
+    public boolean loadMap(String mapSQL)
+    {
+        boolean success;
+        String driver = "com.mysql.jdbc.Driver";
+        String url = "jdbc:mysql://smartcity.ddns.net:3306";
+        try {
+            Class.forName(driver);  // checks if a class descriptor can be made of the given driver string.
+                                    // If not --> this class doesn't exist and a exception should be thrown
+            Connection connection = DriverManager.getConnection(url, "smartcity", "smartcity");
+            PreparedStatement preparedStatement = connection.prepareStatement(mapSQL);
+            preparedStatement.execute();
+            connection.close();
+            success = true;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            System.err.println("ClassNotFoundException: class of driver + " + driver + " is not found!");
+            success = false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("SQLException: error executing mapSQL-script");
+            success = false;
+        }
+        return success;
     }
 
     public List<Vertex> getVertexMap() {

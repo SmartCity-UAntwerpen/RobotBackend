@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/tlight/")
-public class TrafficLightController {
+public class   TrafficLightController {
     /**
      * Autowired Traffic Light Control Service
      */

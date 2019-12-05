@@ -81,8 +81,8 @@ public class JobControlService implements Runnable {
     /**
      * Send job over MQTT
      *
-     * @param bot     The bot that executes the job
      * @param jobId   ID of job for bot
+     * @param bot     The bot that executes the job
      * @param idStart ID start Point
      * @param idStop  ID stop Point
      * @return Success
@@ -119,10 +119,10 @@ public class JobControlService implements Runnable {
      *
      * @param jobId   ID of the job
      * @param idStart ID of starting point
-     * @param idStop  ID of end point
+     * @param idEnd  ID of end point
      * @return
      */
-    public boolean queueJob(Long jobId, long idStart, long idStop) {
+    public boolean queueJob(Long jobId, long idStart, long idEnd) {
         //Check if points exist
         try {
             pointControlService.getPoint(idStart);
@@ -130,7 +130,7 @@ public class JobControlService implements Runnable {
             return false;
         }
         try {
-            pointControlService.getPoint(idStop);
+            pointControlService.getPoint(idEnd);
         } catch (Exception e) {
             return false;
         }
@@ -141,7 +141,7 @@ public class JobControlService implements Runnable {
         }
         Job job = new Job(jobId);
         job.setIdStart(idStart);
-        job.setIdEnd(idStop);
+        job.setIdEnd(idEnd);
         try {
             boolean tmp = jobQueue.add(job);
             jobs.save(job);
@@ -164,10 +164,10 @@ public class JobControlService implements Runnable {
         while (true) {
             //Process that checks the queue and seeks a bot that can execute the job
             try {
-                if (!botControlService.getAllAvialableBots().isEmpty()) {
+                if (!botControlService.getAllAvailableBots().isEmpty()) {
                     Job job = jobQueue.take();
                     //Find closest bot
-                    List<Bot> bots = botControlService.getAllAvialableBots();
+                    List<Bot> bots = botControlService.getAllAvailableBots();
                     TreeMap<Integer, Bot> sortedBots = new TreeMap<>();
                     for (Bot b : bots) {
                         int targetId = -1;

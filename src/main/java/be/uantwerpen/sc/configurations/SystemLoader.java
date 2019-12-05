@@ -16,13 +16,25 @@ public class SystemLoader implements ApplicationRunner
     /**
      * Auto Wired terminalservice
      */
-    @Autowired
+
     private TerminalService terminalService;
     /**
      * Auto Wired jobService
      */
-    @Autowired
+
     private JobControlService jobControlService;
+
+    @Autowired
+    public SystemLoader(TerminalService terminalService, JobControlService jobControlService)
+    {
+        this.terminalService = terminalService;
+        this.jobControlService = jobControlService;
+    }
+
+    public SystemLoader()
+    {
+
+    }
 
     //Run after Spring context initialization
     public void run(ApplicationArguments args)

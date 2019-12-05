@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -165,12 +162,24 @@ public class MapController
         return dirs;
     }
 
+    @RequestMapping(value = "loadMap", method = RequestMethod.POST)
+    //public void loadMap(@RequestBody java.util.Map<String, Object> jsonMapSQL)
+    public void loadMap(@RequestBody String mapSQL)
+    {
+        //TODO: convert jsonMap to sql commands (if requestbody is json)
+        //load sql into database
+        if(!this.mapControlService.loadMap(mapSQL))
+            logger.debug("ERROR loading map into database!");
+        else
+            logger.debug("Map successfully loaded into database");
+    }
+
     /**
      * Update map from DSL
      */
     public void updateMap()
     {
-        //TODO fill data base with the map from the DSL (<type>.save())
+        //TODO fill database with the map from the DSL (<type>.save())
 
     }
 
