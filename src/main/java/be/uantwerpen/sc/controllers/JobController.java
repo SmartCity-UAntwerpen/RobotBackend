@@ -76,13 +76,14 @@ public class JobController
      * @param idstop, end point
      * @return http status
      */
-    @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.GET)
+    @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}", method = RequestMethod.GET)
     public String executeJob(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
     {
-        if(!jobControlService.queueJob(idJob,idstart,idstop)){
+        if(!jobControlService.queueJob(idJob, idstart, idstop)){
             return "HTTP status : 400";
         }
-        return "HTTP status : 200";
+        else
+            return "HTTP status : 200";
     }
 
     /**
@@ -92,13 +93,14 @@ public class JobController
      * @param idstop, end point
      * @return http status
      */
-    @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}",method = RequestMethod.POST)
+    @RequestMapping(value = "execute/{idStart}/{idStop}/{idJob}", method = RequestMethod.POST)
     public String executeJobPOST(@PathVariable("idJob") long idJob, @PathVariable("idStart") long idstart, @PathVariable("idStop") long idstop)
     {
         if(!jobControlService.queueJob(idJob,idstart,idstop)){
             return "HTTP status : 400";
         }
-        return "HTTP status : 200";
+        else
+            return "HTTP status : 200";
     }
 
     /**

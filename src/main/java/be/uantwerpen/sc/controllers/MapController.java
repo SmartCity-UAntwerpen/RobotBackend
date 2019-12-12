@@ -5,7 +5,6 @@ import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Tile;
 import be.uantwerpen.rc.tools.DriveDirEncapsulator;
-import be.uantwerpen.rc.tools.Vertex;
 import be.uantwerpen.sc.services.*;
 import be.uantwerpen.sc.services.LinkControlService;
 import be.uantwerpen.sc.services.MapControlService;
@@ -23,7 +22,6 @@ import java.util.List;
  * @author  Niels on 3/04/2016.
  * @author Reinout
  * @author Dieter 2018-2019
- *
  *
  * Map Controller
  */
@@ -66,16 +64,6 @@ public class MapController
      */
     @Autowired
     private BotControlService botControlService;
-    /**
-     * BackBone IP
-     */
-    @Value("${backbone.ip:default}")
-    String backboneIp;
-    /**
-     * BackBone Port
-     */
-    @Value("${backbone.port:default}")
-    String backbonePort;
 
     private Logger logger = LoggerFactory.getLogger(MapController.class);
 
@@ -100,8 +88,7 @@ public class MapController
     @RequestMapping(value = "getPoint/{id}", method = RequestMethod.GET)
     public Point getPoint(@PathVariable("id") Long id)
     {
-        Point p =  pointControlService.getPoint(id);
-        return p;
+        return pointControlService.getPoint(id);
     }
 
     /**
@@ -112,8 +99,7 @@ public class MapController
     @RequestMapping(value = "getTile/{id}", method = RequestMethod.GET)
     public Tile getTile(@PathVariable("id") Long id)
     {
-        Tile t =  tileControlService.getTile(id);
-        return t;
+        return tileControlService.getTile(id);
     }
 
     /**
@@ -124,8 +110,7 @@ public class MapController
     public DriveDirEncapsulator getDirectionsNG(@PathVariable("start") int start, @PathVariable("end") int end)
     {
         Path path=pathPlanningService.CalculatePath(start,end);
-        DriveDirEncapsulator dirs=pathPlanningService.createBotDriveDirs(path);
-        return dirs;
+        return pathPlanningService.createBotDriveDirs(path);
     }
 
     /**
@@ -137,8 +122,7 @@ public class MapController
     @RequestMapping(value = "path/{start}/{stop}", method = RequestMethod.GET)
     public Path PathPlanning(@PathVariable("start") int start, @PathVariable("stop") int stop)
     {
-        Path p = pathPlanningService.CalculatePath(start,stop);
-        return p;
+        return pathPlanningService.CalculatePath(start,stop);
     }
 
     /**
@@ -150,16 +134,16 @@ public class MapController
      */
     @RequestMapping(value = "getnexthop/{start}/{current}/{end}", method = RequestMethod.GET)
     public DriveDirEncapsulator getNextHop(@PathVariable("start") int start,@PathVariable("current") int current, @PathVariable("end") int end){
-        List<Vertex> vertices=(pathPlanningService.CalculatePath(start,end)).getPath();
+        List<Point> vertices=(pathPlanningService.CalculatePath(start,end)).getPath();
         Path path=new Path();
         for (int i=0; i<vertices.size(); i++){
-            if(vertices.get(i).getId()==current){
+            if(vertices.get(i).getId()==current)
+            {
                 path.addVertex(vertices.get(i));
                 path.addVertex(vertices.get(i+1));
             }
         }
-        DriveDirEncapsulator dirs=pathPlanningService.createBotDriveDirs(path);
-        return dirs;
+        return pathPlanningService.createBotDriveDirs(path);
     }
 
     @RequestMapping(value = "loadMap", method = RequestMethod.POST)
@@ -169,9 +153,9 @@ public class MapController
         //TODO: convert jsonMap to sql commands (if requestbody is json)
         //load sql into database
         if(!this.mapControlService.loadMap(mapSQL))
-            logger.debug("ERROR loading map into database!");
+            logger.error("ERROR loading map into database!");
         else
-            logger.debug("Map successfully loaded into database");
+            logger.error("Map successfully loaded into database");
     }
 
     /**

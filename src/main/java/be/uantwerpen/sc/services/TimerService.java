@@ -32,11 +32,6 @@ public class TimerService implements Runnable {
     public void run() {
 
         final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                botController.checkTimer();
-            }
-        }, 0, 60, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(() -> botController.checkTimer(), 0, 60, TimeUnit.SECONDS);
     }
 }

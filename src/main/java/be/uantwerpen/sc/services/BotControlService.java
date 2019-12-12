@@ -22,17 +22,6 @@ public class BotControlService {
     private BotRepository botRepository;
 
     /**
-     * BackBone IP
-     */
-    @Value("${backbone.ip:default}")
-    String backboneIP;
-    /**
-     * BackBone Port
-     */
-    @Value("${backbone.port:default}")
-    String backbonePort;
-
-    /**
      * Encapsulator to save Bot to DB
      *
      * @param bot Bot to save

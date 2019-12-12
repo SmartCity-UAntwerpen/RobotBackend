@@ -72,7 +72,7 @@ public class LinkController
                     //Point not locked -> attempt lock
                     Bot bot = botService.getBot(botId);
                     link.lockLink(true,bot);
-                    link.setWeight(link.getWeight()+10);
+                    link.getCost().setWeight(link.getCost().getWeight()+10);
                     linkControlService.save(link);
                     logger.info("Bot "+botId+" locked link: "+link.getId());
                     return true;
@@ -108,7 +108,7 @@ public class LinkController
                 if(link.getLock().getLockedBy().getIdCore().equals(botId) && link.getLock().getStatus()) {
                     //Point already locked
                     link.lockLink(false, null);
-                    link.setWeight(1);
+                    link.getCost().setWeight(1);
                     linkControlService.save(link);
                     logger.info("Bot "+botId+" unlocked link: "+id);
                 return true;

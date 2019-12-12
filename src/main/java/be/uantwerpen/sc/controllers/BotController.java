@@ -61,17 +61,6 @@ public class BotController {
     @Autowired
     private JobControlService jobControlService;
 
-    /**
-     * BackBone IP
-     */
-    @Value("${backbone.ip:default}")
-    String backboneIP;
-    /**
-     * BackBone Port
-     */
-    @Value("${backbone.port:default}")
-    String backbonePort;
-
     private Logger logger = LoggerFactory.getLogger(BotController.class);
 
 
@@ -81,42 +70,27 @@ public class BotController {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
-    public List<Bot> allBots() {
+    public List<Bot> allBots()
+    {
         return botControlService.getAllBots();
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Bot getBot(@PathVariable("id") Long id) {
+    public Bot getBot(@PathVariable("id") Long id)
+    {
         return botControlService.getBot(id);
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.POST)
-    public void saveBot(@PathVariable("id") Long id, @RequestBody Bot bot) {
+    public void saveBot(@PathVariable("id") Long id, @RequestBody Bot bot)
+    {
         botControlService.saveBot(bot);
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    public void updateBot(@PathVariable("id") Long id, @RequestBody Bot bot) {
+    public void updateBot(@PathVariable("id") Long id, @RequestBody Bot bot)
+    {
         botControlService.saveBot(bot);
-    }
-
-    /**
-     * Robot calls this
-     *
-     * @return id
-     */
-    @Deprecated
-    @RequestMapping(value = "newRobot/{id}", method = RequestMethod.GET)
-    public Long newRobot(@PathVariable("id") Long id) {
-        Bot bot = new Bot(id);
-        System.out.println(bot);
-        //Save bot in database and get bot new rid
-        botControlService.saveBot(bot);
-
-        Date date = new Date();
-        logger.info("New robot created!! - " + date.toString());
-
-        return bot.getIdCore();
     }
 
     /**
@@ -128,12 +102,14 @@ public class BotController {
     @RequestMapping(value = "{id}/locationUpdate/{pid}", method = RequestMethod.GET)
     public void locationLink(@PathVariable("id") Long id, @PathVariable("pid") Long pid) {
         Bot bot = botControlService.getBot(id);
-        Point point;
+        Point point = new Point();
 
-        if (bot != null) {
+        if (bot != null)
+        {
             point = pointControlService.getPoint(pid);
             logger.info("Bot with id: " + id + " updated its location: " + pid);
-            if (point != null) {
+            if (point != null)
+            {
                 bot.setPoint(pid);
                 botControlService.saveBot(bot);
                 System.out.println(bot.getIdCore());
@@ -245,12 +221,12 @@ public class BotController {
         long currentDate = new Date().getTime();
         for (Bot b : bots) {
             if (b.getStatus() != BotState.Unknown.ordinal()) {
-                if (currentDate - b.getLastUpdated().getTime() > 1000 * 60 * 5) {
+                if (currentDate - b.getLastUpdated().getTime() > 1000 * 60) {
                     b.updateStatus(BotState.Unknown.ordinal());
                     botControlService.saveBot(b);
                 }
             } else {
-                if (new Date().getTime() - b.getLastUpdated().getTime() > 1000 * 60 * 5) {
+                if (new Date().getTime() - b.getLastUpdated().getTime() > 1000 * 60) {
                     this.deleteBot(b.getIdCore());
                 }
             }
@@ -277,6 +253,29 @@ public class BotController {
         bot.updateStatus(BotState.Alive.ordinal());
         botControlService.saveBot(bot);
         logger.info("Bot with id " + bot.getIdCore() + " entered the network!");
+        return bot.getIdCore();
+    }
+
+
+
+
+    //      Deprecated functions    //
+    /**
+     * Robot calls this
+     *
+     * @return id
+     */
+    @Deprecated
+    @RequestMapping(value = "newRobot/{id}", method = RequestMethod.GET)
+    public Long newRobot(@PathVariable("id") Long id) {
+        Bot bot = new Bot(id);
+        System.out.println(bot);
+        //Save bot in database and get bot new rid
+        botControlService.saveBot(bot);
+
+        Date date = new Date();
+        logger.info("New robot created!! - " + date.toString());
+
         return bot.getIdCore();
     }
 }

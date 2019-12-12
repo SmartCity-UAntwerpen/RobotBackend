@@ -53,6 +53,7 @@ public class JobControlService implements Runnable {
     @Autowired
     private PointControlService pointControlService;
 
+
     //TODO: remove blocking queue ==> use database
     private BlockingQueue<Job> jobQueue = null;
 
@@ -63,15 +64,15 @@ public class JobControlService implements Runnable {
         logger.info("Initialising job queue...");
         //Initialize job queue and add all jobs from database
         jobQueue = new ArrayBlockingQueue<Job>(100);
-        List<Job> allJobs = jobs.findAllByBotNull();
-        jobQueue.addAll(allJobs);
-        logger.info(allJobs.size() + " jobs added to the job queue! Init done!");
+        jobQueue.addAll(jobs.findAllByBotNull());
+        logger.info(jobs.findAllByBotNull().size() + " jobs added to the job queue! Init done!");
     }
 
     /**
      * Delete all jobs from database
      */
-    public void deleteAllJobs(){
+    public void deleteAllJobs()
+    {
         List<Job> jobs = this.jobs.findAll();
         jobQueue = new ArrayBlockingQueue<Job>(100); //Reinitialize the jobQueue
         this.jobs.delete(jobs);
@@ -155,57 +156,59 @@ public class JobControlService implements Runnable {
 
     @Override
     public void run() {
-        if (jobQueue == null) {
-            return;
-        }
-
         logger.info("Starting Job Service...");
-
-        while (true) {
-            //Process that checks the queue and seeks a bot that can execute the job
-            try {
-                if (!botControlService.getAllAvailableBots().isEmpty()) {
-                    Job job = jobQueue.take();
-                    //Find closest bot
-                    List<Bot> bots = botControlService.getAllAvailableBots();
-                    TreeMap<Integer, Bot> sortedBots = new TreeMap<>();
-                    for (Bot b : bots) {
-                        int targetId = -1;
-                        //Depending on the type of job, calculate how far the bot is
-                        if (job.getIdStart() == -1L) {
-                            //Go to point job ==> which bot is closest to end
-                            targetId = job.getIdEnd().intValue();
-                        } else {
-                            //Normal job ==> which bot is closest to start point
-                            targetId = job.getIdStart().intValue();
+        if (jobQueue != null && !jobQueue.isEmpty())
+        {
+            while (true) {
+                //Process that checks the queue and seeks a bot that can execute the job
+                try {
+                    if (!botControlService.getAllAvailableBots().isEmpty()) {
+                        Job job = jobQueue.take();
+                        //Find closest bot
+                        List<Bot> bots = botControlService.getAllAvailableBots();
+                        TreeMap<Integer, Bot> sortedBots = new TreeMap<>();
+                        for (Bot b : bots) {
+                            int targetId = -1;
+                            //Depending on the type of job, calculate how far the bot is
+                            if (job.getIdStart() == -1L) {
+                                //Go to point job ==> which bot is closest to end
+                                targetId = job.getIdEnd().intValue();
+                            } else {
+                                //Normal job ==> which bot is closest to start point
+                                targetId = job.getIdStart().intValue();
+                            }
+                            sortedBots.put((int) pathPlanningService.CalculatePathWeight(b.getPoint().intValue(), targetId), b);
                         }
-                        sortedBots.put((int) pathPlanningService.CalculatePathWeight(b.getPoint().intValue(), targetId), b);
-                    }
 
-                    //Get closest bot == first entry and assign job
-                    Bot bot = sortedBots.firstEntry().getValue();
-                    //If the start point is -1L than this is a goToPoint job ==> set start point to current location of the bot
-                    if (job.getIdStart() == -1L) {
-                        job.setIdStart(bot.getPoint());
+                        //Get closest bot == bot with least cost == first entry (key who has the lowest value) and assign job
+                        Bot bot = sortedBots.firstEntry().getValue();
+                        //If the start point is -1L than this is a goToPoint job ==> set start point to current location of the bot
+                        if (job.getIdStart() == -1L) {
+                            job.setIdStart(bot.getPoint());
+                        }
+                        bot.setBusy(true);
+                        bot.setIdStart(job.getIdStart());
+                        bot.setIdStop(job.getIdEnd());
+                        bot.setJobId(job.getJobId());
+                        job.setBot(bot);
+                        botControlService.saveBot(bot);
+                        jobs.save(job);
+                        //Send MQTT message to bot
+                        this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
+                    } else {
+                        //Sleep seconds
+                        TimeUnit.SECONDS.sleep(2);
                     }
-                    bot.setBusy(true);
-                    bot.setIdStart(job.getIdStart());
-                    bot.setIdStop(job.getIdEnd());
-                    bot.setJobId(job.getJobId());
-                    job.setBot(bot);
-                    botControlService.saveBot(bot);
-                    jobs.save(job);
-                    //Send MQTT message to bot
-                    this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
-                } else {
-                    //Sleep seconds
-                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
+                    logger.error("Error taking job from queue: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                logger.error("Error taking job from queue: " + e.getMessage());
             }
-
         }
+        else
+        {
+            logger.info("JobQueue is null or is empty!");
+        }
+
 
     }
 }

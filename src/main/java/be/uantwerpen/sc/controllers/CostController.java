@@ -35,17 +35,6 @@ public class CostController {
     @Autowired
     private BotControlService botControlService;
 
-    /**
-     * BackBone IP
-     */
-    @Value("${backbone.ip:default}")
-    String backboneIP;
-    /**
-     * BackBone Port
-     */
-    @Value("${backbone.port:default}")
-    String backbonePort;
-
     private Logger logger = LoggerFactory.getLogger(CostController.class);
 
     /**
@@ -61,6 +50,7 @@ public class CostController {
         if(botControlService.getAllAvailableBots().isEmpty()){
             cost = cost +10;
         }
+
         /*
         if(start == 9 && stop == 16 || start == 16 && stop == 9){
             return 1000;

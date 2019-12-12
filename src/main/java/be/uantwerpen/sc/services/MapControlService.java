@@ -3,10 +3,7 @@ package be.uantwerpen.sc.services;
 
 import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.rc.models.map.Map;
-import be.uantwerpen.rc.models.map.Node;
 import be.uantwerpen.rc.models.map.Point;
-import be.uantwerpen.rc.tools.Edge;
-import be.uantwerpen.rc.tools.Vertex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +23,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MapControlService {
+
+    private Map map = null;
+
     /**
      * Autowired Point Control Service
      */
@@ -50,13 +50,13 @@ public class MapControlService {
     @Autowired
     private TrafficLightControlService trafficLightControlService;
 
-    private Map map = null;
-    private List<Vertex> vertexMap = null;
 
-    public Map getMap() {
-        //if (map==null)
-        map = buildMap();
-        return map;
+
+
+
+    public Map getMap()
+    {
+        return buildMap();
     }
 
     /**
@@ -70,12 +70,12 @@ public class MapControlService {
     public boolean loadMap(String mapSQL)
     {
         boolean success;
-        String driver = "com.mysql.jdbc.Driver";
-        String url = "jdbc:mysql://smartcity.ddns.net:3306";
+        String driver = "${spring.database.driverClassName:default}";
+        String url = "${spring.datasource.url:default}";
         try {
             Class.forName(driver);  // checks if a class descriptor can be made of the given driver string.
-                                    // If not --> this class doesn't exist and a exception should be thrown
-            Connection connection = DriverManager.getConnection(url, "smartcity", "smartcity");
+                                    // If not --> this class doesn't exist, no driver can be used and a exception should be thrown
+            Connection connection = DriverManager.getConnection(url, "${spring.datasource.username:default}", "${spring.datasource.password:default}");
             PreparedStatement preparedStatement = connection.prepareStatement(mapSQL);
             preparedStatement.execute();
             connection.close();
@@ -92,12 +92,10 @@ public class MapControlService {
         return success;
     }
 
-    public List<Vertex> getVertexMap() {
+    public List<Point> getVertexMap() {
         //Always update the map
-        this.buildMap();
-        //if(vertexMap==null)
-        vertexMap = mapToVertexes();
-        return vertexMap;
+        this.map = this.buildMap();
+        return mapToVertexes();
     }
 
     /**
@@ -107,20 +105,19 @@ public class MapControlService {
      *
      * @return List of vertexes
      */
-    private List<Vertex> mapToVertexes() {
-        List<Vertex> vertexes = new ArrayList<>();
-        for (Node n : getMap().getNodeList())
-            vertexes.add(new Vertex(n));
+    private List<Point> mapToVertexes() {
+        List<Point> vertexes = new ArrayList<>();
+        vertexes.addAll(getMap().getPointList());
 
-        ArrayList<Edge> edges;
-        List<ArrayList<Edge>> edgeslistinlist = new ArrayList<>();
+        ArrayList<Link> edges;
+        List<ArrayList<Link>> edgeslistinlist = new ArrayList<>();
         int i = 0;
-        for (Node node : getMap().getNodeList()) {
+        for (Point node : getMap().getPointList()) {
             edges = new ArrayList<>();
             for (Link neighbour : node.getNeighbours()) {
-                for (Vertex v : vertexes) {
+                for (Point v : vertexes) {
                     if (Objects.equals(v.getId(), neighbour.getEndPoint().getId())) {
-                        edges.add(new Edge(v.getId(), neighbour.getWeight(), neighbour));
+                        edges.add(new Link(v.getId(), neighbour.getCost().getWeight()));
                     }
                 }
             }
@@ -128,14 +125,14 @@ public class MapControlService {
             i++;
         }
         for (int j = 0; j < vertexes.size(); j++) {//Todo: zet dit in de quatro 4 loop
-            vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
+            vertexes.get(j).setNeighbours(edgeslistinlist.get(j));
         }
         return vertexes;
     }
 
 
     public void resetVertex() {
-        for (Vertex v : getVertexMap()) {
+        for (Point v : getVertexMap()) {
             v.setMinDistance(Double.POSITIVE_INFINITY);
             v.setPrevious(null);
         }
@@ -150,22 +147,20 @@ public class MapControlService {
      * @return Created Map
      */
     private Map buildMap() {
-        Map map = new Map();
-
+        this.map = new Map();
         List<Link> linkEntityList = linkControlService.getAllLinks();
 
         for (Point point : pointControlService.getAllPoints()) {
-            Node node = new Node(point);
-            List<Link> targetLinks = linkEntityList.stream().filter(item -> Objects.equals(item.getStartPoint().getId(), node.getNodeId())).collect(Collectors.toList());
+            List<Link> targetLinks = linkEntityList.stream().filter(item -> Objects.equals(item.getStartPoint().getId(), point.getId())).collect(Collectors.toList());
 
-            node.setNeighbours(targetLinks);
-            map.addNode(node);
+            point.setNeighbours(targetLinks);
+            this.map.addPoint(point);
         }
 
-        map.setBotEntities(botControlService.getAllBots());
-        map.setTrafficlightEntity(trafficLightControlService.getAllTrafficLights());
+        this.map.setBotEntities(botControlService.getAllBots());
+        this.map.setTrafficlightEntity(trafficLightControlService.getAllTrafficLights());
 
-        return map;
+        return this.map;
     }
 
 }

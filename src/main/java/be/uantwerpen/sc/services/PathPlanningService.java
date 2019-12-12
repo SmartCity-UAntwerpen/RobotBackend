@@ -3,7 +3,7 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Path;
 import be.uantwerpen.rc.models.map.Link;
-import be.uantwerpen.rc.models.map.Node;
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.rc.tools.*;
 import be.uantwerpen.rc.tools.pathplanning.Dijkstra;
 import be.uantwerpen.rc.tools.pathplanning.IPathplanning;
@@ -46,45 +46,45 @@ public class PathPlanningService implements IPathplanning {
      * @param stop,  stop point
      * @return shortest path
      */
-    public Path CalculatePathNonInterface(int start, int stop) {
+    public Path CalculatePathNonInterface(long start, long stop) {
         Map map = mapControlService.getMap();
         List<Link> linkEntityList = new ArrayList<>();
-        List<Vertex> vertexes = new ArrayList<>();
-        for (Node nj : map.getNodeList()) {
-            vertexes.add(new Vertex(nj));
-            linkEntityList.addAll(nj.getNeighbours());
+        List<Point> vertexes = new ArrayList<>();
+        for (Point node : map.getPointList()) {
+            vertexes.add(node);
+            linkEntityList.addAll(node.getNeighbours());
         }
 
-        ArrayList<Edge> edges;
-        List<ArrayList<Edge>> edgeslistinlist = new ArrayList<>();
+        ArrayList<Link> links;
+        List<ArrayList<Link>> linksListInList = new ArrayList<>();
         Link realLink = new Link();
         int i = 0;
-        for (Node nj : map.getNodeList()) {
-            edges = new ArrayList<>();
-            for (Link neighbour : nj.getNeighbours()) {
-                for (Vertex v : vertexes) {
+        for (Point node : map.getPointList()) {
+            links = new ArrayList<>();
+            for (Link neighbour : node.getNeighbours()) {
+                for (Point v : vertexes) {
                     if (Objects.equals(v.getId(), neighbour.getEndPoint().getId())) {
                         for (Link linkEntity : linkEntityList) {
-                            if (Objects.equals(linkEntity.getEndPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), nj.getPointEntity().getId())) {
+                            if (Objects.equals(linkEntity.getEndPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), node.getId())) {
                                 System.out.println(linkEntity.toString() + " " + linkEntity);
                                 realLink = linkEntity;
                             }
                         }
                         //edges.add(new Edge(v.getId(),neighbour.getWeight(),linkControlService.getLink(neighbour.getPointEntity().getPid())));
-                        edges.add(new Edge(v.getId(), neighbour.getWeight(), realLink));
+                        links.add(new Link(v.getId(), neighbour.getCost().getWeight()));
                     }
                 }
             }
-            edgeslistinlist.add(i, (edges));
+            linksListInList.add(i, (links));
             i++;
         }
 
         for (int j = 0; j < vertexes.size(); j++) {
-            vertexes.get(j).setAdjacencies(edgeslistinlist.get(j));
+            vertexes.get(j).setNeighbours(linksListInList.get(j));
         }
 
-        dijkstra.computePaths((long) start, vertexes); // run Dijkstra
-        return dijkstra.getShortestPathTo((long) stop, vertexes);
+        dijkstra.computePaths(start, vertexes); // run Dijkstra
+        return dijkstra.getShortestPathTo(stop, vertexes);
     }
 
     /**
@@ -97,7 +97,7 @@ public class PathPlanningService implements IPathplanning {
      */
     @Override
     public Path CalculatePath(int start, int stop) {
-        List<Vertex> vertexes = mapControlService.getVertexMap();
+        List<Point> vertexes = mapControlService.getVertexMap();
         mapControlService.resetVertex();
         dijkstra.computePaths((long) start, vertexes);
         return dijkstra.getShortestPathTo((long) stop, vertexes);
@@ -105,14 +105,33 @@ public class PathPlanningService implements IPathplanning {
 
     @Override
     public double CalculatePathWeight(int start, int stop) {
-        Path p = CalculatePath(start, stop);
+        Path p = this.CalculatePath(start, stop);
         return p.getWeight();
     }
 
     public double CalculatePathLength(int start, int stop) {
-        Path p = CalculatePath(start, stop);
+        Path p = this.CalculatePath(start, stop);
         return p.getWeight();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Gets a random next vertex from the start vertex and returns this as path
@@ -124,24 +143,26 @@ public class PathPlanningService implements IPathplanning {
     @Deprecated
     @Override
     public Path nextRandomPath(Map map, int start) {
-        List<Vertex> vertexes = mapControlService.getVertexMap();
+        List<Point> vertexes = mapControlService.getVertexMap();
 
         Random random = new Random();
-        Vertex currentVertex = null;
-        for (Vertex v : vertexes) {
+        Point currentVertex = null;
+        for (Point v : vertexes) {
             if (v.getId() == start) {
                 currentVertex = v;
             }
         }
-        int i = currentVertex.getAdjacencies().size();
+        int i = currentVertex.getNeighbours().size();
         int index = random.nextInt(i);
-        Vertex nextVertex = new Vertex(new Node(currentVertex.getAdjacencies().get(index).getLinkEntity().getEndPoint()));
+        Point nextVertex = currentVertex.getNeighbours().get(index).getEndPoint();
 
-        List<Vertex> vertexList = new ArrayList<>();
+        List<Point> vertexList = new ArrayList<>();
         vertexList.add(currentVertex);
         vertexList.add(nextVertex);
         return new Path(vertexList);
     }
+
+
 
     /**
      * Method used in old full server navigation
@@ -153,18 +174,18 @@ public class PathPlanningService implements IPathplanning {
     @Deprecated
     public DriveDirEncapsulator createBotDriveDirs(Path path) {
         DriveDirEncapsulator commands = new DriveDirEncapsulator();
-        List<Vertex> vertices = path.getPath();
+        List<Point> vertices = path.getPath();
         Collections.reverse(vertices);
         List<Link> links = new LinkedList<>();
-        for (Vertex v : vertices) {
+        for (Point v : vertices) {
             if (v.getPrevious() == null) {
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FORWARD));
                 commands.addDriveDir(new DriveDir(DriveDirEnum.FOLLOW));
                 break;
             }
-            for (Edge l : v.getPrevious().getAdjacencies()) {
+            for (Link l : v.getPrevious().getNeighbours()) {
                 if (Objects.equals(l.getTarget(), v.getId()))
-                    links.add(l.getLinkEntity());
+                    links.add(l);
             }
         }
         Collections.reverse(links);

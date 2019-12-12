@@ -1,4 +1,5 @@
 package be.uantwerpen.sc.repositories;
+
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.Job;
 import org.springframework.data.repository.CrudRepository;
