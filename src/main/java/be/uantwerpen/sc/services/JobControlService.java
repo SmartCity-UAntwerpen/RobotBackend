@@ -154,7 +154,7 @@ public class JobControlService implements Runnable {
         }
     }
 
-    @Override
+    @Override //TODO:: this run method can be migrated to another class (not clean to make a Thread from a Service-class)
     public void run() {
         logger.info("Starting Job Service...");
         if (jobQueue != null && !jobQueue.isEmpty())
