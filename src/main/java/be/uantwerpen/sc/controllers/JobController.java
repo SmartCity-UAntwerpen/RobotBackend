@@ -130,7 +130,7 @@ public class JobController
             bot.setBusy(false);
             bot.setStatus(BotState.Alive.ordinal());
             botControlService.saveBot(bot);
-            completeJob(bot.getJobId());
+            this.completeJob(bot.getJobId());
             logger.info("Job with id: "+job.getJobId() +" is done! Bot with id: "+bot.getIdCore() +" is available again!");
             jobs.delete(job.getJobId());
         }catch(NullPointerException e){

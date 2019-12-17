@@ -81,9 +81,7 @@ public class LinkController
                 logger.error("Error locking link: "+id);
                 return false;
             }
-
         }
-
     }
 
     /**

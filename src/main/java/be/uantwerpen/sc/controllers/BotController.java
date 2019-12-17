@@ -67,7 +67,7 @@ public class BotController {
     /**
      * Get All Bots
      *
-     * @return
+     * @return list of bots
      */
     @RequestMapping(method = RequestMethod.GET)
     public List<Bot> allBots()
@@ -112,11 +112,11 @@ public class BotController {
             {
                 bot.setPoint(pid);
                 botControlService.saveBot(bot);
-                System.out.println(bot.getIdCore());
+                logger.info(bot.getIdCore().toString());
             } else
-                System.out.println("Point with id: " + pid + " not found!");
+                logger.debug("Point with id: " + pid + " not found!");
         } else
-            System.out.println("Bot with id:" + id + " not found!");
+            logger.debug("Bot with id:" + id + " not found!");
     }
 
     /**
@@ -130,11 +130,18 @@ public class BotController {
         Bot bot = botControlService.getBot(id);
 
         if (bot != null) {
-            bot.setPoint(pointId);
-            bot.setPercentageCompleted(progress);
-            bot.updateStatus(BotState.Alive.ordinal());
-            botControlService.saveBot(bot);
+            Point point = pointControlService.getPoint(pointId);
+            if(point != null) {
+                bot.setPoint(pointId);
+                bot.setPercentageCompleted(progress);
+                bot.updateStatus(BotState.Alive.ordinal());
+                botControlService.saveBot(bot);
+            }
+            else
+                logger.debug("Point with id:" + pointId + " not found!");
         }
+        else
+            logger.debug("Bot with id:" + id + " not found!");
     }
 
     /**
@@ -175,7 +182,7 @@ public class BotController {
     /**
      * Get all bot positions
      *
-     * @return
+     * @return jsonString all robot positions
      */
     @RequestMapping(value = "posAll", method = RequestMethod.GET)
     public String posAll() {

@@ -88,7 +88,10 @@ public class MapController
     @RequestMapping(value = "getPoint/{id}", method = RequestMethod.GET)
     public Point getPoint(@PathVariable("id") Long id)
     {
-        return pointControlService.getPoint(id);
+        Point point = pointControlService.getPoint(id);
+        if(point != null)
+            return point;
+        else return null;
     }
 
     /**
@@ -99,7 +102,10 @@ public class MapController
     @RequestMapping(value = "getTile/{id}", method = RequestMethod.GET)
     public Tile getTile(@PathVariable("id") Long id)
     {
-        return tileControlService.getTile(id);
+        Tile tile = tileControlService.getTile(id);
+        if(tile != null)
+            return tile;
+        else return null;
     }
 
     /**

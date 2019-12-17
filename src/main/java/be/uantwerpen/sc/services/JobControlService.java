@@ -1,9 +1,12 @@
 package be.uantwerpen.sc.services;
 
 import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.map.Map;
+import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
 import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.sc.repositories.JobRepository;
+import be.uantwerpen.sc.tools.NavigationParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,12 @@ public class JobControlService implements Runnable {
      */
     @Autowired
     private BotControlService botControlService;
+
+    /**
+     * Autowired MapControl Service
+     */
+    @Autowired
+    private MapControlService mapControlService;
 
     /**
      * Autowired Pathplannig service
@@ -162,7 +171,8 @@ public class JobControlService implements Runnable {
             while (true) {
                 //Process that checks the queue and seeks a bot that can execute the job
                 try {
-                    if (!botControlService.getAllAvailableBots().isEmpty()) {
+                    if (!botControlService.getAllAvailableBots().isEmpty())
+                    {
                         Job job = jobQueue.take();
                         //Find closest bot
                         List<Bot> bots = botControlService.getAllAvailableBots();
@@ -194,7 +204,24 @@ public class JobControlService implements Runnable {
                         botControlService.saveBot(bot);
                         jobs.save(job);
                         //Send MQTT message to bot
-                        this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
+                        if(bot.getWorkingMode().equals("INDEPENDENT"))
+                            this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
+                        else if(bot.getWorkingMode().equals("FULLSERVER"))
+                        {
+                            Map map = this.mapControlService.getMap();
+                            if(map != null)
+                            {
+                                List<Point> path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
+                                NavigationParser navigationParser;
+                                if(job.getIdStart() == -1L)
+                                    navigationParser = new NavigationParser(path, map, false);
+                                else
+                                    navigationParser = new NavigationParser(path, map, true);
+                                navigationParser.parseMap();
+                                job.setDriveDirections(navigationParser.getCommands());
+                                this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
+                            }
+                        }
                     } else {
                         //Sleep seconds
                         TimeUnit.SECONDS.sleep(2);
