@@ -3,6 +3,7 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Point;
+import be.uantwerpen.rc.tools.DriveDir;
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
 import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.sc.repositories.JobRepository;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author Dieter 2018-2019
+ * @author Riad 17/12/2019
  * <p>
  * Job Service
  */
@@ -98,7 +100,7 @@ public class JobControlService implements Runnable {
      * @return Success
      */
     private boolean sendJob(Long jobId, Bot bot, long idStart, long idStop) {
-        Job job = new Job(jobId);
+        Job job = this.jobs.findOne(jobId);
         job.setIdStart(idStart);
         job.setIdEnd(idStop);
         job.setBot(bot);
@@ -202,10 +204,12 @@ public class JobControlService implements Runnable {
                         bot.setJobId(job.getJobId());
                         job.setBot(bot);
                         botControlService.saveBot(bot);
-                        jobs.save(job);
                         //Send MQTT message to bot
                         if(bot.getWorkingMode().equals("INDEPENDENT"))
+                        {
+                            jobs.save(job);
                             this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
+                        }
                         else if(bot.getWorkingMode().equals("FULLSERVER"))
                         {
                             Map map = this.mapControlService.getMap();
@@ -218,7 +222,8 @@ public class JobControlService implements Runnable {
                                 else
                                     navigationParser = new NavigationParser(path, map, true);
                                 navigationParser.parseMap();
-                                job.setDriveDirections(navigationParser.getCommands());
+                                //job.setDriveDirections((List<DriveDir>) navigationParser.getCommands());
+                                jobs.save(job);
                                 this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
                             }
                         }

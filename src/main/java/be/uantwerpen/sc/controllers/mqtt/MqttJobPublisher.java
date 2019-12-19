@@ -54,8 +54,12 @@ public class MqttJobPublisher
     public boolean publishJob(Job job, long botID)
     {
         logger.info("Publishing Job");
-        String content  = "Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getBot().getIdCore().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString()+"}";
-        logger.info(content);
+        StringBuilder content  = new StringBuilder("Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getBot().getIdCore().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString());
+        if(job.getDriveDirections() != null && !job.getDriveDirections().isEmpty())
+            content.append("/ driveDirections:"+job.getDriveDirections().toString() +"}"); //TODO: convert to proper sequence of strings
+        else
+            content.append("}");
+        logger.info(content.toString());
         int qos         = 2;
         String topic    = "BOT/" + botID + "/Job";
         String broker   = "tcp://" + mqttIP + ":" + mqttPort;
@@ -71,7 +75,7 @@ public class MqttJobPublisher
             connectOptions.setUserName(mqttUsername);
             connectOptions.setPassword(mqttPassword.toCharArray());
             client.connect(connectOptions);
-            MqttMessage message = new MqttMessage(content.getBytes());
+            MqttMessage message = new MqttMessage(content.toString().getBytes());
             message.setQos(qos);
             client.publish(topic, message);
             client.disconnect();
