@@ -4,6 +4,7 @@ import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.rc.tools.DriveDir;
+import be.uantwerpen.rc.tools.DriveDirEncapsulator;
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
 import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.sc.repositories.JobRepository;
@@ -14,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -104,6 +104,26 @@ public class JobControlService implements Runnable {
         job.setIdStart(idStart);
         job.setIdEnd(idStop);
         job.setBot(bot);
+        logger.info("job send: idStart: " + idStart + " idStop: " + idStop + " bot: " + bot.getIdCore());
+        return mqttJobPublisher.publishJob(job, bot.getIdCore());
+    }
+
+    /**
+     * Send job over MQTT
+     *
+     * @param jobId   ID of job for bot
+     * @param bot     The bot that executes the job
+     * @param idStart ID start Point
+     * @param idStop  ID stop Point
+     * @return Success
+     */
+    private boolean sendJob(Long jobId, Bot bot, long idStart, long idStop, List<DriveDir> directions) {
+        Job job = this.jobs.findOne(jobId);
+        job.setIdStart(idStart);
+        job.setIdEnd(idStop);
+        job.setBot(bot);
+        job.setDriveDirections(directions);
+        logger.info("job send: idStart: " + idStart + " idStop: " + idStop + " bot: " + bot.getIdCore());
         return mqttJobPublisher.publishJob(job, bot.getIdCore());
     }
 
@@ -138,11 +158,13 @@ public class JobControlService implements Runnable {
         //Check if points exist
         try {
             pointControlService.getPoint(idStart);
+            logger.info("StartPoint found: " + pointControlService.getPoint(idStart).getId());
         } catch (Exception e) {
             return false;
         }
         try {
             pointControlService.getPoint(idEnd);
+            logger.info("EndPoint found: " + pointControlService.getPoint(idEnd).getId());
         } catch (Exception e) {
             return false;
         }
@@ -155,12 +177,18 @@ public class JobControlService implements Runnable {
         job.setIdStart(idStart);
         job.setIdEnd(idEnd);
         try {
-            boolean tmp = jobQueue.add(job);
+            this.jobQueue.put(job);
+            //logger.info("New job added to queue!");
             jobs.save(job);
             logger.info("New job queued!\tId: " + job.getJobId() + "\tStart: " + job.getIdStart() + "\tEnd: " + job.getIdEnd());
+            logger.info("jobQueue size: " + this.jobQueue.size());
             return true;
         } catch (IllegalStateException e) {
-            logger.error("Error adding job to job queue!");
+            logger.error("IllegalStateException Error adding job to job queue!");
+            return false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            logger.error("InterruptedException Error adding job to job queue!");
             return false;
         }
     }
@@ -168,18 +196,18 @@ public class JobControlService implements Runnable {
     @Override //TODO:: this run method can be migrated to another class (not clean to make a Thread from a Service-class)
     public void run() {
         logger.info("Starting Job Service...");
-        if (jobQueue != null && !jobQueue.isEmpty())
-        {
+        if (jobQueue != null && !jobQueue.isEmpty()) {
             while (true) {
                 //Process that checks the queue and seeks a bot that can execute the job
                 try {
-                    if (!botControlService.getAllAvailableBots().isEmpty())
-                    {
+                    if (!botControlService.getAllAvailableBots().isEmpty()) {
+                        logger.info("New job taken!");
                         Job job = jobQueue.take();
                         //Find closest bot
                         List<Bot> bots = botControlService.getAllAvailableBots();
                         TreeMap<Integer, Bot> sortedBots = new TreeMap<>();
                         for (Bot b : bots) {
+                            logger.info("Bot found for job");
                             int targetId = -1;
                             //Depending on the type of job, calculate how far the bot is
                             if (job.getIdStart() == -1L) {
@@ -205,26 +233,36 @@ public class JobControlService implements Runnable {
                         job.setBot(bot);
                         botControlService.saveBot(bot);
                         //Send MQTT message to bot
-                        if(bot.getWorkingMode().equals("INDEPENDENT"))
-                        {
+                        if (bot.getWorkingMode().equals("INDEPENDENT")) {
                             jobs.save(job);
                             this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
-                        }
-                        else if(bot.getWorkingMode().equals("FULLSERVER"))
-                        {
+                        } else if (bot.getWorkingMode().equals("FULLSERVER")) {
                             Map map = this.mapControlService.getMap();
-                            if(map != null)
-                            {
-                                List<Point> path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
+                            if (map != null) {
+                                List<Point> path;
                                 NavigationParser navigationParser;
-                                if(job.getIdStart() == -1L)
+                                Queue<DriveDir> driveCommands = new LinkedList<>();
+                                if(job.getIdStart().equals(bot.getPoint())) //(job.getIdStart() == -1L)
+                                {
+                                    path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
                                     navigationParser = new NavigationParser(path, map, false);
+                                    navigationParser.parseMap();
+                                    driveCommands.addAll(navigationParser.getCommands());
+                                }
                                 else
+                                {
+                                    path = this.pathPlanningService.Calculatepath(map, bot.getPoint(), job.getIdStart());
                                     navigationParser = new NavigationParser(path, map, true);
-                                navigationParser.parseMap();
-                                //job.setDriveDirections((List<DriveDir>) navigationParser.getCommands());
+                                    navigationParser.parseMap();
+                                    driveCommands.addAll(navigationParser.getCommands());
+                                    map = this.mapControlService.getMap();
+                                    path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
+                                    navigationParser = new NavigationParser(path, map, false);
+                                    navigationParser.parseMap();
+                                    driveCommands.addAll(navigationParser.getCommands());
+                                }
                                 jobs.save(job);
-                                this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
+                                this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd(), (List<DriveDir>) driveCommands);
                             }
                         }
                     } else {
@@ -233,6 +271,7 @@ public class JobControlService implements Runnable {
                     }
                 } catch (Exception e) {
                     logger.error("Error taking job from queue: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
@@ -240,7 +279,5 @@ public class JobControlService implements Runnable {
         {
             logger.info("JobQueue is null or is empty!");
         }
-
-
     }
 }

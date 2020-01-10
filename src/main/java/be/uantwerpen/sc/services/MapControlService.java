@@ -4,6 +4,9 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Point;
+import be.uantwerpen.sc.controllers.MapController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
 public class MapControlService {
 
     private Map map = null;
+
+    private Logger logger = LoggerFactory.getLogger(MapControlService.class);
 
     /**
      * Autowired Point Control Service
@@ -116,7 +121,7 @@ public class MapControlService {
             edges = new ArrayList<>();
             for (Link neighbour : node.getNeighbours()) {
                 for (Point v : vertexes) {
-                    if (Objects.equals(v.getId(), neighbour.getEndPoint().getId())) {
+                    if (Objects.equals(v.getId(), neighbour.getEndPoint())) {
                         edges.add(new Link(v.getId(), neighbour.getCost().getWeight()));
                     }
                 }
@@ -140,7 +145,7 @@ public class MapControlService {
 
     /**
      * Gets all links and points from the database
-     * Connects all links to their specific nodes and sets them as neighbors
+     * Connects all links to their specific nodes and sets them as neighbours
      * Adds all these nodes to the map
      * Map creates both real (Correct RFID) as simulated (letter of the alphabet) maps
      *
@@ -149,13 +154,18 @@ public class MapControlService {
     private Map buildMap() {
         this.map = new Map();
         List<Link> linkEntityList = linkControlService.getAllLinks();
-
+        //logger.info("Link Entity List: " + linkEntityList.toString());
         for (Point point : pointControlService.getAllPoints()) {
-            List<Link> targetLinks = linkEntityList.stream().filter(item -> Objects.equals(item.getStartPoint().getId(), point.getId())).collect(Collectors.toList());
+            //logger.info("Point: " + point.toString());
+            List<Link> targetLinks = linkEntityList.stream().filter(item -> Objects.equals(item.getStartPoint(), point.getId())).collect(Collectors.toList());
+            //logger.info("Target Links: " + targetLinks.toString());
+
 
             point.setNeighbours(targetLinks);
             this.map.addPoint(point);
         }
+
+        //logger.info("Map: " + map.toString());
 
         this.map.setBotEntities(botControlService.getAllBots());
         this.map.setTrafficlightEntity(trafficLightControlService.getAllTrafficLights());

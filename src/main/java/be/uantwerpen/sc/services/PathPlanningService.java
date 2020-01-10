@@ -48,7 +48,7 @@ public class PathPlanningService implements IPathplanning {
      */
     public Path CalculatePathNonInterface(long start, long stop) {
         Map map = mapControlService.getMap();
-        List<Link> linkEntityList = new ArrayList<>();
+        /*List<Link> linkEntityList = new ArrayList<>();
         List<Point> vertexes = new ArrayList<>();
         for (Point node : map.getPointList()) {
             vertexes.add(node);
@@ -63,9 +63,9 @@ public class PathPlanningService implements IPathplanning {
             links = new ArrayList<>();
             for (Link neighbour : node.getNeighbours()) {
                 for (Point v : vertexes) {
-                    if (Objects.equals(v.getId(), neighbour.getEndPoint().getId())) {
+                    if (Objects.equals(v.getId(), neighbour.getEndPoint())) {
                         for (Link linkEntity : linkEntityList) {
-                            if (Objects.equals(linkEntity.getEndPoint().getId(), v.getId()) && Objects.equals(linkEntity.getStartPoint().getId(), node.getId())) {
+                            if (Objects.equals(linkEntity.getEndPoint(), v.getId()) && Objects.equals(linkEntity.getStartPoint(), node.getId())) {
                                 System.out.println(linkEntity.toString() + " " + linkEntity);
                                 realLink = linkEntity;
                             }
@@ -81,10 +81,10 @@ public class PathPlanningService implements IPathplanning {
 
         for (int j = 0; j < vertexes.size(); j++) {
             vertexes.get(j).setNeighbours(linksListInList.get(j));
-        }
+        }*/
 
-        dijkstra.computePaths(start, vertexes); // run Dijkstra
-        return dijkstra.getShortestPathTo(stop, vertexes);
+        dijkstra.computePaths(start, map.getPointList()); // run Dijkstra
+        return dijkstra.getShortestPathTo(stop, map.getPointList());
     }
 
     /**
@@ -121,7 +121,7 @@ public class PathPlanningService implements IPathplanning {
         // TODO: transitions from map-classes to pathplanning-classes
 
 
-        List<Link> linkEntityList = new ArrayList<>();
+        /*List<Link> linkEntityList = new ArrayList<>();
         List<Point> vertexes = new ArrayList<>();
         for (Point node : map.getPointList()){
             System.out.print(node);
@@ -140,11 +140,11 @@ public class PathPlanningService implements IPathplanning {
             {
                 for (Point v : vertexes)
                 {
-                    if(v.getId().equals(neighbour.getEndPoint().getId()))
+                    if(v.getId().equals(neighbour.getEndPoint()))
                     {
                         for(Link linkEntity: linkEntityList)
                         {
-                            if(linkEntity.getEndPoint().getId().equals(v.getId()) && linkEntity.getStartPoint().getId().equals(node.getId()))
+                            if(linkEntity.getEndPoint().equals(v.getId()) && linkEntity.getStartPoint().equals(node.getId()))
                             {
                                 realLink = linkEntity;
                             }
@@ -159,11 +159,11 @@ public class PathPlanningService implements IPathplanning {
 
         for (int j = 0; j < vertexes.size();j++){
             vertexes.get(j).setNeighbours(edgesListInList.get(j));
-        }
+        }*/
 
 
-        dijkstra.computePaths(start, vertexes); // run Dijkstra
-        List<Point> path = dijkstra.getShortestPathTo(stop,vertexes).getPath();
+        dijkstra.computePaths(start, map.getPointList()); // run Dijkstra
+        List<Point> path = dijkstra.getShortestPathTo(stop,map.getPointList()).getPath();
         System.out.println("Path: " + path);
         return path;
     }
@@ -194,7 +194,7 @@ public class PathPlanningService implements IPathplanning {
     @Deprecated
     @Override
     public Path nextRandomPath(Map map, int start) {
-        List<Point> vertexes = mapControlService.getVertexMap();
+/*        List<Point> vertexes = mapControlService.getVertexMap();
 
         Random random = new Random();
         Point currentVertex = null;
@@ -210,7 +210,8 @@ public class PathPlanningService implements IPathplanning {
         List<Point> vertexList = new ArrayList<>();
         vertexList.add(currentVertex);
         vertexList.add(nextVertex);
-        return new Path(vertexList);
+        return new Path(vertexList);*/
+        return null;
     }
 
 

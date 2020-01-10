@@ -77,7 +77,9 @@ public class MapController
     {
         updateMap();
         logger.info("Map requested!");
-        return mapControlService.getMap();
+        Map map = mapControlService.getMap();
+        logger.info("Builded map: " +map.toString());
+        return map;
     }
 
     /**

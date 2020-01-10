@@ -1,6 +1,8 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
 import be.uantwerpen.rc.models.Job;
+import be.uantwerpen.rc.tools.DriveDir;
+import com.google.gson.Gson;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -55,8 +57,14 @@ public class MqttJobPublisher
     {
         logger.info("Publishing Job");
         StringBuilder content  = new StringBuilder("Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getBot().getIdCore().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString());
+        logger.info("Basic Mqtt content created!");
         if(job.getDriveDirections() != null && !job.getDriveDirections().isEmpty())
-            content.append("/ driveDirections:"+job.getDriveDirections().toString() +"}"); //TODO: convert to proper sequence of strings
+        {
+            Gson gson = new Gson();
+            String jsonDir = gson.toJson(job.getDriveDirections());
+            content.append("/ driveDirections:").append(jsonDir).append("}"); //TODO: convert to proper sequence of strings
+            logger.info("Json First DriveDirection: " + jsonDir);
+        }
         else
             content.append("}");
         logger.info(content.toString());
