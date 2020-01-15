@@ -1,12 +1,11 @@
 package be.uantwerpen.sc.services;
 
 import be.uantwerpen.rc.models.Bot;
+import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.rc.tools.DriveDir;
-import be.uantwerpen.rc.tools.DriveDirEncapsulator;
 import be.uantwerpen.sc.controllers.mqtt.MqttJobPublisher;
-import be.uantwerpen.rc.models.Job;
 import be.uantwerpen.sc.repositories.JobRepository;
 import be.uantwerpen.sc.tools.NavigationParser;
 import org.slf4j.Logger;
@@ -15,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;

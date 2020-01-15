@@ -1,6 +1,9 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
 import be.uantwerpen.rc.models.TrafficLight;
+import be.uantwerpen.sc.tools.TrafficLightAdapter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -55,6 +58,13 @@ public class MqttLightPublisher
         int qos         = 2;
         String topic    = "LIGHT/" + tlID + "/Light";
         String broker   = "tcp://" + mqttIP + ":" + mqttPort;
+
+        if(light.getId() != tlID)
+            light.setId(tlID);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(TrafficLight.class, new TrafficLightAdapter());
+        Gson gson = gsonBuilder.create();
+        content = gson.toJson(light);
 
         MemoryPersistence persistence = new MemoryPersistence();
 

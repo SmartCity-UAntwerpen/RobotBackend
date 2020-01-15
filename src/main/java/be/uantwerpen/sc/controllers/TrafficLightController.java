@@ -161,5 +161,4 @@ public class   TrafficLightController {
         trafficLight.setState(state);
         trafficLightControlService.sendLight((long) id, state);
     }
-
 }
