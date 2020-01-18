@@ -48,41 +48,6 @@ public class PathPlanningService implements IPathplanning {
      */
     public Path CalculatePathNonInterface(long start, long stop) {
         Map map = mapControlService.getMap();
-        /*List<Link> linkEntityList = new ArrayList<>();
-        List<Point> vertexes = new ArrayList<>();
-        for (Point node : map.getPointList()) {
-            vertexes.add(node);
-            linkEntityList.addAll(node.getNeighbours());
-        }
-
-        ArrayList<Link> links;
-        List<ArrayList<Link>> linksListInList = new ArrayList<>();
-        Link realLink = new Link();
-        int i = 0;
-        for (Point node : map.getPointList()) {
-            links = new ArrayList<>();
-            for (Link neighbour : node.getNeighbours()) {
-                for (Point v : vertexes) {
-                    if (Objects.equals(v.getId(), neighbour.getEndPoint())) {
-                        for (Link linkEntity : linkEntityList) {
-                            if (Objects.equals(linkEntity.getEndPoint(), v.getId()) && Objects.equals(linkEntity.getStartPoint(), node.getId())) {
-                                System.out.println(linkEntity.toString() + " " + linkEntity);
-                                realLink = linkEntity;
-                            }
-                        }
-                        //edges.add(new Edge(v.getId(),neighbour.getWeight(),linkControlService.getLink(neighbour.getPointEntity().getPid())));
-                        links.add(new Link(v.getId(), neighbour.getCost().getWeight()));
-                    }
-                }
-            }
-            linksListInList.add(i, (links));
-            i++;
-        }
-
-        for (int j = 0; j < vertexes.size(); j++) {
-            vertexes.get(j).setNeighbours(linksListInList.get(j));
-        }*/
-
         dijkstra.computePaths(start, map.getPointList()); // run Dijkstra
         return dijkstra.getShortestPathTo(stop, map.getPointList());
     }
@@ -119,49 +84,6 @@ public class PathPlanningService implements IPathplanning {
 
         // TODO: should be completely independent of Dijkstra
         // TODO: transitions from map-classes to pathplanning-classes
-
-
-        /*List<Link> linkEntityList = new ArrayList<>();
-        List<Point> vertexes = new ArrayList<>();
-        for (Point node : map.getPointList()){
-            System.out.print(node);
-            vertexes.add(node);
-            linkEntityList.addAll(node.getNeighbours());
-        }
-
-        ArrayList<Link> edges = new ArrayList<>();
-        List<ArrayList<Link>> edgesListInList = new ArrayList<>();
-        Link realLink = new Link();
-        int i = 0;
-        for (Point node : map.getPointList())
-        {
-            edges.clear();
-            for (Link neighbour : node.getNeighbours())
-            {
-                for (Point v : vertexes)
-                {
-                    if(v.getId().equals(neighbour.getEndPoint()))
-                    {
-                        for(Link linkEntity: linkEntityList)
-                        {
-                            if(linkEntity.getEndPoint().equals(v.getId()) && linkEntity.getStartPoint().equals(node.getId()))
-                            {
-                                realLink = linkEntity;
-                            }
-                        }
-                        edges.add(new Link(v.getId(), neighbour.getCost().getWeight()));
-                    }
-                }
-            }
-            edgesListInList.add(i, (edges));
-            i++;
-        }
-
-        for (int j = 0; j < vertexes.size();j++){
-            vertexes.get(j).setNeighbours(edgesListInList.get(j));
-        }*/
-
-
         dijkstra.computePaths(start, map.getPointList()); // run Dijkstra
         List<Point> path = dijkstra.getShortestPathTo(stop,map.getPointList()).getPath();
         System.out.println("Path: " + path);

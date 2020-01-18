@@ -198,8 +198,10 @@ public class JobControlService implements Runnable {
     @Override //TODO:: this run method can be migrated to another class (not clean to make a Thread from a Service-class)
     public void run() {
         logger.info("Starting Job Service...");
+        //boolean emptyQueue = false;
         if (jobQueue != null && !jobQueue.isEmpty()) {
             while (true) {
+                //emptyQueue = true;
                 //Process that checks the queue and seeks a bot that can execute the job
                 try {
                     if (!botControlService.getAllAvailableBots().isEmpty()) {

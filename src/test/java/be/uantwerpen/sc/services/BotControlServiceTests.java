@@ -62,11 +62,11 @@ public class BotControlServiceTests {
     @Test
     public void testLoadBot()
     {
-        when(botRepository.findAll()).thenReturn(botList);
+        /*when(botRepository.findAll()).thenReturn(botList);
 
         Bot testBot = botList.get(0);
 
-        assertEquals(bot1,testBot);
+        assertEquals(bot1,testBot);*/
 
         //assertTrue("This test has no value! No reference to BotControlService.", false);
     }

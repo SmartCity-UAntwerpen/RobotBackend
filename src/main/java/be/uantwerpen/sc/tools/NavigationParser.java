@@ -31,36 +31,6 @@ public class NavigationParser {
         this.isTempJob = isTempJob;
     }
 
-    public List<Point> getPath(){
-        return path;
-    }
-
-    public void decideOnCrossing(Point current, Point next) {
-        for(Link link: current.getNeighbours()) {
-            if(link.getStartPoint().equals(current.getId()) && link.getEndPoint().equals(next.getId())) {
-                if(link.getAngle() > -181.0 && link.getAngle() < 181.0)
-                    if(link.getAngle() <= 0.0001 && link.getAngle() >= -0.0001) {
-                        //if the length of the path is 0 we assume it's a crossroad
-                        if(link.getCost().getLength() == 0) {
-                            commands.add(new DriveDir(DriveDirEnum.FORWARD));
-                        } else {
-                            // execute follow line after each crossroad
-                            commands.add(new DriveDir(DriveDirEnum.FOLLOW));
-                        }
-                    } else if(Math.abs(link.getAngle()) <= 180.0001 && Math.abs(link.getAngle()) >= 179.9999) {
-                        commands.add(new DriveDir(DriveDirEnum.TURN));
-                    } else {
-                        if(link.getAngle() > 0)
-                            commands.add(new DriveDir(DriveDirEnum.RIGHT, link.getAngle()));
-                        else
-                            commands.add(new DriveDir(DriveDirEnum.LEFT, Math.abs(link.getAngle())));
-                    }
-                break;
-            }
-
-        }
-    }
-
     public Queue<DriveDir> parseMap(){
         if(this.path.isEmpty()){
             logger.warn("Cannot parse empty path");
@@ -134,6 +104,36 @@ public class NavigationParser {
 
         }
         return commands;
+    }
+
+    public List<Point> getPath(){
+        return path;
+    }
+
+    public void decideOnCrossing(Point current, Point next) {
+        for(Link link: current.getNeighbours()) {
+            if(link.getStartPoint().equals(current.getId()) && link.getEndPoint().equals(next.getId())) {
+                if(link.getAngle() > -181.0 && link.getAngle() < 181.0)
+                    if(link.getAngle() <= 0.0001 && link.getAngle() >= -0.0001) {
+                        //if the length of the path is 0 we assume it's a crossroad
+                        if(link.getCost().getLength() == 0) {
+                            commands.add(new DriveDir(DriveDirEnum.FORWARD));
+                        } else {
+                            // execute follow line after each crossroad
+                            commands.add(new DriveDir(DriveDirEnum.FOLLOW));
+                        }
+                    } else if(Math.abs(link.getAngle()) <= 180.0001 && Math.abs(link.getAngle()) >= 179.9999) {
+                        commands.add(new DriveDir(DriveDirEnum.TURN));
+                    } else {
+                        if(link.getAngle() > 0)
+                            commands.add(new DriveDir(DriveDirEnum.RIGHT, link.getAngle()));
+                        else
+                            commands.add(new DriveDir(DriveDirEnum.LEFT, Math.abs(link.getAngle())));
+                    }
+                break;
+            }
+
+        }
     }
 
     public void setPath(List<Point> path) {

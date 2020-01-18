@@ -74,6 +74,7 @@ public class   TrafficLightController {
      * @param id    Traffic Light ID
      * @param state Traffic Light new State
      */
+    @RequestMapping(value = "{id}/{state}", method = RequestMethod.POST)
     public void updateState(long id, String state) {
         logger.info("Traffic light " + id + " updated its state to: " + state);
         trafficLightControlService.updateState(id, state);

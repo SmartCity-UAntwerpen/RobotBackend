@@ -262,27 +262,4 @@ public class BotController {
         logger.info("Bot with id " + bot.getIdCore() + " entered the network!");
         return bot.getIdCore();
     }
-
-
-
-
-    //      Deprecated functions    //
-    /**
-     * Robot calls this
-     *
-     * @return id
-     */
-    @Deprecated
-    @RequestMapping(value = "newRobot/{id}", method = RequestMethod.GET)
-    public Long newRobot(@PathVariable("id") Long id) {
-        Bot bot = new Bot(id);
-        System.out.println(bot);
-        //Save bot in database and get bot new rid
-        botControlService.saveBot(bot);
-
-        Date date = new Date();
-        logger.info("New robot created!! - " + date.toString());
-
-        return bot.getIdCore();
-    }
 }

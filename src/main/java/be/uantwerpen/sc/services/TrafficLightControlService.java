@@ -7,6 +7,7 @@ import be.uantwerpen.sc.repositories.TrafficLightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -101,5 +102,28 @@ public class TrafficLightControlService {
      */
     public List<TrafficLight> findTrafficLightByPoint(Point point) {
         return trafficLightRepository.findByPoint(point);
+    }
+
+
+    //smart traffic lights
+    public boolean controlFlowTrafficLights()
+    {
+        List<TrafficLight> lights = new ArrayList<>();
+        for(TrafficLight light: this.trafficLightRepository.findAll())
+        {
+            if(light.getPoint().getTileLock())
+                lights.add(light);
+        }
+
+        for(TrafficLight light: lights)
+        {
+            if(light.getState().trim().toLowerCase().equals("red"))
+            {
+
+            }
+
+        }
+
+        return false;
     }
 }
