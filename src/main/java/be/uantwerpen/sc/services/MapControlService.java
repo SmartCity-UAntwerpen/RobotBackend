@@ -64,14 +64,6 @@ public class MapControlService {
         return buildMap();
     }
 
-    /**
-     * Update map
-     * Update the map
-     */
-    public void updateMap() {
-        map = buildMap();
-    }
-
     public boolean loadMap(String mapSQL)
     {
         boolean success;
@@ -97,47 +89,10 @@ public class MapControlService {
         return success;
     }
 
-    public List<Point> getVertexMap() {
-        //Always update the map
-        this.map = this.buildMap();
-        return mapToVertexes();
-    }
 
-    /**
-     * What the fuck, optimise this shit.
-     * Quadruple nested for?
-     * Really?
-     *
-     * @return List of vertexes
-     */
-    private List<Point> mapToVertexes() {
-        List<Point> vertexes = new ArrayList<>();
-        vertexes.addAll(getMap().getPointList());
-
-        ArrayList<Link> edges;
-        List<ArrayList<Link>> edgeslistinlist = new ArrayList<>();
-        int i = 0;
-        for (Point node : getMap().getPointList()) {
-            edges = new ArrayList<>();
-            for (Link neighbour : node.getNeighbours()) {
-                for (Point v : vertexes) {
-                    if (Objects.equals(v.getId(), neighbour.getEndPoint())) {
-                        edges.add(new Link(v.getId(), neighbour.getCost().getWeight()));
-                    }
-                }
-            }
-            edgeslistinlist.add(i, (edges));
-            i++;
-        }
-        for (int j = 0; j < vertexes.size(); j++) {//Todo: zet dit in de quatro 4 loop
-            vertexes.get(j).setNeighbours(edgeslistinlist.get(j));
-        }
-        return vertexes;
-    }
-
-
-    public void resetVertex() {
-        for (Point v : getVertexMap()) {
+    public void resetMap() {
+        map = buildMap();
+        for (Point v : map.getPointList()) {
             v.setMinDistance(Double.POSITIVE_INFINITY);
             v.setPrevious(null);
         }
@@ -154,18 +109,11 @@ public class MapControlService {
     private Map buildMap() {
         this.map = new Map();
         List<Link> linkEntityList = linkControlService.getAllLinks();
-        //logger.info("Link Entity List: " + linkEntityList.toString());
         for (Point point : pointControlService.getAllPoints()) {
-            //logger.info("Point: " + point.toString());
             List<Link> targetLinks = linkEntityList.stream().filter(item -> Objects.equals(item.getStartPoint(), point.getId())).collect(Collectors.toList());
-            //logger.info("Target Links: " + targetLinks.toString());
-
-
             point.setNeighbours(targetLinks);
             this.map.addPoint(point);
         }
-
-        //logger.info("Map: " + map.toString());
 
         this.map.setBotEntities(botControlService.getAllBots());
         this.map.setTrafficlightEntity(trafficLightControlService.getAllTrafficLights());

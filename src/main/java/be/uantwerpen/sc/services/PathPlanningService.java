@@ -39,18 +39,6 @@ public class PathPlanningService implements IPathplanning {
         this.dijkstra = new Dijkstra();
     }
 
-    /**
-     * Calculates Path
-     *
-     * @param start, start point
-     * @param stop,  stop point
-     * @return shortest path
-     */
-    public Path CalculatePathNonInterface(long start, long stop) {
-        Map map = mapControlService.getMap();
-        dijkstra.computePaths(start, map.getPointList()); // run Dijkstra
-        return dijkstra.getShortestPathTo(stop, map.getPointList());
-    }
 
     /**
      * Calculates path following Dijkstra
@@ -62,8 +50,8 @@ public class PathPlanningService implements IPathplanning {
      */
     @Override
     public Path CalculatePath(int start, int stop) {
-        List<Point> vertexes = mapControlService.getVertexMap();
-        mapControlService.resetVertex();
+        List<Point> vertexes = mapControlService.getMap().getPointList();
+        //mapControlService.resetMap();
         dijkstra.computePaths((long) start, vertexes);
         return dijkstra.getShortestPathTo((long) stop, vertexes);
     }

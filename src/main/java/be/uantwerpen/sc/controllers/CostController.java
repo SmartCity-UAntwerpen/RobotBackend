@@ -49,14 +49,6 @@ public class CostController {
         if(botControlService.getAllAvailableBots().isEmpty()){
             cost = cost +10;
         }
-
-        /*
-        if(start == 9 && stop == 16 || start == 16 && stop == 9){
-            return 1000;
-        }
-        if(start == 10 && stop == 16 || start == 16 && stop == 10){
-            return 1000;
-        }*/
         logger.info("Cost calculated between "+start +" and "+stop+": "+cost);
         return "{\"cost\":" +cost+"}";
     }
