@@ -70,7 +70,7 @@ public class SystemLoader implements ApplicationRunner
 
             //Start jobService
 
-            jobControlService.handleJobsInQueue();
+            jobControlService.run();
         }
     }
 }

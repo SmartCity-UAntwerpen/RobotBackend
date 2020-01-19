@@ -50,12 +50,6 @@ public class JobController
     private JobRepository jobs;
 
     /**
-     * Autowired Point Control Service
-     */
-    @Autowired
-    private PointControlService pointControlService;
-
-    /**
      * Maas IP
      */
     @Value("${backbone.ip:default}")

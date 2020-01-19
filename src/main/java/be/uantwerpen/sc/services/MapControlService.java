@@ -4,7 +4,6 @@ package be.uantwerpen.sc.services;
 import be.uantwerpen.rc.models.map.Link;
 import be.uantwerpen.rc.models.map.Map;
 import be.uantwerpen.rc.models.map.Point;
-import be.uantwerpen.sc.controllers.MapController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -54,9 +52,6 @@ public class MapControlService {
      */
     @Autowired
     private TrafficLightControlService trafficLightControlService;
-
-
-
 
 
     public Map getMap()
@@ -114,10 +109,8 @@ public class MapControlService {
             point.setNeighbours(targetLinks);
             this.map.addPoint(point);
         }
-
         this.map.setBotEntities(botControlService.getAllBots());
         this.map.setTrafficlightEntity(trafficLightControlService.getAllTrafficLights());
-
         return this.map;
     }
 

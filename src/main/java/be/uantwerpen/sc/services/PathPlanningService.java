@@ -68,10 +68,7 @@ public class PathPlanningService implements IPathplanning {
     }
 
     public List<Point> Calculatepath(Map map, long start, long stop) {
-
-
         // TODO: should be completely independent of Dijkstra
-        // TODO: transitions from map-classes to pathplanning-classes
         dijkstra.computePaths(start, map.getPointList()); // run Dijkstra
         List<Point> path = dijkstra.getShortestPathTo(stop,map.getPointList()).getPath();
         System.out.println("Path: " + path);

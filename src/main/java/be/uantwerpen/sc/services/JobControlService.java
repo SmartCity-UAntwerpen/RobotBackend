@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * Job Service
  */
 @Service
-public class JobControlService {
+public class JobControlService implements Runnable {
     /**
      * Autowired Job repository
      */
@@ -144,7 +144,7 @@ public class JobControlService {
             //logger.info("New job added to queue!");
             jobs.save(job);
             logger.info("New job queued!\tId: " + job.getJobId() + "\tStart: " + job.getIdStart() + "\tEnd: " + job.getIdEnd());
-            logger.info("customBlockingQueue size: " + this.jobQueue.size());
+            logger.info("jobQueue size: " + this.jobQueue.size());
             return true;
         } catch (IllegalStateException e) {
             logger.error("IllegalStateException Error adding job to job queue!");
@@ -156,7 +156,7 @@ public class JobControlService {
         }
     }
 
-    public void handleJobsInQueue()
+    public void run()
     {
         if(this.jobQueue == null) return;
 
@@ -242,7 +242,6 @@ public class JobControlService {
         }
     }
 
-
     /**
      * Send job over MQTT
      *
@@ -279,5 +278,4 @@ public class JobControlService {
         logger.info("job send: idStart: " + idStart + " idStop: " + idStop + " bot: " + bot.getIdCore());
         return mqttJobPublisher.publishJob(job, bot.getIdCore());
     }
-
 }

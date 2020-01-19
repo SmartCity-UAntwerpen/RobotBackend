@@ -1,8 +1,9 @@
 package be.uantwerpen.sc.controllers.mqtt;
 
 import be.uantwerpen.rc.models.Job;
-import be.uantwerpen.rc.tools.DriveDir;
+import be.uantwerpen.rc.tools.helpers.JobAdapter;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -56,18 +57,11 @@ public class MqttJobPublisher
     public boolean publishJob(Job job, long botID)
     {
         logger.info("Publishing Job");
-        StringBuilder content  = new StringBuilder("Job:{jobId:"+job.getJobId().toString()+"/ botId:"+job.getBot().getIdCore().toString()+"/ idStart:"+job.getIdStart().toString()+"/ idEnd:"+job.getIdEnd().toString());
-        logger.info("Basic Mqtt content created!");
-        if(job.getDriveDirections() != null && !job.getDriveDirections().isEmpty())
-        {
-            Gson gson = new Gson();
-            String jsonDir = gson.toJson(job.getDriveDirections());
-            content.append("/ driveDirections:").append(jsonDir).append("}"); //TODO: convert to proper sequence of strings
-            logger.info("Json First DriveDirection: " + jsonDir);
-        }
-        else
-            content.append("}");
-        logger.info(content.toString());
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Job.class, new JobAdapter());
+        Gson gson = gsonBuilder.create();
+        String jsonJob = gson.toJson(job);
+        logger.info(jsonJob);
         int qos         = 2;
         String topic    = "BOT/" + botID + "/Job";
         String broker   = "tcp://" + mqttIP + ":" + mqttPort;
@@ -83,7 +77,7 @@ public class MqttJobPublisher
             connectOptions.setUserName(mqttUsername);
             connectOptions.setPassword(mqttPassword.toCharArray());
             client.connect(connectOptions);
-            MqttMessage message = new MqttMessage(content.toString().getBytes());
+            MqttMessage message = new MqttMessage(jsonJob.getBytes());
             message.setQos(qos);
             client.publish(topic, message);
             client.disconnect();
