@@ -56,14 +56,6 @@ public class MapController
     /**
      * Autowirded Link Control Service
      */
-    @Autowired
-    private LinkControlService linkControlService;
-
-    /**
-     * Autowired Bot Control Service
-     */
-    @Autowired
-    private BotControlService botControlService;
 
     private Logger logger = LoggerFactory.getLogger(MapController.class);
 

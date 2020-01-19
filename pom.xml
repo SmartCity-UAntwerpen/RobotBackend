@@ -100,21 +100,17 @@
 			<artifactId>json</artifactId>
 		</dependency>
 
-
-
-
-
-
 		<dependency>
 			<groupId>be.uantwerpen.rc</groupId>
 			<artifactId>RobotCommon</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-
-
-
-
+		<dependency>
+			<groupId>biz.paluch.logging</groupId>
+			<artifactId>logstash-gelf</artifactId>
+			<version>1.11.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

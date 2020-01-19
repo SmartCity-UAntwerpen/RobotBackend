@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Dieter 2018-2019
+ * @author Riad 2019-2020
  * <p>
  * Map Control Service
  */
@@ -68,8 +69,11 @@ public class MapControlService {
             Class.forName(driver);  // checks if a class descriptor can be made of the given driver string.
                                     // If not --> this class doesn't exist, no driver can be used and a exception should be thrown
             Connection connection = DriverManager.getConnection(url, "${spring.datasource.username:default}", "${spring.datasource.password:default}");
-            PreparedStatement preparedStatement = connection.prepareStatement(mapSQL);
-            preparedStatement.execute();
+            String sqlQueries[] = mapSQL.split(";");
+            for (String sqlQuery : sqlQueries) {
+                PreparedStatement preparedStatement = connection.prepareStatement((sqlQuery + ";"));
+                preparedStatement.execute();
+            }
             connection.close();
             success = true;
         } catch (ClassNotFoundException e) {
