@@ -29,18 +29,12 @@ import java.util.concurrent.TimeUnit;
  * Job Service
  */
 @Service
-public class JobControlService implements Runnable {
+public class JobControlService {
     /**
      * Autowired Job repository
      */
     @Autowired
     private JobRepository jobs;
-
-    /**
-     * Autowired MQTT Publisher
-     */
-    @Autowired
-    private MqttJobPublisher mqttJobPublisher;
 
     /**
      * Autowired Botcontrol Service
@@ -54,21 +48,26 @@ public class JobControlService implements Runnable {
     @Autowired
     private MapControlService mapControlService;
 
+
+    /**
+     * Autowired MQTT Publisher
+     */
+    @Autowired
+    private MqttJobPublisher mqttJobPublisher;
+
     /**
      * Autowired Pathplannig service
      */
     @Autowired
     private PathPlanningService pathPlanningService;
 
+    private BlockingQueue<Job> jobQueue = null;
+
     /**
      * Autowired PointControlService service
      */
     @Autowired
     private PointControlService pointControlService;
-
-
-    //TODO: remove blocking queue ==> use database
-    private BlockingQueue<Job> jobQueue = null;
 
     private Logger logger = LoggerFactory.getLogger(JobControlService.class);
 
@@ -87,46 +86,8 @@ public class JobControlService implements Runnable {
     public void deleteAllJobs()
     {
         List<Job> jobs = this.jobs.findAll();
-        jobQueue = new ArrayBlockingQueue<Job>(100); //Reinitialize the jobQueue
+        jobQueue = new ArrayBlockingQueue<Job>(100); //Reinitialize the customBlockingQueue
         this.jobs.delete(jobs);
-    }
-
-
-    /**
-     * Send job over MQTT
-     *
-     * @param jobId   ID of job for bot
-     * @param bot     The bot that executes the job
-     * @param idStart ID start Point
-     * @param idStop  ID stop Point
-     * @return Success
-     */
-    private boolean sendJob(Long jobId, Bot bot, long idStart, long idStop) {
-        Job job = this.jobs.findOne(jobId);
-        job.setIdStart(idStart);
-        job.setIdEnd(idStop);
-        job.setBot(bot);
-        logger.info("job send: idStart: " + idStart + " idStop: " + idStop + " bot: " + bot.getIdCore());
-        return mqttJobPublisher.publishJob(job, bot.getIdCore());
-    }
-
-    /**
-     * Send job over MQTT
-     *
-     * @param jobId   ID of job for bot
-     * @param bot     The bot that executes the job
-     * @param idStart ID start Point
-     * @param idStop  ID stop Point
-     * @return Success
-     */
-    private boolean sendJob(Long jobId, Bot bot, long idStart, long idStop, List<DriveDir> directions) {
-        Job job = this.jobs.findOne(jobId);
-        job.setIdStart(idStart);
-        job.setIdEnd(idStop);
-        job.setBot(bot);
-        job.setDriveDirections(directions);
-        logger.info("job send: idStart: " + idStart + " idStop: " + idStop + " bot: " + bot.getIdCore());
-        return mqttJobPublisher.publishJob(job, bot.getIdCore());
     }
 
     /**
@@ -183,7 +144,7 @@ public class JobControlService implements Runnable {
             //logger.info("New job added to queue!");
             jobs.save(job);
             logger.info("New job queued!\tId: " + job.getJobId() + "\tStart: " + job.getIdStart() + "\tEnd: " + job.getIdEnd());
-            logger.info("jobQueue size: " + this.jobQueue.size());
+            logger.info("customBlockingQueue size: " + this.jobQueue.size());
             return true;
         } catch (IllegalStateException e) {
             logger.error("IllegalStateException Error adding job to job queue!");
@@ -195,93 +156,128 @@ public class JobControlService implements Runnable {
         }
     }
 
-    @Override //TODO:: this run method can be migrated to another class (not clean to make a Thread from a Service-class)
-    public void run() {
-        logger.info("Starting Job Service...");
-        //boolean emptyQueue = false;
-        if (jobQueue != null && !jobQueue.isEmpty()) {
-            while (true) {
-                //emptyQueue = true;
-                //Process that checks the queue and seeks a bot that can execute the job
-                try {
-                    if (!botControlService.getAllAvailableBots().isEmpty()) {
-                        logger.info("New job taken!");
-                        Job job = jobQueue.take();
-                        //Find closest bot
-                        List<Bot> bots = botControlService.getAllAvailableBots();
-                        TreeMap<Integer, Bot> sortedBots = new TreeMap<>();
-                        for (Bot b : bots) {
-                            logger.info("Bot found for job");
-                            int targetId = -1;
-                            //Depending on the type of job, calculate how far the bot is
-                            if (job.getIdStart() == -1L) {
-                                //Go to point job ==> which bot is closest to end
-                                targetId = job.getIdEnd().intValue();
-                            } else {
-                                //Normal job ==> which bot is closest to start point
-                                targetId = job.getIdStart().intValue();
-                            }
-                            sortedBots.put((int) pathPlanningService.CalculatePathWeight(b.getPoint().intValue(), targetId), b);
-                        }
+    public void handleJobsInQueue()
+    {
+        if(this.jobQueue == null) return;
 
-                        //Get closest bot == bot with least cost == first entry (key who has the lowest value) and assign job
-                        Bot bot = sortedBots.firstEntry().getValue();
-                        //If the start point is -1L than this is a goToPoint job ==> set start point to current location of the bot
+        logger.info("Starting Job Service...");
+
+        //TODO: clean up this while loop (can only be terminated by throwing an exception)
+        while (true) {
+            //Process that checks the queue and seeks a bot that can execute the job
+            try {
+                if (!botControlService.getAllAvailableBots().isEmpty()) {
+                    Job job = jobQueue.take();
+                    logger.info("New job taken!");
+                    //Find closest bot
+                    List<Bot> bots = botControlService.getAllAvailableBots();
+                    TreeMap<Integer, Bot> sortedBots = new TreeMap<>();
+                    for (Bot b : bots) {
+                        logger.info("Bot found for job");
+                        int targetId;
+                        //Depending on the type of job, calculate how far the bot is
                         if (job.getIdStart() == -1L) {
-                            job.setIdStart(bot.getPoint());
+                            //Go to point job ==> which bot is closest to end
+                            targetId = job.getIdEnd().intValue();
+                        } else {
+                            //Normal job ==> which bot is closest to start point
+                            targetId = job.getIdStart().intValue();
                         }
-                        bot.setBusy(true);
-                        bot.setIdStart(job.getIdStart());
-                        bot.setIdStop(job.getIdEnd());
-                        bot.setJobId(job.getJobId());
-                        job.setBot(bot);
-                        botControlService.saveBot(bot);
-                        //Send MQTT message to bot
-                        if (bot.getWorkingMode().equals("INDEPENDENT")) {
-                            jobs.save(job);
-                            this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
-                        } else if (bot.getWorkingMode().equals("FULLSERVER")) {
-                            Map map = this.mapControlService.getMap();
-                            if (map != null) {
-                                List<Point> path;
-                                NavigationParser navigationParser;
-                                Queue<DriveDir> driveCommands = new LinkedList<>();
-                                if(job.getIdStart().equals(bot.getPoint())) //(job.getIdStart() == -1L)
-                                {
-                                    path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
-                                    navigationParser = new NavigationParser(path, map, false);
-                                    navigationParser.parseMap();
-                                    driveCommands.addAll(navigationParser.getCommands());
-                                }
-                                else
-                                {
-                                    path = this.pathPlanningService.Calculatepath(map, bot.getPoint(), job.getIdStart());
-                                    navigationParser = new NavigationParser(path, map, true);
-                                    navigationParser.parseMap();
-                                    driveCommands.addAll(navigationParser.getCommands());
-                                    map = this.mapControlService.getMap();
-                                    path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
-                                    navigationParser = new NavigationParser(path, map, false);
-                                    navigationParser.parseMap();
-                                    driveCommands.addAll(navigationParser.getCommands());
-                                }
-                                jobs.save(job);
-                                this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd(), (List<DriveDir>) driveCommands);
-                            }
-                        }
-                    } else {
-                        //Sleep seconds
-                        TimeUnit.SECONDS.sleep(2);
+                        sortedBots.put((int) pathPlanningService.CalculatePathWeight(b.getPoint().intValue(), targetId), b);
                     }
-                } catch (Exception e) {
-                    logger.error("Error taking job from queue: " + e.getMessage());
-                    e.printStackTrace();
+
+                    //Get closest bot == bot with least cost == first entry (key who has the lowest value) and assign job
+                    Bot bot = sortedBots.firstEntry().getValue();
+                    //If the start point is -1L than this is a goToPoint job ==> set start point to current location of the bot
+                    if (job.getIdStart() == -1L) {
+                        job.setIdStart(bot.getPoint());
+                    }
+                    bot.setBusy(true);
+                    bot.setIdStart(job.getIdStart());
+                    bot.setIdStop(job.getIdEnd());
+                    bot.setJobId(job.getJobId());
+                    job.setBot(bot);
+                    botControlService.saveBot(bot);
+                    //Send MQTT message to bot
+                    if (bot.getWorkingMode().equals("INDEPENDENT")) {
+                        jobs.save(job);
+                        this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd());
+                    } else if (bot.getWorkingMode().equals("FULLSERVER")) {
+                        Map map = this.mapControlService.getMap();
+                        if (map != null) {
+                            List<Point> path;
+                            NavigationParser navigationParser;
+                            Queue<DriveDir> driveCommands = new LinkedList<>();
+                            if(job.getIdStart().equals(bot.getPoint())) //(job.getIdStart() == -1L)
+                            {
+                                path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
+                                navigationParser = new NavigationParser(path, map, false);
+                                navigationParser.parseMap();
+                                driveCommands.addAll(navigationParser.getCommands());
+                            }
+                            else
+                            {
+                                path = this.pathPlanningService.Calculatepath(map, bot.getPoint(), job.getIdStart());
+                                navigationParser = new NavigationParser(path, map, true);
+                                navigationParser.parseMap();
+                                driveCommands.addAll(navigationParser.getCommands());
+                                map = this.mapControlService.getMap();
+                                path = this.pathPlanningService.Calculatepath(map, job.getIdStart(), job.getIdEnd());
+                                navigationParser = new NavigationParser(path, map, false);
+                                navigationParser.parseMap();
+                                driveCommands.addAll(navigationParser.getCommands());
+                            }
+                            jobs.save(job);
+                            this.sendJob(job.getJobId(), bot, job.getIdStart(), job.getIdEnd(), (List<DriveDir>) driveCommands);
+                        }
+                    }
+                } else {
+                    //Sleep seconds
+                    TimeUnit.SECONDS.sleep(2);
                 }
+            } catch (Exception e) {
+                logger.error("Error taking job from queue: " + e.getMessage());
+                e.printStackTrace();
             }
         }
-        else
-        {
-            logger.info("JobQueue is null or is empty!");
-        }
     }
+
+
+    /**
+     * Send job over MQTT
+     *
+     * @param jobId   ID of job for bot
+     * @param bot     The bot that executes the job
+     * @param idStart ID start Point
+     * @param idStop  ID stop Point
+     * @return Success
+     */
+    private boolean sendJob(Long jobId, Bot bot, long idStart, long idStop) {
+        Job job = this.jobs.findOne(jobId);
+        job.setIdStart(idStart);
+        job.setIdEnd(idStop);
+        job.setBot(bot);
+        logger.info("job send: idStart: " + idStart + " idStop: " + idStop + " bot: " + bot.getIdCore());
+        return mqttJobPublisher.publishJob(job, bot.getIdCore());
+    }
+
+    /**
+     * Send job over MQTT
+     *
+     * @param jobId   ID of job for bot
+     * @param bot     The bot that executes the job
+     * @param idStart ID start Point
+     * @param idStop  ID stop Point
+     * @return Success
+     */
+    private boolean sendJob(Long jobId, Bot bot, long idStart, long idStop, List<DriveDir> directions) {
+        Job job = this.jobs.findOne(jobId);
+        job.setIdStart(idStart);
+        job.setIdEnd(idStop);
+        job.setBot(bot);
+        job.setDriveDirections(directions);
+        logger.info("job send: idStart: " + idStart + " idStop: " + idStop + " bot: " + bot.getIdCore());
+        return mqttJobPublisher.publishJob(job, bot.getIdCore());
+    }
+
 }
