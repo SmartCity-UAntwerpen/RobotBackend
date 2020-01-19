@@ -4,28 +4,23 @@ package be.uantwerpen.sc.controllers;
 import be.uantwerpen.rc.models.Bot;
 import be.uantwerpen.rc.models.BotState;
 import be.uantwerpen.rc.models.Job;
-import be.uantwerpen.rc.models.Location;
 import be.uantwerpen.rc.models.map.Point;
 import be.uantwerpen.sc.services.BotControlService;
 import be.uantwerpen.sc.services.JobControlService;
 import be.uantwerpen.sc.services.LinkControlService;
 import be.uantwerpen.sc.services.PointControlService;
 import be.uantwerpen.sc.services.TileControlService;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
 
-import org.json.JSONObject;
-
 /**
  * @author Dieter 2018-2019
+ * @author Riad 2019-2020
  * Bot Controller
  */
 @RestController
@@ -178,44 +173,6 @@ public class BotController {
         }
 
     }
-
-    /**
-     * Get all bot positions
-     *
-     * @return jsonString all robot positions
-     */
-    @RequestMapping(value = "posAll", method = RequestMethod.GET)
-    public String posAll() {
-        List<Bot> bots = botControlService.getAllBots();
-        JSONArray array = new JSONArray();
-        for (Bot b : bots) {
-            Location loc = new Location();
-            loc.setVehicleID(b.getIdCore());
-
-            if (b.getBusy()) {
-                loc.setStartID(b.getIdStart());
-                loc.setStopID(b.getIdStop());
-                loc.setPercentage((long) b.getPercentageCompleted());
-            } else {
-                loc.setStartID(b.getLinkId());
-                loc.setStopID(b.getLinkId());
-                loc.setPercentage((long) 100);
-            }
-
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("idVehicle", loc.getVehicleID());
-                obj.put("idStart", loc.getStartID());
-                obj.put("idEnd", loc.getStopID());
-                obj.put("percentage", loc.getPercentage());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            array.put(obj);
-        }
-        return array.toString();
-    }
-
 
     /**
      * Check if the bots are alive
