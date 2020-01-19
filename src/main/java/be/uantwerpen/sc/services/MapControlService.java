@@ -7,6 +7,7 @@ import be.uantwerpen.rc.models.map.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -25,6 +26,18 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MapControlService {
+
+    @Value("${spring.database.driverClassName}")
+    private String driver;
+
+    @Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
     private Map map = null;
 
@@ -63,12 +76,10 @@ public class MapControlService {
     public boolean loadMap(String mapSQL)
     {
         boolean success;
-        String driver = "${spring.database.driverClassName:default}";
-        String url = "${spring.datasource.url:default}";
         try {
             Class.forName(driver);  // checks if a class descriptor can be made of the given driver string.
                                     // If not --> this class doesn't exist, no driver can be used and a exception should be thrown
-            Connection connection = DriverManager.getConnection(url, "${spring.datasource.username:default}", "${spring.datasource.password:default}");
+            Connection connection = DriverManager.getConnection(url, username, password);
             String sqlQueries[] = mapSQL.split(";");
             for (String sqlQuery : sqlQueries) {
                 PreparedStatement preparedStatement = connection.prepareStatement((sqlQuery + ";"));
